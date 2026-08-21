@@ -10,6 +10,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-21
 updatedAt: 2026-08-21
+enhancedAt: 2026-08-21
 implementedAt:
 closedAt:
 supersedes: []
@@ -78,6 +79,7 @@ A shared Astro middleware (`access-protection-middleware.ts`) is included in eve
 - If no PIN is configured (secret is unset) → no protection (allows new sites to work before protection is set up)
 
 The middleware also sets HTTP response headers for dev/alt:
+
 - `X-Robots-Tag: noindex, nofollow` — prevents search engine indexing
 - `X-Robots-Tag: noai, noimageai` — prevents AI training data collection
 
@@ -85,13 +87,18 @@ The middleware also sets HTTP response headers for dev/alt:
 
 Three new `leitstand` commands manage PIN protection per Sternsystem:
 
-- `leitstand.access.protect --id <system-id> [--pin <4-digit-pin>]` — sets a PIN as a Cloudflare Worker secret for the site's dev and alt deployments. If `--pin` is omitted, a random PIN is generated and displayed.
-- `leitstand.access.unprotect --id <system-id>` — removes the PIN secret from the site's dev and alt deployments.
-- `leitstand.access.status --id <system-id>` — reports whether protection is active for dev and alt, and shows the PIN (since it's a simple 4-digit code, not a high-security password).
+- `leitstand.access.protect --site <system-id> [--pin <4-digit-pin>]` — sets a PIN as a Cloudflare Worker secret for the site's dev and alt deployments. If `--pin` is omitted, a random PIN is generated and displayed. The PIN is also recorded in `system-state.yaml` (as a non-secret field `accessPin`) so that `status` can report it.
+- `leitstand.access.unprotect --site <system-id>` — removes the PIN secret from the site's dev and alt Workers and clears `accessPin` from `system-state.yaml`.
+- `leitstand.access.status --site <system-id>` — reports whether protection is active for dev and alt, and shows the PIN from `system-state.yaml` (since it's a simple 4-digit code, not a high-security password). Cloudflare Worker secrets cannot be retrieved via the `wrangler secret` API, so the PIN is stored in `system-state.yaml` for status reporting.
 
 ### 3. PIN storage
 
-The PIN is stored as a Cloudflare Worker secret (`ACCESS_PIN`) via `wrangler secret put`. The middleware reads it from the Worker runtime environment (`env.ACCESS_PIN`). Secrets are per-Worker, so each site has its own PIN.
+The PIN is stored in two places:
+
+1. **Cloudflare Worker secret (`ACCESS_PIN`)** via `wrangler secret put` — the runtime secret checked by the middleware. Secrets are per-Worker, so each site/channel has its own PIN.
+2. **`system-state.yaml` field `accessPin`** — a non-secret record of the PIN, used by `leitstand.access.status` to report the PIN value. Cloudflare Worker secrets cannot be retrieved via the `wrangler secret` API (`wrangler secret list` only shows names, not values), so the PIN must be stored in `system-state.yaml` for status reporting. The PIN is a 4-digit staging code, not a high-security password — storing it in `system-state.yaml` is acceptable.
+
+The middleware reads the runtime secret from `env.ACCESS_PIN` (Cloudflare Workers runtime environment).
 
 ## Architectural fit
 
@@ -105,18 +112,18 @@ The PIN is stored as a Cloudflare Worker secret (`ACCESS_PIN`) via `wrangler sec
 
 ```sh
 # Protect a site's dev/alt with a PIN
-pnpm exec werkstatt run leitstand.access.protect --id warpgogol-com
+pnpm exec werkstatt run leitstand.access.protect --site warpgogol-com
 # → Sets ACCESS_PIN secret on dev and alt Workers
 # → Output: "Access protection enabled for warpgogol-com (dev/alt). PIN: 4827"
 
 # Protect with a specific PIN
-pnpm exec werkstatt run leitstand.access.protect --id warpgogol-com --pin 1234
+pnpm exec werkstatt run leitstand.access.protect --site warpgogol-com --pin 1234
 
 # Remove protection
-pnpm exec werkstatt run leitstand.access.unprotect --id warpgogol-com
+pnpm exec werkstatt run leitstand.access.unprotect --site warpgogol-com
 
 # Check status
-pnpm exec werkstatt run leitstand.access.status --id warpgogol-com
+pnpm exec werkstatt run leitstand.access.status --site warpgogol-com
 # → "warpgogol-com: dev=protected(PIN: 4827), alt=protected(PIN: 4827), main=public"
 ```
 
@@ -134,8 +141,14 @@ interface AccessProtectResult {
   channels: Array<{ channel: "dev" | "alt"; status: "protected" | "failed"; error?: string }>;
 }
 
+interface AccessUnprotectResult {
+  systemId: string;
+  channels: Array<{ channel: "dev" | "alt"; status: "unprotected" | "failed"; error?: string }>;
+}
+
 interface AccessStatusResult {
   systemId: string;
+  accessPin: string | null;
   channels: Array<{
     channel: "dev" | "alt" | "main";
     protected: boolean;
@@ -148,6 +161,8 @@ interface AccessStatusResult {
 
 ```ts
 // Pseudocode for access-protection middleware
+// Auth check happens BEFORE next() to short-circuit unauthorized access.
+// X-Robots-Tag is set on ALL dev/alt responses including 401 challenges.
 export function accessProtectionMiddleware(context, next) {
   const host = context.request.headers.get("host") ?? "";
   const isDevOrAlt = host.startsWith("dev.") || host.startsWith("alt.");
@@ -156,38 +171,66 @@ export function accessProtectionMiddleware(context, next) {
     return next(); // Main domain — no protection
   }
 
-  // Set noindex headers on all dev/alt responses
-  const response = await next();
-  response.headers.set("X-Robots-Tag", "noindex, nofollow, noai, noimageai");
+  const NOINDEX_HEADERS = {
+    "X-Robots-Tag": "noindex, nofollow, noai, noimageai",
+  };
 
   // Check if PIN is configured
   const pin = context.locals.runtime?.env?.ACCESS_PIN;
   if (!pin) {
-    return response; // No PIN set — allow access (new sites, pre-protection)
+    // No PIN set — allow access but still set noindex headers
+    const response = await next();
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noai, noimageai");
+    return response;
   }
 
-  // Check Basic Auth
+  // Check Basic Auth BEFORE calling next()
   const auth = context.request.headers.get("authorization");
-  if (auth === `Basic ${btoa(`access:${pin}`)}`) {
-    return response; // Authenticated — show the page
+  const expected = `Basic ${btoa(`access:${pin}`)}`;
+
+  // Constant-time comparison to prevent timing attacks
+  if (auth && constantTimeEqual(auth, expected)) {
+    const response = await next(); // Authenticated — render the page
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noai, noimageai");
+    return response;
   }
 
-  // Not authenticated — challenge
+  // Not authenticated — challenge with noindex headers
   return new Response("Authentication required", {
     status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="Staging Access"' },
+    headers: {
+      "WWW-Authenticate": 'Basic realm="Staging Access"',
+      ...NOINDEX_HEADERS,
+    },
   });
 }
+
+// Constant-time string comparison
+function constantTimeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return diff === 0;
+}
 ```
+
+**Note:** `btoa()` is available in the Cloudflare Workers runtime. The Astro Cloudflare adapter does not polyfill it — it is a native Workers API. The middleware must not use Node.js-specific APIs (`Buffer`, `crypto.timingSafeEqual`) since it runs in the Workers runtime, not Node.
 
 ### File system responsibilities
 
 | Path | Role |
-|---|---|
-| `packages/werkstatt-site/src/domain/share/middleware/access-protection.ts` | Shared middleware implementation |
-| `packages/werkstatt-site/src/codegen/templates/app-boilerplate/src/middleware/` | Codegen template includes middleware in site build |
+| --- | --- |
+| `packages/werkstatt-site/src/domain/share/middleware/access-protection.ts` | Shared middleware implementation (exported via `@warpgogol/werkstatt-site/share/middleware`) |
+| `packages/werkstatt-site/src/codegen/templates/app-boilerplate/src/middleware/access-protection.ts.template` | Codegen template for middleware in site build |
+| `packages/werkstatt-site/src/codegen/templates/app-boilerplate/src/middleware.template.ts` | Root middleware chain template (updated to chain access protection first) |
 | `packages/werkstatt/src/leitstand/access-commands.ts` | Workshop-level command implementations |
-| `systems-cache/{id}/system-config.yaml` | Read for dev/alt subdomain configuration |
+| `packages/werkstatt/src/leitstand/leitstand.module.ts` | Command registration (3 new commands) |
+| `systems-cache/{id}/system-config.yaml` | Read for `deployment.channels.{dev,alt}.url` and `deployment.channels.{dev,alt}.workerName` |
+| `systems-cache/{id}/system-state.yaml` | Read/written for `accessPin` field |
+| `docs/technology.xml` | Updated with 3 new commands |
+| `docs/verification-plan.xml` | Updated with verification coverage for access protection |
 
 ### PIN format
 
@@ -198,17 +241,20 @@ export function accessProtectionMiddleware(context, next) {
 
 ### Subdomain detection
 
-The middleware checks the `Host` header against the site's configured subdomains from `system-config.yaml`:
-- `mirrors[0].devSubdomain` (e.g. `dev.warpgogol.com`)
-- `mirrors[0].altSubdomain` (e.g. `alt.warpgogol.com`)
+The middleware checks the `Host` header against the site's configured dev/alt URLs from `system-config.yaml`:
 
-If the Host matches either, protection is active. If `system-config.yaml` does not declare subdomains, the middleware falls back to pattern matching: `host.startsWith("dev.")` or `host.startsWith("alt.")`.
+- `deployment.channels.dev.url` (e.g. `https://dev.warpgogol.com`)
+- `deployment.channels.alt.url` (e.g. `https://alt.warpgogol.com`)
+
+The URL hostname is extracted and compared against the request `Host` header. If the Host matches either dev or alt hostname, protection is active. If `system-config.yaml` does not declare a deployment config, the middleware falls back to pattern matching: `host.startsWith("dev.")` or `host.startsWith("alt.")`.
+
+At runtime, the middleware receives the `Host` header from the incoming request. The `deployment.channels.{dev,alt}.url` values are not available at runtime in the Worker (they are workshop-side config). The middleware therefore uses the pattern-based fallback (`host.startsWith("dev.")` / `host.startsWith("alt.")`) as the primary detection mechanism. The `system-config.yaml` URLs are used by the CLI commands (`leitstand.access.protect/unprotect/status`) to resolve Worker names for `wrangler secret put/delete`.
 
 ### Integration with deployment pipeline
 
-The middleware is included in the Astro server entry point via codegen templates. It runs before all other middleware (language redirect, markdown negotiation). No changes to deployment commands are needed — the middleware is already in the built Worker.
+The middleware is included in the Astro server entry point via codegen templates. It runs **first** in the middleware chain, before `retired-tombstones`, `language-redirect`, and `markdown-negotiation`. The auth gate must short-circuit before any response logic runs. The updated chain order is: `access-protection` → `retired-tombstones` → `language-redirect` → `markdown-negotiation`. No changes to deployment commands are needed — the middleware is already in the built Worker.
 
-`leitstand.access.protect` runs `wrangler secret put ACCESS_PIN` against the dev and alt Workers for the specified site. This is a runtime configuration change, not a redeployment.
+`leitstand.access.protect` runs `wrangler secret put ACCESS_PIN` separately for the dev and alt Workers. Each channel has its own worker name (`deployment.channels.dev.workerName` and `deployment.channels.alt.workerName` from `system-config.yaml`). The command creates a temporary `wrangler.json` with the correct worker name for each channel, runs `wrangler secret put ACCESS_PIN`, then cleans up the temp file. This is a runtime configuration change, not a redeployment.
 
 ## Rollout
 
@@ -226,27 +272,98 @@ The middleware is included in the Astro server entry point via codegen templates
 - **IP-based allowlisting:** Rejected — operators work from varying locations (home, office, mobile). PIN-based auth is location-independent and simpler to manage.
 - **Session-based auth with login page:** Rejected — overkill for staging. Basic Auth with a PIN is stateless, requires no session storage, and works with all browsers and curl.
 
+## Output format
+
+All three commands return `KernelCommandResult<T>` (standard kernel command output). The `--json` flag produces machine-readable JSON.
+
+### leitstand.access.protect
+
+```json
+{
+  "command": "leitstand.access.protect",
+  "systemId": "warpgogol-com",
+  "pin": "4827",
+  "channels": [
+    { "channel": "dev", "status": "protected" },
+    { "channel": "alt", "status": "protected" }
+  ]
+}
+```
+
+### leitstand.access.unprotect
+
+```json
+{
+  "command": "leitstand.access.unprotect",
+  "systemId": "warpgogol-com",
+  "channels": [
+    { "channel": "dev", "status": "unprotected" },
+    { "channel": "alt", "status": "unprotected" }
+  ]
+}
+```
+
+### leitstand.access.status
+
+```json
+{
+  "command": "leitstand.access.status",
+  "systemId": "warpgogol-com",
+  "accessPin": "4827",
+  "channels": [
+    { "channel": "dev", "protected": true, "pin": "4827" },
+    { "channel": "alt", "protected": true, "pin": "4827" },
+    { "channel": "main", "protected": false }
+  ]
+}
+```
+
+## Failure modes
+
+| Scenario | Exit code | Behavior |
+| --- | --- | --- |
+| Site not found in `systems-cache/` | 1 | Error: "System '<id>' not found" |
+| `--pin` format invalid (not 4 digits) | 1 | Error: "PIN must be a 4-digit numeric string" |
+| `wrangler secret put` fails for dev Worker | 1 | Best-effort: alt channel is still attempted. Result reports per-channel status. |
+| `wrangler secret put` fails for alt Worker | 1 | Best-effort: dev result is reported. Result reports per-channel status. |
+| `wrangler secret delete` fails (secret not set) | 0 | Warn: "Secret ACCESS_PIN not set on <channel> Worker" — treated as success (idempotent) |
+| `system-state.yaml` write fails | 0 | Warn: "Failed to record accessPin in system-state.yaml" — secret is still set on Workers |
+| Operator not authenticated to Cloudflare | 1 | Error: "wrangler secret put failed: not authenticated. Run 'wrangler login' first." |
+| `system-config.yaml` has no deployment config | 1 | Error: "System '<id>' has no deployment config" |
+
 ## Risks
 
 - **PIN guessing:** A 4-digit PIN has 10,000 combinations. At 1 request/second, brute force takes ~2.8 hours. This is acceptable for staging protection — not a high-security boundary. Cloudflare rate limiting can be added later if needed.
 - **PIN leakage in URLs:** Basic Auth sends credentials in the URL (`https://access:4827@dev.warpgogol.com`). This is a known Basic Auth limitation. For staging environments, this is acceptable. Operators should not share PIN-embedded URLs publicly.
 - **Middleware performance:** The Host header check is O(1) — a string comparison. No measurable performance impact.
 - **Secret management:** `wrangler secret put` requires Cloudflare API credentials. The command fails if the operator is not authenticated to Cloudflare. The error message includes a hint to run `wrangler login`.
+- **PIN in system-state.yaml:** The PIN is stored in `system-state.yaml` as a non-secret field (`accessPin`). This is acceptable because the PIN is a 4-digit staging code (10,000 combinations), not a high-security password. `system-state.yaml` is in `systems-cache/` which is a git-tracked cache clone — the PIN is visible to anyone with repo access. If a site requires a truly secret PIN, a future RFC can move to encrypted storage.
 
 ## Acceptance criteria
 
 - [ ] `access-protection.ts` middleware implemented in `packages/werkstatt-site/src/domain/share/middleware/`
+- [ ] Middleware exported via `@warpgogol/werkstatt-site/share/middleware` subpath export
 - [ ] Middleware included in codegen templates for new sites
-- [ ] Middleware runs before language redirect and markdown negotiation
-- [ ] `leitstand.access.protect` command registered and implemented
-- [ ] `leitstand.access.unprotect` command registered and implemented
-- [ ] `leitstand.access.status` command registered and implemented
-- [ ] Middleware sets `X-Robots-Tag: noindex, nofollow, noai, noimageai` on dev/alt
+- [ ] Middleware runs first in chain (before retired-tombstones, language redirect, markdown negotiation)
+- [ ] `leitstand.access.protect` command registered and implemented with `--site` flag
+- [ ] `leitstand.access.unprotect` command registered and implemented with `--site` flag
+- [ ] `leitstand.access.status` command registered and implemented with `--site` flag
+- [ ] Middleware sets `X-Robots-Tag: noindex, nofollow, noai, noimageai` on all dev/alt responses (including 401)
 - [ ] Middleware returns 401 with `WWW-Authenticate` challenge when PIN is set and no/incorrect auth provided
-- [ ] Middleware passes through when no PIN is configured (env var unset)
+- [ ] Middleware auth check happens BEFORE `next()` (no page rendering for unauthenticated requests)
+- [ ] Middleware uses constant-time string comparison for auth check
+- [ ] Middleware passes through when no PIN is configured (env var unset) but still sets `X-Robots-Tag`
 - [ ] Middleware passes through for main domain regardless of PIN
-- [ ] Unit tests for middleware (dev host, alt host, main host, no PIN, correct PIN, incorrect PIN)
-- [ ] Unit tests for `leitstand.access.protect` (auto-generate PIN, custom PIN, missing site)
+- [ ] `leitstand.access.protect` targets correct Worker per channel using `deployment.channels.{dev,alt}.workerName`
+- [ ] `leitstand.access.protect` stores PIN in `system-state.yaml` `accessPin` field
+- [ ] `leitstand.access.status` reads PIN from `system-state.yaml` (not from Worker secret API)
+- [ ] `leitstand.access.unprotect` clears `accessPin` from `system-state.yaml`
+- [ ] Unit tests for middleware (dev host, alt host, main host, no PIN, correct PIN, incorrect PIN, 401 has X-Robots-Tag)
+- [ ] Unit tests for `leitstand.access.protect` (auto-generate PIN, custom PIN, missing site, invalid PIN format)
+- [ ] Unit tests for `leitstand.access.unprotect` (success, secret not set, missing site)
+- [ ] Unit tests for `leitstand.access.status` (protected, unprotected, missing site)
+- [ ] `docs/technology.xml` updated with 3 new commands
+- [ ] `docs/verification-plan.xml` updated with verification coverage
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
@@ -258,3 +375,9 @@ The middleware is included in the Astro server entry point via codegen templates
 - The middleware MUST NOT activate for the main/production domain, even if the PIN secret is set on the main Worker.
 - The PIN is a 4-digit string (`/^\d{4}$/`). The command MUST validate this format before setting the secret.
 - `leitstand.access.protect` MUST use `wrangler secret put ACCESS_PIN` (not environment variables in `wrangler.toml` — secrets are not stored in config files).
+- `leitstand.access.protect` MUST run `wrangler secret put` separately for each channel Worker (dev and alt), using the correct `workerName` from `deployment.channels.{dev,alt}.workerName`.
+- `leitstand.access.status` MUST read the PIN from `system-state.yaml` (`accessPin` field), NOT from the Cloudflare Worker secret API (which cannot retrieve secret values).
+- The middleware MUST use constant-time string comparison for the auth check (not `===`).
+- The middleware auth check MUST happen BEFORE `next()` is called — unauthenticated requests must not trigger page rendering.
+- The 401 challenge response MUST include `X-Robots-Tag: noindex, nofollow, noai, noimageai` headers.
+- The middleware MUST NOT use Node.js-specific APIs (`Buffer`, `crypto.timingSafeEqual`) — it runs in the Cloudflare Workers runtime. Use `btoa()` (available in Workers) and a manual constant-time compare function.
