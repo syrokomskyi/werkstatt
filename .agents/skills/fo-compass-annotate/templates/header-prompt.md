@@ -26,9 +26,9 @@ Generate a `MODULE_CONTRACT` block with:
 
 ```
 <MODULE_CONTRACT>
-<purpose>Validates CHANGE_SUMMARY blocks for boilerplate items and over-cap items per RFC-0349.</purpose>
+<purpose>Validates CHANGE_SUMMARY blocks for boilerplate items and over-cap items per RFC-XXXX.</purpose>
 <non-goals>
-  <item>Do not audit truthfulness of CHANGE_SUMMARY items against code — that is RFC-0352.</item>
+  <item>Do not audit truthfulness of CHANGE_SUMMARY items against code — that is RFC-XXXX.</item>
   <item>Do not delete protected (RFC/code-referencing) items under any circumstance.</item>
 </non-goals>
 </MODULE_CONTRACT>

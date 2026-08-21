@@ -1,6 +1,6 @@
 # Property-Based Testing Guide
 
-Reference for writing property-based tests (PBT) using `fast-check` + `vitest` per RFC-0347 (DNA-41).
+Reference for writing property-based tests (PBT) using `fast-check` + `vitest`. Check the project's invariants file for the canonical PBT rule.
 
 ## Decision tree
 
@@ -178,16 +178,16 @@ test("compareSemver is antisymmetric: compare(a, b) == -compare(b, a)", () => {
 
 | Function | Package | Property | Pattern |
 | --- | --- | --- | --- |
-| `normalizeText` | `@gogol/share` | `normalize(normalize(x)) == normalize(x)` | Idempotency |
-| `normalizeHtml` | `@gogol/share` | `normalize(normalize(x)) == normalize(x)` | Idempotency |
-| `normalizeMarkdown` | `@gogol/share` | `normalize(normalize(x)) == normalize(x)` | Idempotency |
-| `normalizeJson` | `@gogol/share` | `normalize(normalize(x)) == normalize(x)` | Idempotency |
-| `compareSemver` | `@gogol/site-kernel-handoff` | `a < b and b < c implies a < c` | Transitivity |
-| `compareSemver` | `@gogol/site-kernel-handoff` | `compare(a, b) == -compare(b, a)` | Antisymmetry |
-| `parseSemver` / `formatSemver` | `@gogol/site-kernel-handoff` | `parse(format(parsed)) == parsed` | Round-trip |
-| `substituteRefsDeep` | `@gogol/share` | Input is not mutated after call | Immutability |
-| `markdownTwinRelPath` | `@gogol/share` | `twinUrlPath(twinRelPath(x))` is consistent for valid paths | Round-trip |
-| `deepMergeEntryData` | `@gogol/share` | Merge is associative for nested objects (not arrays) | Associativity |
-| `citySlug` | `@gogol/geo` | Output only contains lowercase alphanumeric and hyphens | Invariance |
-| `redactUrl` | `@gogol/observability` | Output never contains a query string | Invariance |
-| `validateAgainstCapabilitySchema` | `@gogol/agent-gate` | Non-object input always fails validation | Invariance |
+| `normalizeText` | `@warpgogol/werkstatt-shared` | `normalize(normalize(x)) == normalize(x)` | Idempotency |
+| `normalizeHtml` | `@warpgogol/werkstatt-shared` | `normalize(normalize(x)) == normalize(x)` | Idempotency |
+| `normalizeMarkdown` | `@warpgogol/werkstatt-shared` | `normalize(normalize(x)) == normalize(x)` | Idempotency |
+| `normalizeJson` | `@warpgogol/werkstatt-shared` | `normalize(normalize(x)) == normalize(x)` | Idempotency |
+| `compareSemver` | `@warpgogol/werkstatt` | `a < b and b < c implies a < c` | Transitivity |
+| `compareSemver` | `@warpgogol/werkstatt` | `compare(a, b) == -compare(b, a)` | Antisymmetry |
+| `parseSemver` / `formatSemver` | `@warpgogol/werkstatt` | `parse(format(parsed)) == parsed` | Round-trip |
+| `substituteRefsDeep` | `@warpgogol/werkstatt-shared` | Input is not mutated after call | Immutability |
+| `markdownTwinRelPath` | `@warpgogol/werkstatt-shared` | `twinUrlPath(twinRelPath(x))` is consistent for valid paths | Round-trip |
+| `deepMergeEntryData` | `@warpgogol/werkstatt-shared` | Merge is associative for nested objects (not arrays) | Associativity |
+| `citySlug` | `@warpgogol/werkstatt-site` | Output only contains lowercase alphanumeric and hyphens | Invariance |
+| `redactUrl` | `@warpgogol/werkstatt-shared` | Output never contains a query string | Invariance |
+| `validateAgainstCapabilitySchema` | `@warpgogol/werkstatt` | Non-object input always fails validation | Invariance |
