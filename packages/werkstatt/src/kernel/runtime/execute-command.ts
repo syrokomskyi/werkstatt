@@ -118,7 +118,7 @@ export async function executeRegisteredCommand(
           info: 0,
         },
       };
-      const summary = `${command.name}: ${errorDiagnostics.length} flag error(s)`;
+      const summary = `[${command.name}] ${errorDiagnostics.length} flag error(s)`;
       logger.error(summary);
       for (const line of formatFailureDiagnostics(data)) {
         logger.error(line);
@@ -131,6 +131,9 @@ export async function executeRegisteredCommand(
         exitCode: 1,
         ok: false,
         summary,
+        nextSteps: [
+          { action: `Fix the flag errors for ${command.name} and re-run`, kind: "required" },
+        ],
         metadata: command,
         logs,
         logSummary: summarizeLogs(logs),
@@ -153,7 +156,7 @@ export async function executeRegisteredCommand(
           info: 0,
         },
       };
-      const summary = `${command.name}: ${errorDiagnostics.length} argument error(s)`;
+      const summary = `[${command.name}] ${errorDiagnostics.length} argument error(s)`;
       logger.error(summary);
       for (const line of formatFailureDiagnostics(data)) {
         logger.error(line);
@@ -166,6 +169,9 @@ export async function executeRegisteredCommand(
         exitCode: 1,
         ok: false,
         summary,
+        nextSteps: [
+          { action: `Fix the argument errors for ${command.name} and re-run`, kind: "required" },
+        ],
         metadata: command,
         logs,
         logSummary: summarizeLogs(logs),
