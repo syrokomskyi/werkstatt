@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-08-21
-updatedAt: 2026-08-21
+updatedAt: 2026-08-22
+enhancedAt: 2026-08-22
 implementedAt:
 closedAt:
 supersedes: []
@@ -140,6 +141,10 @@ function canonicalRootUrl(baseUrl: URL | string, trailingSlash: "always" | "neve
 // Applied in buildOrganizationProfile, buildWebSiteNode, and the breadcrumb builder.
 ```
 
+**Package boundary justification.** `canonicalPageUrl` and `localizeUrl` live in `@warpgogol/werkstatt-site` (`src/domain/share/astro/`), and `werkstatt-shared` MUST NOT import from `werkstatt-site` (RFC-0868, enforced by `werkstatt.shared.validate`). `canonicalRootUrl` is a minimal helper in `werkstatt-shared` that produces the unprefixed root URL (`https://site/`) with the trailing-slash policy. It does not need `localizeUrl` because the entity root URL is always the unprefixed root `/` regardless of language — the language prefix only applies to page URLs, not to site-wide entity identity URLs. The validator in `werkstatt-site` can use `canonicalPageUrl({ lang: defaultLang, route: "", kind: "html" }, ...)` to compute the expected root URL, which produces the same output as `canonicalRootUrl`. No synchronization mechanism is needed — both produce `https://site/` for the root because the canonical root is language-independent.
+
+**Breadcrumb home URL.** The breadcrumb home item is constructed in `resolve-route.ts:995` as `localizeUrl(lang, "", { defaultLanguage: defaultLang })`, which already returns `/` for the default language per RFC-0160. The breadcrumb item URLs in `jsonld/breadcrumb.ts` are absolutized against `page.url` (not `page.organization.url`), so they inherit the correct root from the trail. The breadcrumb fix target is the `homeUrl` parameter passed to `buildBreadcrumbTrail` — if a caller still constructs `homeUrl` with a raw language prefix, that caller must be fixed. The `jsonld/breadcrumb.ts` file itself does not construct URLs — it only absolutizes relative trail URLs.
+
 Validator-side:
 
 ```ts
@@ -156,10 +161,16 @@ interface EntityUrlFinding {
 
 | Path | Role |
 | --- | --- |
-| `packages/werkstatt-shared/src/share/semantic/organization-profile.ts` | Fixed: identity URL via canonical policy |
-| `packages/werkstatt-shared/src/share/semantic/jsonld/website.ts` | Fixed: `WebSite.url` canonical |
-| `packages/werkstatt-shared/src/share/semantic/jsonld/breadcrumb.ts` | Fixed: item URLs canonical |
+| `packages/werkstatt-shared/src/share/semantic/organization-profile.ts` | Fixed: identity URL via canonical root, not `/${lang}/` |
+| `packages/werkstatt-shared/src/share/semantic/jsonld/website.ts` | Fixed: `WebSite.url` inherits from `page.organization.url` (fixed via organization-profile) |
+| `packages/werkstatt-shared/src/share/semantic/jsonld/breadcrumb.ts` | No change needed — absolutizes against `page.url`, does not construct URLs |
+| `packages/werkstatt-site/src/domain/share/astro/page-handler/resolve-route.ts` | Verify `homeUrl` uses `localizeUrl` (already correct per RFC-0160); fix if any caller bypasses |
 | `packages/werkstatt-site/src/checks/audit/validators/` | Home of the new validator |
+| `packages/werkstatt-site/src/checks/command-tables/05-seo-audit.ts` | Modified: register `jsonld.canonical-entity.validate` command |
+| `packages/werkstatt-site/src/checks/pipelines/sites-check-postbuild.ts` | Modified: add `jsonld.canonical-entity.validate` after `jsonld.url.validate` |
+| `packages/werkstatt-site/AGENTS.md` | Modified: document `jsonld.canonical-entity.validate` command |
+| `packages/werkstatt-shared/AGENTS.md` | Modified: document canonical entity URL policy in semantic builders section |
+| `docs/verification-plan.xml` | Modified: add JSONLD-ENTITY-01..03 rule IDs |
 | `dist/client/**/*.html` (workpiece) | Read-only scan target |
 | Site content files | Never touched — the fix is in shared builders, not in content |
 
@@ -186,7 +197,7 @@ Standard Diagnostic envelope:
 | --- | --- | --- |
 | `JSONLD-ENTITY-01` | error | `Organization.url` / `WebSite.url` differs from the canonical root URL. |
 | `JSONLD-ENTITY-02` | error | `BreadcrumbList` item URL carries the default-language prefix or non-canonical form. |
-| `JSONLD-ENTITY-03` | error | `Person.url` (when present) is non-canonical. |
+| `JSONLD-ENTITY-03` | error | `Person.url` (when present, same-origin only) is non-canonical. External profile URLs (LinkedIn, Twitter, etc.) are authored content and are not canonicalized. The validator checks `new URL(person.url).origin === siteOrigin` before applying the canonical check. |
 
 ### Failure modes
 
@@ -212,18 +223,24 @@ Standard Diagnostic envelope:
 
 - **Knowledge-graph re-anchoring** — changing `Organization.url` from `/de/` to `/` asks Google to re-associate the entity. Low risk: `/de/` already canonicalizes to `/`, so the change consolidates rather than moves signals.
 - **False positives on sites with intentional prefixed roots** — a site whose canonical root genuinely lives under a language prefix would fail. Mitigation: the validator derives the expected form from the site's own RFC-0160 routing config, not from a hardcoded rule.
+- **Performance** — the validator scans `dist/client/**/*.html` and parses JSON-LD `<script type="application/ld+json">` blocks. This is the same pattern used by `seo.structured-data.validate` and `jsonld.url.validate`. Performance impact is negligible (one pass over rendered HTML, ~100-200 pages).
+- **Migration suppression** — the builder fix and validator land atomically in the same implementation, so the pipeline goes green in one commit. No suppression mechanism is needed during migration because the fix is in shared builders, not in per-site content. Sites that rebuild after the fix automatically produce canonical entity URLs.
 - **Test churn** — behavior snapshots and JSON-LD tests that assert `/de/` URLs must be updated in the same commit; forgetting them breaks unrelated pipelines. The rollout makes this atomic.
 - **Agent misinterpretation** — agents must not "fix" this by editing site content or by adding redirects; the fix point is the shared semantic builders.
 
 ## Acceptance criteria
 
 - [ ] `buildOrganizationProfile` builds `Organization.url` from the canonical root (no default-language prefix) (evidence: `organization-profile.ts`)
-- [ ] `WebSite.url` and `BreadcrumbList` item URLs use the same canonical policy (evidence: `jsonld/website.ts`, `jsonld/breadcrumb.ts`)
+- [ ] `WebSite.url` inherits the canonical root from `page.organization.url` (evidence: `jsonld/website.ts`)
+- [ ] Breadcrumb home item uses `localizeUrl` (already correct per RFC-0160); no `jsonld/breadcrumb.ts` change needed (evidence: `resolve-route.ts:995`)
 - [ ] `jsonld.canonical-entity.validate` registered (app scope, postbuild) with JSONLD-ENTITY-01..03 (evidence: command table + handler)
 - [ ] Validator wired into `SITES_CHECK_POSTBUILD_PIPELINE` as error (evidence: pipeline definition)
+- [ ] JSONLD-ENTITY-03 applies only to same-origin `Person.url` (evidence: validator origin check)
 - [ ] Unit tests cover default-language root, non-default language, and prefixed-site edge case (evidence: test file)
 - [ ] warpgogol-com rendered JSON-LD passes the validator (evidence: probe run output)
-- [ ] `AGENTS.md` updated where agent behavior rules changed
+- [ ] `packages/werkstatt-shared/AGENTS.md` documents canonical entity URL policy
+- [ ] `packages/werkstatt-site/AGENTS.md` documents `jsonld.canonical-entity.validate` command
+- [ ] `docs/verification-plan.xml` updated with JSONLD-ENTITY-01..03 rule IDs
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
