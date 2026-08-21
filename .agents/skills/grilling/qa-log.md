@@ -731,3 +731,27 @@ status: active
 - **Context:** 2026-08-14 — RFC-0854 enhancement, current Sternsystem cutover
 - **Question:** May the replaceable single site republish directly to Main, or must it prove the Node 24 build/deploy path through Alt first?
 - **Answer:** Require `Alt deploy → Alt smoke pass → Main deploy → Main smoke pass`. Any non-pass stops the transition and blocks RFC completion; the single-site topology does not justify bypassing the available staging proof.
+
+- **Context:** 2026-08-21 — SEO indexing hardening series (RFC-A search verification)
+- **Question:** Which domain verification method is canonical for all workshop sites?
+- **Answer:** DNS TXT as primary via the existing RFC-0753 DNS protocol, with meta-tag as optional fallback for sites whose DNS is not workshop-managed. The validator accepts either.
+
+- **Context:** 2026-08-21 — SEO indexing hardening series (RFC-A sitemap submission)
+- **Question:** Manual runbook for GSC sitemap submission, or full Search Console API automation?
+- **Answer:** Full automation — a `search.sitemap.submit` command using a service account, despite the larger OAuth/secrets scope. (Operator overrode the runbook-first recommendation.)
+
+- **Context:** 2026-08-21 — SEO indexing hardening series (RFC-B JSON-LD entity identity)
+- **Question:** Which DNA does the canonical entity-URL invariant satisfy?
+- **Answer:** `satisfies DNA-85` (trailing-slash/canonical parity), `related DNA-86`. No new DNA for a special case of the same parity principle.
+
+- **Context:** 2026-08-21 — SEO indexing hardening series (RFC-C anchor-text lint)
+- **Question:** Where does the anchor-text stop-list live?
+- **Answer:** Built-in de/uk/en defaults in the validator plus optional extension via system.md (DNA-72 config location).
+
+- **Context:** 2026-08-21 — SEO indexing hardening series (RFC-D video markup)
+- **Question:** Which videos get VideoObject and video-sitemap entries?
+- **Answer:** Explicit opt-in per block via props (e.g. `seo.videoObject: true`) with required name/description/uploadDate. Hero/background videos never qualify.
+
+- **Context:** 2026-08-21 — SEO indexing hardening series (all RFCs)
+- **Question:** Warning-first gated adoption or immediate error for the new validators?
+- **Answer:** Immediate `error` from day one; each RFC's rollout includes greening warpgogol-com so the gate passes. (Operator overrode the warning-first recommendation.)
