@@ -156,6 +156,12 @@ export async function runDeployArtifactBuild(
           artifactPath: finalDir,
         },
         summary: `[deploy.artifact.build] artifact ${hash.slice(0, 16)}... (${files.length} files, ${totalSize} bytes)`,
+        nextSteps: [
+          {
+            action: `Verify the artifact: pnpm exec werkstatt run deploy.artifact.verify --hash ${hash}`,
+            kind: "optional",
+          },
+        ],
       };
     }
 
@@ -177,6 +183,12 @@ export async function runDeployArtifactBuild(
         artifactPath: finalDir,
       },
       summary: `[deploy.artifact.build] artifact ${hash.slice(0, 16)}... (${files.length} files, ${totalSize} bytes)`,
+      nextSteps: [
+        {
+          action: `Verify the artifact: pnpm exec werkstatt run deploy.artifact.verify --hash ${hash}`,
+          kind: "optional",
+        },
+      ],
     };
   } finally {
     if (existsSync(stagingDir)) {

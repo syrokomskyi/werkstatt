@@ -102,5 +102,11 @@ export async function runDeployAtomicRollback(
       swapTimeMs,
     },
     summary: `[deploy.atomic.rollback] rolled back to ${previousHash.slice(0, 16)}... in ${swapTimeMs}ms`,
+    nextSteps: [
+      {
+        action: `Verify health: pnpm exec werkstatt run leitstand.health --site <system-id> --channel main`,
+        kind: "optional",
+      },
+    ],
   };
 }
