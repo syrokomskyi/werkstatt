@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 281b1384352d1c65f07317e619551f0095f9c1ce22852424f66d3708f870438e
+  contentHash: f135aba62a6f5ac9492129ccd93556a304d4aaf90549f33663d3d09a7648ae30
 commands:
   - name: a11y.label-in-name.component.validate
     description: "RFC-0836: scan .astro component source files in
@@ -1700,6 +1700,22 @@ commands:
       - <app>/src/**/*.css
       - packages/tokens/src/**/*.ts
     writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: block.id.generate
+    description: One-time migration command that backfills missing block ids in page
+      content files using slugId(heading) with suffix deduplication (RFC-0914).
+    scope: app
+    provider: workspace
+    module: check
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags: {}
+    reads:
+      - <app>/src/content/pages/**/*.md
+    writes:
+      - <app>/src/content/pages/**/*.md
     validatesOutputs: []
     pipelines: []
   - name: blog.validate
@@ -10317,9 +10333,9 @@ commands:
     validatesOutputs: []
     pipelines: []
   - name: page.blocks.extract.validate
-    description: Validate that every block type has a registered extractor and every
-      block has an id. Enforces the unified SemanticBlock contract
-      (RFC-0208/RFC-0372).
+    description: Validate that every block type has a registered extractor, every
+      block has an id, and every block id is kebab-case. Enforces the unified
+      SemanticBlock contract (RFC-0208/RFC-0372/RFC-0914).
     scope: app
     provider: workspace
     module: check
@@ -15342,6 +15358,28 @@ commands:
     reads:
       - uni.registry.yaml
       - packages/werkstatt-site/src/domain/ui/{sections,components,pages}/**/*.manifest.yaml
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - packages.check
+  - name: utility.provenance.validate
+    description: Scan packages TS files for reimplemented canonical utilities
+      outside their canonical paths (RFC-0916, DNA-88). Use --mode warning
+      (default) or --mode fail.
+    scope: workspace
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      mode:
+        kind: string
+        default: warning
+        description: "Diagnostic mode: warning or fail."
+    reads:
+      - packages/**/*.ts
+      - packages/werkstatt-shared/src/share/utility-registry.yaml
     writes: []
     validatesOutputs: []
     pipelines:

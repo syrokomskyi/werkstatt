@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec werkstatt run command.manifest.generate` then
 `pnpm exec werkstatt run docs.commands.generate`.
 
-Generated command rows: 792. Raw manifest entries: 792.
+Generated command rows: 794. Raw manifest entries: 794.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -101,6 +101,7 @@ Generated command rows: 792. Raw manifest entries: 792.
 | `biome.site-background.derive` | workspace | workspace | yes | no | Derive the siteBackground block from biome axes only (RFC-0114). Preserves an existing biome.siteBackground when one is already declared. |
 | `biome.tokens.derive` | workspace | workspace | yes | no | Derive biome palette/typography/spacing/motion/geometry/siteBackground deterministically from RFC-0071 axes input. |
 | `biome.tokens.validate` | workspace | app | no | no | Validate CSS token usage against active app biomes. Reports BIOME-TOKEN-01..04 (RFC-0201). |
+| `block.id.generate` | workspace | app | yes | no | One-time migration command that backfills missing block ids in page content files using slugId(heading) with suffix deduplication (RFC-0914). |
 | `blog.validate` | workspace | app | no | no | Validate the article contract (publishedAt/updatedAt dates, tag shape, author resolution) over system.md article pages. No-op pass when the blog feature is not entitled (RFC-0167). |
 | `blueprint.validate` | workspace | app | no | no | Validate Programmatic Surface Blueprints against the schema and the app's datasets (RFC-0193). No-op when `pseo` is not entitled. |
 | `bodenstation.voice.validate` | workspace | app | no | no | Enforce Bodenstation voice rules: no LocalBusiness, no aggregateRating, no impersonation. RFC-0242. |
@@ -518,7 +519,7 @@ Generated command rows: 792. Raw manifest entries: 792.
 | `packages-check.run` | workspace | workspace | no | no | Validate workspace packages against PACKAGES_CHECK_PIPELINE (RFC-0075). |
 | `packages.check` | workspace | workspace | no | no | Alias for packages-check.run; validates workspace packages against the same PACKAGES_CHECK_PIPELINE step list (RFC-0246). |
 | `page.block.validate` | workspace | app | no | no | Validate block-declarative page content: PageEntrySchema parse, planet-pin cross-ref with system.yaml, propsSchema strict validation, no markdown body (DNA-24, RFC-0026). B-07: body.kind matches archetype bodyKind (RFC-0719). |
-| `page.blocks.extract.validate` | workspace | app | no | no | Validate that every block type has a registered extractor and every block has an id. Enforces the unified SemanticBlock contract (RFC-0208/RFC-0372). |
+| `page.blocks.extract.validate` | workspace | app | no | no | Validate that every block type has a registered extractor, every block has an id, and every block id is kebab-case. Enforces the unified SemanticBlock contract (RFC-0208/RFC-0372/RFC-0914). |
 | `page.blocks.mirror.validate` | workspace | app | no | no | Compare each localized page with its default-language twin block-by-block. Fails when a localized block is missing a prop or nested label key present in the default twin (RFC-0205). |
 | `page.markdown.generate` | workspace | app | yes | no | Generate a sibling <route>.md twin for every full/summary page from the disk semantic model; home pages keep index.md (RFC-0166/RFC-0306). |
 | `page.markdown.validate` | workspace | app | no | no | Validate that every rel=alternate text/markdown link in the rendered HTML resolves to an emitted Markdown twin (RFC-0166). |
@@ -770,6 +771,7 @@ Generated command rows: 792. Raw manifest entries: 792.
 | `ui.silent-defaults.lint` | workspace | workspace | no | no | Scan packages/werkstatt-site/src/domain/ui/{sections,components}/ for silent empty-string fallbacks (?? "", = "", defaultContent) on UI-visible text props (RFC-0205). |
 | `uni.registry.build` | workspace | workspace | yes | no | Scan all *.manifest.yaml files across workspace apps and packages/ui/, validate each against manifestSchema, and emit uni.registry.yaml at the workspace root (DNA-18, RFC-0023). |
 | `uni.registry.validate` | workspace | workspace | no | no | Validate that uni.registry.yaml is fresh — detect NEW, STALE, and CHANGED manifest entries (DNA-18, RFC-0023). |
+| `utility.provenance.validate` | workspace | workspace | no | no | Scan packages TS files for reimplemented canonical utilities outside their canonical paths (RFC-0916, DNA-88). Use --mode warning (default) or --mode fail. |
 | `validate.postbuild` | workspace | workspace | no | no | Run post-build validators on existing dist/ without a full rebuild (RFC-0883). |
 | `video.dist.prune` | workspace | app | yes | no | RFC-0210 build.post: delete bundled feature/background SOURCE videos from dist/client/_astro (served from public/_video instead) so large masters don't break the Cloudflare 25 MiB asset limit. Ambient clips are untouched. |
 | `video.ios-fallback.validate` | workspace | app | no | no | Refuse to publish without an iOS-playable video format: every `media:` source must expose an existing MP4 rendition, and every living-photo clip must ship a sibling iOS MP4 or be transparent-by-design (poster-only on iOS) (RFC-0234). |
