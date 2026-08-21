@@ -341,6 +341,12 @@ export async function runMissionOpen(
         staleEntries,
       },
       summary: `[mission.open] opened mission ${missionId} for ${systemId}`,
+      nextSteps: [
+        {
+          action: `Materialize the workpiece: pnpm exec werkstatt run mission.materialize --mission ${missionId}`,
+          kind: "required",
+        },
+      ],
     };
   } finally {
     await releaseLock(workspaceRoot, `system:${systemId}`);

@@ -63,5 +63,14 @@ export async function runSternsystemList(
   return {
     data: { systems, count: systems.length },
     summary: `[sternsystem.list] ${systems.length} system${systems.length === 1 ? "" : "s"} registered`,
+    nextSteps:
+      systems.length === 0
+        ? [
+            {
+              action: `Onboard a new system: pnpm exec forge run onboarding.scaffold --system-id <id>`,
+              kind: "optional",
+            },
+          ]
+        : undefined,
   };
 }

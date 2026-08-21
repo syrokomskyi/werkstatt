@@ -211,6 +211,12 @@ export async function runLeitstandServiceDevDeploy(
     return {
       data,
       summary: `[leitstand.service.dev-deploy] ${serviceId}: dev-deployed (${healthState})`,
+      nextSteps: [
+        {
+          action: `Promote service to production: pnpm exec werkstatt run leitstand.service.promote --service ${serviceId}`,
+          kind: "optional",
+        },
+      ],
     };
   } finally {
     await releaseServiceLock(workspaceRoot, serviceId);

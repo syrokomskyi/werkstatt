@@ -59,5 +59,14 @@ export async function runMissionStatus(
       bordbuch: missionEntries as Array<Record<string, unknown>>,
     },
     summary: `[mission.status] ${missionId}: state=${manifest.state}, ${missionEntries.length} Bordbuch entries`,
+    nextSteps:
+      manifest.state === "open"
+        ? [
+            {
+              action: `Validate the mission: pnpm exec werkstatt run mission.validate --mission ${missionId}`,
+              kind: "optional",
+            },
+          ]
+        : undefined,
   };
 }

@@ -1046,12 +1046,24 @@ export async function runMissionBuild(
       },
       exitCode: 1,
       summary: `[mission.build] ${missionId} build FAILED`,
+      nextSteps: [
+        {
+          action: `Fix the build errors above, then re-run: pnpm exec werkstatt run mission.build --mission ${missionId}`,
+          kind: "required",
+        },
+      ],
     };
   }
 
   return {
     data: { missionId, distributionPath: distDest, buildSucceeded: true, builtAt: now },
     summary: `[mission.build] ${missionId} distribution built`,
+    nextSteps: [
+      {
+        action: `Validate the mission: pnpm exec werkstatt run mission.validate --mission ${missionId}`,
+        kind: "optional",
+      },
+    ],
   };
 }
 
@@ -1115,6 +1127,12 @@ export async function runMissionDiff(
   return {
     data: { missionId, added, modified, removed },
     summary: `[mission.diff] ${missionId}: ${added.length} added, ${modified.length} modified, ${removed.length} removed`,
+    nextSteps: [
+      {
+        action: `Commit changes: pnpm exec werkstatt run mission.git.commit --mission ${missionId} --message "<msg>"`,
+        kind: "optional",
+      },
+    ],
   };
 }
 
@@ -1632,6 +1650,12 @@ export async function runMissionReconcile(
         ...(mirrorSync.attempted ? { mirrorSync } : {}),
       },
       summary: `[mission.reconcile] ${missionId} reconciled (${commitSha ? `${commitSha.slice(0, 8)}, ${transferredCommits} commits merged` : "no git"}${autoResolveSuffix}${workpieceCommit.committed ? `, workpiece auto-committed ${workpieceCommit.commitSha?.slice(0, 8)}` : ""}${mirrorSyncSuffix})`,
+      nextSteps: [
+        {
+          action: `Close the mission: pnpm exec werkstatt run mission.close --mission ${missionId}`,
+          kind: "optional",
+        },
+      ],
     };
   } finally {
     await releaseLock(workspaceRoot, `mission:${missionId}`);

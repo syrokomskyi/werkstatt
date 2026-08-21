@@ -320,6 +320,12 @@ The \`bordbuch/events.ndjson\` file contains the complete mission and release hi
         bordbuchHash,
       },
       summary: `[notausgang.export] ${systemId} exported to ${outputFlag} (${nulled.length} integrations nulled, ${exceptions.length} exceptions)`,
+      nextSteps: [
+        {
+          action: `Validate the export: pnpm exec werkstatt run notausgang.validate --site ${systemId}`,
+          kind: "optional",
+        },
+      ],
     };
   } catch (error) {
     // Cleanup staging on failure
@@ -782,5 +788,13 @@ export async function runNotausgangValidate(
     },
     exitCode: hasViolations ? 1 : 0,
     summary: `[notausgang.validate] ${hasViolations ? "invalid" : "valid"} — ${violations.length} violation(s), ${liveKeyScan}`,
+    nextSteps: hasViolations
+      ? [
+          {
+            action: `Fix the ${violations.length} violation(s) above, then re-run: pnpm exec werkstatt run notausgang.validate --site <system-id>`,
+            kind: "required",
+          },
+        ]
+      : undefined,
   };
 }

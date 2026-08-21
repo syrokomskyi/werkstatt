@@ -271,5 +271,13 @@ export async function runEvidenceSync(
     },
     exitCode: 0,
     summary,
+    nextSteps: dryRun
+      ? [
+          {
+            action: `Upload for real: pnpm exec werkstatt run evidence.sync --mission ${missionId}`,
+            kind: "optional",
+          },
+        ]
+      : undefined,
   };
 }

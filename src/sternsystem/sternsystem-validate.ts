@@ -540,5 +540,14 @@ export async function runSternsystemValidate(
     data: { validated, violations, warnings, withOwner, withoutOwner },
     exitCode: violations.length > 0 ? 1 : 0,
     summary: `[sternsystem.validate] ${validated} system${validated === 1 ? "" : "s"} validated, ${violations.length} violation(s), ${withOwner} with owner, ${withoutOwner} without owner`,
+    nextSteps:
+      violations.length > 0
+        ? [
+            {
+              action: `Fix the ${violations.length} validation violation(s) above, then re-run: pnpm exec werkstatt run sternsystem.validate`,
+              kind: "required",
+            },
+          ]
+        : undefined,
   };
 }

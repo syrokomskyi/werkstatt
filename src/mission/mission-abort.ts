@@ -157,6 +157,12 @@ export async function runMissionAbort(
         reason,
       },
       summary: `[mission.abort] aborted mission ${missionId}`,
+      nextSteps: [
+        {
+          action: `Open a new mission: pnpm exec werkstatt run mission.open --system ${manifest.systemId} --brief "<new brief>"`,
+          kind: "optional",
+        },
+      ],
     };
   } finally {
     await releaseLock(workspaceRoot, `mission:${missionId}`);

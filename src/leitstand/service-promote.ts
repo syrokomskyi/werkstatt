@@ -310,6 +310,12 @@ export async function runLeitstandServicePromote(
     return {
       data,
       summary: `[leitstand.service.promote] ${serviceId}: promoted to production (${healthState})`,
+      nextSteps: [
+        {
+          action: `Verify service health: pnpm exec werkstatt run leitstand.health --service ${serviceId}`,
+          kind: "optional",
+        },
+      ],
     };
   } finally {
     await releaseServiceLock(workspaceRoot, serviceId);
