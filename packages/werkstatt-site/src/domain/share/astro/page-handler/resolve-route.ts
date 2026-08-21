@@ -552,7 +552,21 @@ function buildAiAgentProfileBlocks(
 }
 
 // RFC-0887: Extract display, websiteUrl, websiteScreenshot, pdfUrl, pdfSha256
+// and core attestation props (variant, title, status, source, sichtpass)
 // from the evidence-source entity matching the nachweis slug.
+const AUTHORITY_LABELS: Record<string, Record<string, string>> = {
+  "client-attested": { de: "vom Kunden bestätigt", uk: "підтверджено Клієнтом" },
+  "operator-attested": { de: "vom Betreiber bestätigt", uk: "підтверджено оператором" },
+  "third-party-verified": { de: "durch Dritte verifiziert", uk: "перевірено третьою стороною" },
+};
+
+const KIND_RESULT_LABELS: Record<string, Record<string, string>> = {
+  "client-statement": { de: "Kundenbestätigung", uk: "Підтвердження Клієнта" },
+  "project-confirmation": { de: "Projektbestätigung", uk: "Підтвердження проєкту" },
+  certificate: { de: "Zertifikat", uk: "Сертифікат" },
+  "operational-evidence": { de: "Operativer Nachweis", uk: "Операційний доказ" },
+};
+
 async function resolveNachweisEvidenceProps(
   slug: string,
   lang: string,
@@ -579,9 +593,48 @@ async function resolveNachweisEvidenceProps(
     const props: Record<string, unknown> = {};
     if (data.display) props.display = data.display;
     if (data.websiteUrl) props.websiteUrl = data.websiteUrl;
-    if (data.websiteScreenshot) props.websiteScreenshot = data.websiteScreenshot;
-    if (data.pdfUrl) props.pdfUrl = data.pdfUrl;
+    if (data.websiteScreenshot) {
+      const screenshot = data.websiteScreenshot as Record<string, unknown>;
+      props.websiteScreenshot = {
+        ...screenshot,
+        capturedAt:
+          screenshot.capturedAt instanceof Date
+            ? screenshot.capturedAt.toISOString()
+            : typeof screenshot.capturedAt === "string"
+              ? screenshot.capturedAt
+              : undefined,
+      };
+    }
     if (data.pdfSha256) props.pdfSha256 = data.pdfSha256;
+
+    const kind = data.kind as string | undefined;
+    if (kind) {
+      props.variant = kind === "technical-assessment" ? "technical-assessment" : "attestation";
+      const resultLabels = KIND_RESULT_LABELS[kind];
+      if (resultLabels) {
+        props.result = resultLabels[lang] ?? resultLabels[defaultLang] ?? kind;
+      }
+    }
+
+    if (data.name) props.title = data.name;
+    if (data.status) props.status = data.status;
+
+    const authority = data.authority as Record<string, unknown> | undefined;
+    if (authority?.kind) {
+      const authLabels = AUTHORITY_LABELS[authority.kind as string];
+      if (authLabels) {
+        props.source = authLabels[lang] ?? authLabels[defaultLang] ?? authority.kind;
+      }
+    }
+
+    const items = data.items as Record<string, Record<string, unknown>> | undefined;
+    const doc = items?.document;
+    if (doc?.sha256) {
+      props.sichtpass = { sourceSha256: doc.sha256 };
+      if (!props.pdfSha256) props.pdfSha256 = doc.sha256;
+    }
+    if (doc?.url && !props.pdfUrl) props.pdfUrl = doc.url;
+
     return props;
   }
   return {};

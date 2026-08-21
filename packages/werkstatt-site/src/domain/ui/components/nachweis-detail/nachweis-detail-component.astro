@@ -150,6 +150,9 @@ const domain = websiteUrl ? safeHostname(websiteUrl) : undefined;
 const captureDate = websiteScreenshot?.capturedAt
   ? formatDate(websiteScreenshot.capturedAt)
   : undefined;
+const captureDatetime = websiteScreenshot?.capturedAt
+  ? toISOString(websiteScreenshot.capturedAt)
+  : undefined;
 
 function safeHostname(url: string): string | undefined {
   try {
@@ -159,17 +162,33 @@ function safeHostname(url: string): string | undefined {
   }
 }
 
-function formatDate(iso: string): string {
-  try {
-    const d = new Date(iso);
-    return d.toLocaleDateString("de-DE", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  } catch {
-    return iso;
+function isDateLike(value: unknown): value is Date {
+  return value instanceof Date || Object.prototype.toString.call(value) === "[object Date]";
+}
+
+function toDate(value: unknown): Date | undefined {
+  if (isDateLike(value)) return value as Date;
+  if (typeof value === "string" || typeof value === "number") {
+    const d = new Date(value);
+    if (!isNaN(d.getTime())) return d;
   }
+  return undefined;
+}
+
+function formatDate(value: unknown): string {
+  const d = toDate(value);
+  if (!d) return String(value);
+  return d.toLocaleDateString("de-DE", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function toISOString(value: unknown): string {
+  const d = toDate(value);
+  if (!d) return String(value);
+  return d.toISOString();
 }
 ---
 
@@ -205,24 +224,26 @@ function formatDate(iso: string): string {
           websiteUrl={websiteUrl}
         />
 
-        {display?.document === "visible" && pdfUrl && (
+        {display?.document === "visible" && (pdfUrl || pdfSha256) && (
           <section class="nachweis-detail__pdf" aria-labelledby={pdfHeadingId}>
             <h2 id={pdfHeadingId} class="nachweis-detail__section-title">
               PDF-Dokument
             </h2>
-            <object
-              data={pdfUrl}
-              type="application/pdf"
-              width="100%"
-              class="nachweis-detail__pdf-viewer"
-            >
-              <p>
-                Ihr Browser kann kein PDF anzeigen.
-                <a href={pdfUrl} download>
-                  Dokument herunterladen
-                </a>
-              </p>
-            </object>
+            {pdfUrl && (
+              <object
+                data={`${pdfUrl}#toolbar=0&navpanes=0&view=FitH`}
+                type="application/pdf"
+                width="100%"
+                class="nachweis-detail__pdf-viewer"
+              >
+                <p>
+                  Ihr Browser kann kein PDF anzeigen.
+                  <a href={pdfUrl} download>
+                    Dokument herunterladen
+                  </a>
+                </p>
+              </object>
+            )}
             {pdfSha256 && (
               <p class="nachweis-detail__pdf-hash">
                 <span class="sr-only">SHA-256-Hash: </span>
@@ -249,9 +270,7 @@ function formatDate(iso: string): string {
               />
               <figcaption>
                 {captureDate && (
-                  <time datetime={websiteScreenshot.capturedAt}>
-                    Homepage-Aufnahme vom {captureDate}
-                  </time>
+                  <time datetime={captureDatetime}>Homepage-Aufnahme vom {captureDate}</time>
                 )}
               </figcaption>
             </figure>

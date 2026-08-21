@@ -143,15 +143,16 @@
 
 .nachweis-detail__pdf-viewer {
   width: 100%;
-  min-height: 400px;
-  max-height: 600px;
+  aspect-ratio: 210 / 297;
+  max-width: 620px;
+  margin-inline: auto;
   border: 1px solid var(--ds-color-border);
   border-radius: var(--ds-radius-sm);
 }
 
 @media (max-width: 768px) {
   .nachweis-detail__pdf-viewer {
-    min-height: 300px;
+    aspect-ratio: 210 / 297;
   }
 }
 
