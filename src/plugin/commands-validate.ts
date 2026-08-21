@@ -58,6 +58,8 @@ const HELPER_RETURN_PATTERN = new RegExp(
   `return\\s+(?:await\\s+)?(${[...HELPER_FUNCTIONS].join("|")})\\s*\\(`,
 );
 
+const COMMAND_RESULT_KEY_PATTERN = /\b(?:exitCode|summary)\s*:/;
+
 function shouldExcludeFile(fileName: string): boolean {
   return EXCLUDE_SUFFIXES.some((suffix) => fileName.endsWith(suffix));
 }
@@ -130,6 +132,18 @@ function analyzeReturnObject(
     fullContent.slice(returnStartIdx, returnStartIdx + 200),
   );
   if (helperMatch) {
+    return {
+      exitCodePresent: true,
+      exitCodeValue: null,
+      exitCodeIsLiteral: false,
+      summaryPresent: true,
+      summaryValue: null,
+      nextStepsPresent: true,
+      isHelperReturn: true,
+    };
+  }
+
+  if (!COMMAND_RESULT_KEY_PATTERN.test(returnText)) {
     return {
       exitCodePresent: true,
       exitCodeValue: null,

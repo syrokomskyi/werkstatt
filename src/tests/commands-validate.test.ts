@@ -319,7 +319,9 @@ export async function execute(): Promise<KernelCommandResult> {
     );
 
     const result = await runCommandsValidate(workspaceRoot, "error");
-    expect(result.summary).toBe("[werkstatt.commands.validate] 0 violation(s) across 1 files scanned");
+    expect(result.summary).toBe(
+      "[werkstatt.commands.validate] 0 violation(s) across 1 files scanned",
+    );
   });
 
   it("nextSteps present on failure result", async () => {
@@ -337,5 +339,41 @@ export async function execute(): Promise<KernelCommandResult> {
     expect(result.nextSteps).toBeDefined();
     expect(result.nextSteps?.length).toBeGreaterThan(0);
     expect(result.nextSteps?.[0]?.kind).toBe("required");
+  });
+
+  it("non-command-result returns are not flagged (module descriptors, internal objects)", async () => {
+    writeHandlerFile(
+      workspaceRoot,
+      "packages/werkstatt/src/test-cmd.ts",
+      `${HANDLER_HEADER}
+export function createModule() {
+  return {
+    name: "test-module",
+    version: "0.1.0",
+    async register(registry) {
+      registry.registerCommand({
+        name: "test.cmd",
+        description: "test",
+        scope: "workspace",
+        flags: {},
+        reads: [],
+        cacheable: false,
+        async execute(): Promise<KernelCommandResult> {
+          return { exitCode: 0, summary: "[test.cmd] OK" };
+        },
+      });
+    },
+  };
+}
+
+function helper(): { found: boolean; line: number } {
+  return { found: false, line: 0 };
+}
+`,
+    );
+
+    const result = await runCommandsValidate(workspaceRoot, "error");
+    const violations = result.data?.diagnostics ?? [];
+    expect(violations.length).toBe(0);
   });
 });
