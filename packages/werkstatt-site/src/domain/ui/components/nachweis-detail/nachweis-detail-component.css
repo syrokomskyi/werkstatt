@@ -23,11 +23,26 @@
   gap: var(--ds-space-6);
 }
 
+.nachweis-detail .nachweis-card {
+  background: var(--ds-color-surface-glass);
+  border: 1px solid var(--ds-color-border-glass);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: var(--ds-shadow-glass);
+}
+
+.nachweis-detail .nachweis-card:hover {
+  box-shadow: var(--ds-shadow-glass);
+}
+
 .nachweis-detail__sichtpass {
   padding: var(--ds-space-6);
-  border: 1px solid var(--ds-color-border);
+  border: 1px solid var(--ds-color-border-glass);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-color-surface);
+  background: var(--ds-color-surface-glass);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: var(--ds-shadow-glass);
 }
 
 .nachweis-detail__sichtpass-title,
@@ -74,9 +89,12 @@
 
 .nachweis-detail__technical {
   padding: var(--ds-space-6);
-  border: 1px solid var(--ds-color-border);
+  border: 1px solid var(--ds-color-border-glass);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-color-surface);
+  background: var(--ds-color-surface-glass);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: var(--ds-shadow-glass);
 }
 
 .nachweis-detail__technical-dl {
@@ -89,9 +107,12 @@
 
 .nachweis-detail__history {
   padding: var(--ds-space-6);
-  border: 1px solid var(--ds-color-border);
+  border: 1px solid var(--ds-color-border-glass);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-color-surface);
+  background: var(--ds-color-surface-glass);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: var(--ds-shadow-glass);
 }
 
 .nachweis-detail__history-table {
@@ -136,9 +157,12 @@
 
 .nachweis-detail__pdf {
   padding: var(--ds-space-6);
-  border: 1px solid var(--ds-color-border);
+  border: 1px solid var(--ds-color-border-glass);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-color-surface);
+  background: var(--ds-color-surface-glass);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: var(--ds-shadow-glass);
 }
 
 .nachweis-detail__pdf-viewer {
@@ -173,9 +197,12 @@
 
 .nachweis-detail__screenshot {
   padding: var(--ds-space-6);
-  border: 1px solid var(--ds-color-border);
+  border: 1px solid var(--ds-color-border-glass);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-color-surface);
+  background: var(--ds-color-surface-glass);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: var(--ds-shadow-glass);
 }
 
 .nachweis-detail__screenshot-figure {
@@ -208,9 +235,12 @@
   align-items: center;
   gap: var(--ds-space-2);
   padding: var(--ds-space-3) var(--ds-space-5);
-  border: 1px solid var(--ds-color-border);
+  border: 1px solid var(--ds-color-border-glass);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-color-surface);
+  background: var(--ds-color-surface-glass);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: var(--ds-shadow-glass);
   color: var(--ds-color-text-primary);
   text-decoration: none;
   font-weight: 500;
@@ -221,7 +251,7 @@
 
 .nachweis-detail__website-link-anchor:hover,
 .nachweis-detail__website-link-anchor:focus-visible {
-  background: var(--ds-color-surface-elevated);
+  background: var(--ds-color-surface-glass-strong);
   border-color: var(--ds-color-border-strong);
 }
 
