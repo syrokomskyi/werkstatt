@@ -25,7 +25,10 @@ import { loadDhtConfig } from "./config.ts";
 import { clearCachedEntry } from "./cache.ts";
 import { createDhtNode, startDhtNode, stopDhtNode, dhtPut, dhtGet } from "./node.ts";
 import { signDhtEntry, verifyDhtEntry } from "@warpgogol/werkstatt-shared/passport/dht-sign";
-import { WerkstattIdentityConfigSchema, type WerkstattIdentityConfig } from "@warpgogol/werkstatt-shared/passport";
+import {
+  WerkstattIdentityConfigSchema,
+  type WerkstattIdentityConfig,
+} from "@warpgogol/werkstatt-shared/passport";
 
 const IDENTITY_FILENAME = "werkstatt.identity.json";
 const PASSPORT_SIGNING_KEY_ENV = "PASSPORT_SIGNING_KEY";
@@ -93,7 +96,10 @@ export async function runDhtRegister(
         diagnostics: ["dht.register: --site-id flag is required"],
       },
       exitCode: 1,
-      summary: "dht.register: --site-id flag is required",
+      summary: "[dht.register] --site-id flag is required",
+      nextSteps: [
+        { action: "Provide the --site-id flag and re-run dht.register", kind: "required" },
+      ],
     };
   }
 
@@ -107,7 +113,13 @@ export async function runDhtRegister(
         diagnostics: ["dht.register: --owner flag is required (did:web identifier)"],
       },
       exitCode: 1,
-      summary: "dht.register: --owner flag is required",
+      summary: "[dht.register] --owner flag is required",
+      nextSteps: [
+        {
+          action: "Provide the --owner flag (did:web identifier) and re-run dht.register",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -121,7 +133,13 @@ export async function runDhtRegister(
         diagnostics: ["dht.register: --endpoint flag is required (host:port)"],
       },
       exitCode: 1,
-      summary: "dht.register: --endpoint flag is required",
+      summary: "[dht.register] --endpoint flag is required",
+      nextSteps: [
+        {
+          action: "Provide the --endpoint flag (host:port) and re-run dht.register",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -143,7 +161,13 @@ export async function runDhtRegister(
         ],
       },
       exitCode: 1,
-      summary: `dht.register: identity not bootstrapped`,
+      summary: `[dht.register] identity not bootstrapped`,
+      nextSteps: [
+        {
+          action: "Run identity.bootstrap first (RFC-0558), then re-run dht.register",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -161,7 +185,13 @@ export async function runDhtRegister(
         diagnostics: [`dht.register: ${PASSPORT_SIGNING_KEY_ENV} environment variable is not set`],
       },
       exitCode: 1,
-      summary: `dht.register: ${PASSPORT_SIGNING_KEY_ENV} not set`,
+      summary: `[dht.register] ${PASSPORT_SIGNING_KEY_ENV} not set`,
+      nextSteps: [
+        {
+          action: `Set the ${PASSPORT_SIGNING_KEY_ENV} environment variable and re-run dht.register`,
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -179,7 +209,10 @@ export async function runDhtRegister(
         diagnostics: [`dht.register: no werkstatt.dht.json found — run dht.node.init first`],
       },
       exitCode: 1,
-      summary: `dht.register: DHT not initialized`,
+      summary: `[dht.register] DHT not initialized`,
+      nextSteps: [
+        { action: "Run dht.node.init first, then re-run dht.register", kind: "required" },
+      ],
     };
   }
 
@@ -210,7 +243,13 @@ export async function runDhtRegister(
         ],
       },
       exitCode: 1,
-      summary: `dht.register: signing failed`,
+      summary: `[dht.register] signing failed`,
+      nextSteps: [
+        {
+          action: "Check the PASSPORT_SIGNING_KEY environment variable and re-run dht.register",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -233,7 +272,13 @@ export async function runDhtRegister(
         ],
       },
       exitCode: 1,
-      summary: `dht.register: DHT node startup failed`,
+      summary: `[dht.register] DHT node startup failed`,
+      nextSteps: [
+        {
+          action: "Check the DHT configuration and network connectivity, then re-run dht.register",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -273,7 +318,7 @@ export async function runDhtRegister(
                 ],
               },
               exitCode: 0,
-              summary: `dht.register: existing entry wins (LWW ${reason})`,
+              summary: `[dht.register] existing entry wins (LWW ${reason})`,
             };
           }
         }
@@ -299,7 +344,7 @@ export async function runDhtRegister(
         conflictResolved,
       },
       exitCode: 0,
-      summary: `dht.register: published ${siteId} to DHT key ${key}`,
+      summary: `[dht.register] published ${siteId} to DHT key ${key}`,
     };
   } finally {
     await stopDhtNode(node);

@@ -95,7 +95,7 @@ export async function runDhtStatus(
         ],
       },
       exitCode: 0,
-      summary: `dht.status: not initialized`,
+      summary: `[dht.status] not initialized`,
     };
   }
 
@@ -112,6 +112,6 @@ export async function runDhtStatus(
       swimConfigured,
     },
     exitCode: 0,
-    summary: `dht.status: initialized, bind=${config.bindAddr}, bootstrap=${config.bootstrapNodes.length} nodes, cache=${cacheEntries} entries`,
+    summary: `[dht.status] initialized, bind=${config.bindAddr}, bootstrap=${config.bootstrapNodes.length} nodes, cache=${cacheEntries} entries`,
   };
 }

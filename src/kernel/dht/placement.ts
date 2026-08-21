@@ -23,7 +23,10 @@ import { workshopCapacitySchema } from "./types.ts";
 import { loadDhtConfig } from "./config.ts";
 import { createDhtNode, startDhtNode, stopDhtNode, dhtGet } from "./node.ts";
 import { verifyCapacity } from "./capacity.ts";
-import { WerkstattIdentityConfigSchema, type WerkstattIdentityConfig } from "@warpgogol/werkstatt-shared/passport";
+import {
+  WerkstattIdentityConfigSchema,
+  type WerkstattIdentityConfig,
+} from "@warpgogol/werkstatt-shared/passport";
 
 const IDENTITY_FILENAME = "werkstatt.identity.json";
 
@@ -80,7 +83,10 @@ export async function runDhtPlacement(
         diagnostics: ["dht.placement: --site-id flag is required"],
       } as DHTPlacementResult,
       exitCode: 1,
-      summary: "dht.placement: --site-id flag is required",
+      summary: "[dht.placement] --site-id flag is required",
+      nextSteps: [
+        { action: "Provide the --site-id flag and re-run dht.placement", kind: "required" },
+      ],
     };
   }
 
@@ -100,7 +106,13 @@ export async function runDhtPlacement(
         ],
       } as DHTPlacementResult,
       exitCode: 1,
-      summary: `dht.placement: identity not bootstrapped`,
+      summary: `[dht.placement] identity not bootstrapped`,
+      nextSteps: [
+        {
+          action: "Run identity.bootstrap first (RFC-0558), then re-run dht.placement",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -118,7 +130,10 @@ export async function runDhtPlacement(
         diagnostics: [`dht.placement: no werkstatt.dht.json found — run dht.node.init first`],
       } as DHTPlacementResult,
       exitCode: 1,
-      summary: `dht.placement: DHT not initialized`,
+      summary: `[dht.placement] DHT not initialized`,
+      nextSteps: [
+        { action: "Run dht.node.init first, then re-run dht.placement", kind: "required" },
+      ],
     };
   }
 
@@ -134,7 +149,14 @@ export async function runDhtPlacement(
         diagnostics: [`dht.placement: --workshops flag is required (comma-separated or repeated)`],
       } as DHTPlacementResult,
       exitCode: 1,
-      summary: `dht.placement: no workshops specified`,
+      summary: `[dht.placement] no workshops specified`,
+      nextSteps: [
+        {
+          action:
+            "Provide the --workshops flag (comma-separated or repeated) and re-run dht.placement",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -155,7 +177,13 @@ export async function runDhtPlacement(
         ],
       } as DHTPlacementResult,
       exitCode: 1,
-      summary: `dht.placement: DHT node startup failed`,
+      summary: `[dht.placement] DHT node startup failed`,
+      nextSteps: [
+        {
+          action: "Check the DHT configuration and network connectivity, then re-run dht.placement",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -213,8 +241,8 @@ export async function runDhtPlacement(
       },
       exitCode: 0,
       summary: result.winner
-        ? `dht.placement: ${siteId} → ${result.winner.workshopId} (${result.reason})`
-        : `dht.placement: no available workshop for ${siteId} (local-fallback)`,
+        ? `[dht.placement] ${siteId} → ${result.winner.workshopId} (${result.reason})`
+        : `[dht.placement] no available workshop for ${siteId} (local-fallback)`,
     };
   } finally {
     await stopDhtNode(node);

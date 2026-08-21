@@ -64,6 +64,6 @@ export async function runDhtNodeInit(
       config,
     },
     exitCode: 0,
-    summary: `dht.node.init: created ${CONFIG_FILENAME} with bindAddr ${config.bindAddr}`,
+    summary: `[dht.node.init] created ${CONFIG_FILENAME} with bindAddr ${config.bindAddr}`,
   };
 }

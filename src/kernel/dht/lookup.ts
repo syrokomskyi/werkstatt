@@ -24,7 +24,10 @@ import { loadDhtConfig } from "./config.ts";
 import { getCachedEntry, setCachedEntry, loadCache } from "./cache.ts";
 import { createDhtNode, startDhtNode, stopDhtNode, dhtGet } from "./node.ts";
 import { verifyDhtEntry } from "@warpgogol/werkstatt-shared/passport/dht-sign";
-import { WerkstattIdentityConfigSchema, type WerkstattIdentityConfig } from "@warpgogol/werkstatt-shared/passport";
+import {
+  WerkstattIdentityConfigSchema,
+  type WerkstattIdentityConfig,
+} from "@warpgogol/werkstatt-shared/passport";
 
 const IDENTITY_FILENAME = "werkstatt.identity.json";
 
@@ -66,7 +69,8 @@ export async function runDhtLookup(
         diagnostics: ["dht.lookup: --site-id flag is required"],
       },
       exitCode: 1,
-      summary: "dht.lookup: --site-id flag is required",
+      summary: "[dht.lookup] --site-id flag is required",
+      nextSteps: [{ action: "Provide the --site-id flag and re-run dht.lookup", kind: "required" }],
     };
   }
 
@@ -89,7 +93,7 @@ export async function runDhtLookup(
             signatureValid: true,
           },
           exitCode: 0,
-          summary: `dht.lookup: cache hit for ${siteId}`,
+          summary: `[dht.lookup] cache hit for ${siteId}`,
         };
       }
     }
@@ -111,7 +115,8 @@ export async function runDhtLookup(
         diagnostics: [`dht.lookup: no werkstatt.dht.json found — run dht.node.init first`],
       },
       exitCode: 1,
-      summary: `dht.lookup: DHT not initialized — run dht.node.init first`,
+      summary: `[dht.lookup] DHT not initialized — run dht.node.init first`,
+      nextSteps: [{ action: "Run dht.node.init first, then re-run dht.lookup", kind: "required" }],
     };
   }
 
@@ -133,7 +138,13 @@ export async function runDhtLookup(
         ],
       },
       exitCode: 1,
-      summary: `dht.lookup: identity not bootstrapped`,
+      summary: `[dht.lookup] identity not bootstrapped`,
+      nextSteps: [
+        {
+          action: "Run identity.bootstrap first (RFC-0558), then re-run dht.lookup",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -156,7 +167,13 @@ export async function runDhtLookup(
         ],
       },
       exitCode: 1,
-      summary: `dht.lookup: DHT node startup failed`,
+      summary: `[dht.lookup] DHT node startup failed`,
+      nextSteps: [
+        {
+          action: "Check the DHT configuration and network connectivity, then re-run dht.lookup",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -175,7 +192,7 @@ export async function runDhtLookup(
           signatureValid: false,
         },
         exitCode: 0,
-        summary: `dht.lookup: site ${siteId} not found in DHT`,
+        summary: `[dht.lookup] site ${siteId} not found in DHT`,
       };
     }
 
@@ -196,7 +213,13 @@ export async function runDhtLookup(
           diagnostics: [`dht.lookup: DHT entry for ${siteId} is malformed`],
         },
         exitCode: 1,
-        summary: `dht.lookup: malformed DHT entry for ${siteId}`,
+        summary: `[dht.lookup] malformed DHT entry for ${siteId}`,
+        nextSteps: [
+          {
+            action: `The DHT entry for ${siteId} is malformed — re-register the site with dht.register`,
+            kind: "required",
+          },
+        ],
       };
     }
 
@@ -220,7 +243,13 @@ export async function runDhtLookup(
           diagnostics: [`dht.lookup: DHT entry for ${siteId} has invalid signature — rejected`],
         },
         exitCode: 1,
-        summary: `dht.lookup: invalid signature for ${siteId}`,
+        summary: `[dht.lookup] invalid signature for ${siteId}`,
+        nextSteps: [
+          {
+            action: `The DHT entry for ${siteId} has an invalid signature — re-register the site with dht.register`,
+            kind: "required",
+          },
+        ],
       };
     }
 
@@ -240,7 +269,7 @@ export async function runDhtLookup(
           ],
         },
         exitCode: 0,
-        summary: `dht.lookup: workshop dead, routing around ${siteId}`,
+        summary: `[dht.lookup] workshop dead, routing around ${siteId}`,
       };
     }
 
@@ -257,7 +286,7 @@ export async function runDhtLookup(
         signatureValid: true,
       },
       exitCode: 0,
-      summary: `dht.lookup: found ${siteId} at ${entry.workshopEndpoint}`,
+      summary: `[dht.lookup] found ${siteId} at ${entry.workshopEndpoint}`,
     };
   } finally {
     await stopDhtNode(node);
