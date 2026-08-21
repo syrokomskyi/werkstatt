@@ -10,6 +10,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-21
 updatedAt: 2026-08-21
+enhancedAt: 2026-08-21
 implementedAt:
 closedAt:
 supersedes: []
@@ -18,6 +19,7 @@ amends: []
 amendedBy: []
 related:
   - DNA-11
+  - DNA-82
   - RFC-0097
   - RFC-0684
   - RFC-0732
@@ -49,6 +51,8 @@ nonGoals:
   - "Do not replace surface.translation.validate (PSEO artifact lifecycle) — this RFC covers authored markdown content"
   - "Do not replace legal.translation.validate (binding-language policy) — this RFC covers structural completeness"
   - "Do not compare rendered HTML — all checks run against authored markdown source"
+  - "Do not check frontmatter field parity between locale variants — frontmatter fields (title, description) are validated by content.validate and semantic.drift.validate; this RFC checks body structure only"
+  - "Do not validate translation quality or accuracy — structural counts are a necessary but not sufficient condition for translation completeness"
 ---
 
 # RFC-0901: Cross-locale structural parity validation for translated content
@@ -115,14 +119,14 @@ pnpm exec werkstatt run translation.parity.review --site warpgogol-com
 # Add a suppression record
 pnpm exec werkstatt run translation.parity.suppress --site warpgogol-com \
   --file prose/impressum.md \
-  --rule PROSE-PARITY-SENTENCE-COUNT \
+  --ruleId PARITY-SENTENCE-COUNT \
   --section "Haftung für Links" \
   --reason "DE has additional TMG §5 disclaimer not required under Ukrainian law"
 ```
 
 ### Content directories covered
 
-All content directories that use locale subdirectories (`{lang}/`):
+Content directories that use locale subdirectories (`{lang}/`). The parity validator scans only directories that exist and contain locale subdirectories matching `/^[a-z]{2}$/` — absent directories are silently skipped (no false positives on sites that don't use a particular content domain):
 
 | Directory                              | Content type                       | Severity |
 | -------------------------------------- | ---------------------------------- | -------- |
@@ -135,6 +139,8 @@ All content directories that use locale subdirectories (`{lang}/`):
 | `src/content/site/{lang}/`             | Site-level content                 | warning  |
 
 Legal documents are identified by filename: `impressum.md`, `datenschutz.md`, `agb.md`, `widerruf.md`, `barrierefreiheit.md` — these produce **error**-severity diagnostics. All other files produce **warning**-severity diagnostics.
+
+Note: `mirroring.validate` currently scans only `src/content/pages/{lang}/` (`paths.contentPagesDirectory`). The parity validator has a broader scope because it scans all locale-subdirectory content domains. This is intentional — `mirroring.validate` may be extended in a future RFC to cover the same scope, but parity validation does not wait for that.
 
 ### File matching
 
@@ -152,11 +158,10 @@ Same mechanism as `mirroring.validate` (RFC-0097): a page may declare `locales` 
 
 ### Structural metrics
 
-Four hierarchical checks, applied per matched file pair:
+Three hierarchical checks, applied per matched file pair. File-level presence is not checked here — `mirroring.validate` already enforces file presence (DNA-11) and runs before this validator in the pipeline. The parity validator assumes both source and target files exist; if a source file is missing, the finding is skipped (mirroring.validate catches it separately):
 
 | Rule ID                  | What it checks                       | Level     |
 | ------------------------ | ------------------------------------ | --------- |
-| `PARITY-FILE`            | File exists in all expected locales  | file      |
 | `PARITY-SECTION-COUNT`   | H2 section count matches             | file      |
 | `PARITY-PARAGRAPH-COUNT` | Paragraph count per section matches  | section   |
 | `PARITY-SENTENCE-COUNT`  | Sentence count per paragraph matches | paragraph |
@@ -165,13 +170,13 @@ Four hierarchical checks, applied per matched file pair:
 
 **Paragraph counting:** A paragraph is a block of text separated by one or more blank lines within a section body.
 
-**Sentence splitting:** Locale-aware sentence boundary detection. Abbreviation lists per locale to avoid false splits:
+**Sentence splitting:** Locale-aware sentence boundary detection. Abbreviation lists per locale to avoid false splits. Abbreviation matching has priority over the general boundary rule — a known abbreviation never triggers a sentence break:
 
 - `de`: `z.B.`, `etc.`, `Nr.`, `Abs.`, `§`, `S.`, `ca.`, `u.a.`, `vgl.`, `bspw.`
 - `uk`: `т.д.`, `т.п.`, `п.`, `ст.`, `див.`, `пор.`, `напр.`, `ім.`, `о.`
 - `en`: `e.g.`, `i.e.`, `etc.`, `vs.`, `Mr.`, `Mrs.`, `Dr.`, `Inc.`, `Ltd.`
 
-Sentence boundary = `.` `!` `?` followed by whitespace + capital letter, excluding known abbreviations.
+Sentence boundary = `.` `!` `?` followed by whitespace + capital letter, excluding known abbreviations. The `§` symbol in German legal text is treated as an abbreviation prefix, not a sentence boundary — `§ 5 TMG` must not split. For Ukrainian, where sentence-initial lowercase is uncommon but possible after certain abbreviations, the capital-letter requirement is relaxed: a sentence boundary is `.` `!` `?` followed by whitespace, regardless of the next letter's case, unless the preceding token matches a known abbreviation.
 
 ### Suppression mechanism
 
@@ -195,14 +200,14 @@ suppressions:
 | Field | Required | Description |
 | --- | --- | --- |
 | `file` | yes | Content-relative path (e.g. `prose/impressum.md`) |
-| `ruleId` | yes | One of `PARITY-FILE`, `PARITY-SECTION-COUNT`, `PARITY-PARAGRAPH-COUNT`, `PARITY-SENTENCE-COUNT` |
+| `ruleId` | yes | One of `PARITY-SECTION-COUNT`, `PARITY-PARAGRAPH-COUNT`, `PARITY-SENTENCE-COUNT` |
 | `section` | no | H2 heading text. If omitted, suppression covers the entire file for this ruleId |
 | `reason` | yes | Human-readable justification |
 | `approvedAt` | yes | Date the suppression was approved |
 
 **Matching logic:** A finding is suppressed when `file` + `ruleId` match and either `section` matches or `section` is omitted (file-level suppression).
 
-**Validation:** `translation.parity.suppress` validates the config file schema (Zod), checks for duplicate suppression records, and warns on stale suppressions (file/section no longer exists).
+**Validation:** `translation.parity.suppress` validates the config file schema (Zod), checks for duplicate suppression records, and warns on stale suppressions (file/section no longer exists). The `approvedAt` field is auto-populated with the current date (YYYY-MM-DD) — the operator does not need to pass `--approvedAt` as a flag. The command appends the new record to the existing file (or creates it if absent), preserving existing records.
 
 ### Agent-actionable diagnostics
 
@@ -241,7 +246,7 @@ interface ParityFinding {
   file: string;
   sourceFile: string;
   targetFile: string;
-  ruleId: "PARITY-FILE" | "PARITY-SECTION-COUNT" | "PARITY-PARAGRAPH-COUNT" | "PARITY-SENTENCE-COUNT";
+  ruleId: "PARITY-SECTION-COUNT" | "PARITY-PARAGRAPH-COUNT" | "PARITY-SENTENCE-COUNT";
   section?: string;
   sourceLocale: string;
   targetLocale: string;
@@ -283,9 +288,10 @@ interface ParityValidateResult {
 | `src/content/{domain}/{lang}/*.md` | Scanned for structural parity |
 | `src/content/system.md` | Read for `pages[].locales` scoping (RFC-0097) |
 | `translation-parity.suppressions.yaml` (workpiece root) | Suppression records, git-tracked |
-| `packages/werkstatt-shared/src/share/semantic/extract.ts` | `splitMarkdownSections` — existing, reused |
-| `packages/werkstatt-shared/src/checks/parity/` | New module: sentence splitting, paragraph counting, suppression schema |
-| `packages/werkstatt-site/src/checks/translation-parity.ts` | New module: validate, review, suppress command handlers |
+| `packages/werkstatt-shared/src/share/semantic/extract.ts` | `splitMarkdownSections`, `extractParagraphs` — existing, reused; `splitSentences` — new function added here (natural extension of existing semantic extraction utilities) |
+| `packages/werkstatt-site/src/checks/translation-parity.ts` | New module: validate, review, suppress command handlers, suppression Zod schema (only consumer is this command — no cross-package export needed) |
+| `packages/werkstatt-site/src/checks/command-tables/04-content-quality.ts` | Command registration for all three `translation.parity.*` commands |
+| `translation-parity-review.yaml` (workpiece root) | Review manifest written by `translation.parity.review` (generated, git-tracked) |
 
 ### Output format
 
@@ -359,6 +365,7 @@ interface ParityValidateResult {
 - **Stale suppression** (file or section no longer exists) → warning `PARITY-SUP-02`
 - **Duplicate suppression records** → error `PARITY-SUP-03`
 - **Source locale file missing** → skip (mirroring.validate catches this separately)
+- **Concurrent suppression file writes** → low risk (missions are single-threaded; if two agents somehow write simultaneously, the last writer wins and the stale writer's suppression is lost — acceptable since suppressions are idempotent and re-addable). No file locking needed.
 
 ## Rollout
 
@@ -367,6 +374,28 @@ interface ParityValidateResult {
 - **New sites:** Automatically comply from day one. Structural parity is checked from the first multi-locale build.
 - **No flag day:** The suppression file is optional. Sites without it simply get all findings reported.
 - **Pipeline integration:** Added to `SITES_CHECK_AUTHOR_PIPELINE` after `mirroring.validate` (line ~338 in `sites-check-author.ts`).
+
+### Review manifest output
+
+`translation.parity.review` writes a review manifest to `translation-parity-review.yaml` in the workpiece root (git-tracked, same pattern as `content.regression.review.generate` writes `review.yaml` in RFC-0734). The manifest contains all unsuppressed findings with `sourceFile`, `targetFile`, `ruleId`, `section`, `sourceCount`, `targetCount`, `fixHint`, and `sourceExcerpt` for operator inspection. The command also outputs the manifest to `--json` for agent consumption.
+
+### AGENTS.md updates
+
+The following `AGENTS.md` files require updates during implementation:
+
+- `packages/werkstatt-site/AGENTS.md` — add `translation.parity.validate`, `translation.parity.review`, `translation.parity.suppress` to the «Check commands» section with one-line descriptions.
+- `packages/werkstatt-shared/AGENTS.md` — document the new `splitSentences` function in the share/semantic entry.
+
+### Compass sync
+
+The following `docs/*.xml` files require synchronization during implementation:
+
+- `docs/requirements.xml` — add the translation parity validation requirement.
+- `docs/knowledge-graph.xml` — add the three new commands and their relationships to DNA-11, mirroring.validate, and the translation validation contour.
+
+### Subpath exports
+
+`splitSentences` is added to the existing `@warpgogol/werkstatt-shared/share/semantic` subpath export — no new subpath export needed. The suppression Zod schema lives in `packages/werkstatt-site/src/checks/translation-parity.ts` and is not exported cross-package (single consumer).
 
 ## Alternatives considered
 
@@ -390,7 +419,7 @@ interface ParityValidateResult {
 
 ## Acceptance criteria
 
-- [ ] `translation.parity.validate` command registered with `scope: app` in `packages/werkstatt-site/src/checks/command-tables/`
+- [ ] `translation.parity.validate` command registered with `scope: app` in `packages/werkstatt-site/src/checks/command-tables/04-content-quality.ts`
 - [ ] Detects H2 section count mismatches between locale variants
 - [ ] Detects paragraph count mismatches per section
 - [ ] Detects sentence count mismatches per paragraph
@@ -406,6 +435,7 @@ interface ParityValidateResult {
 - [ ] Each finding includes `sourceFile`, `targetFile`, `fixHint`, and `missingItems` for agent-actionable remediation
 - [ ] `sourceExcerpt` includes the source-locale text of missing sections/paragraphs so agents can translate without re-reading files
 - [ ] `translation.parity.suppress` accepts finding fields directly (`--file`, `--ruleId`, `--section`) so agents can suppress without manual YAML editing
+- [ ] Each command handler returns `KernelCommandResult` with `exitCode` explicitly set on every return path, `summary` prefixed with `[command.name]`, and `nextSteps` non-empty on failure (DNA-82)
 - [ ] Unit tests cover: section count, paragraph count, sentence count, suppression matching, stale suppression detection, locale scoping, legal vs non-legal severity
 - [ ] `rfc.validate` passes on this file before merging
 
