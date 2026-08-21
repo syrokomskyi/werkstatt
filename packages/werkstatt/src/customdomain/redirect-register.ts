@@ -68,10 +68,7 @@ export async function runRedirectRegister(
   const systemId = flagSite(input);
   if (!systemId) throw new Error("[redirect.register] --site is required");
 
-  const { zoneId, apexDomain } = await resolveCustomDomainConfig(
-    workspaceRoot,
-    systemId,
-  );
+  const { zoneId, apexDomain } = await resolveCustomDomainConfig(workspaceRoot, systemId);
 
   const env = await resolveCustomDomainEnv();
   const apiToken = env["CLOUDFLARE_API_TOKEN"];
@@ -127,9 +124,7 @@ export async function runRedirectRegister(
   // --- Redirect Rule (www → apex 301) ---
   const ruleset = await getRedirectRuleset(zoneId, apiToken);
   const matchingRule = ruleset.rules.find(
-    (r) =>
-      r.expression === expectedExpression ||
-      r.description === expectedDescription,
+    (r) => r.expression === expectedExpression || r.description === expectedDescription,
   );
 
   let ruleResult: RedirectRegisterResult["redirectRule"];
@@ -188,6 +183,11 @@ export async function runRedirectRegister(
       state,
     },
     summary: `[redirect.register] ${wwwDomain} → ${apexDomain}: ${state} (dns: ${dnsCreated ? "created" : "exists"}, rule: ${ruleCreated ? "created" : "exists"})`,
-    nextSteps: [],
+    nextSteps: [
+      {
+        action: `Verify the redirect: curl -I https://${wwwDomain}`,
+        kind: "optional",
+      },
+    ],
   };
 }

@@ -82,10 +82,7 @@ export async function runCustomdomainRegister(
   let dnsCreated = false;
 
   if (matchingDns) {
-    if (
-      matchingDns.type === "A" &&
-      matchingDns.proxied === true
-    ) {
+    if (matchingDns.type === "A" && matchingDns.proxied === true) {
       dnsResult = {
         id: matchingDns.id,
         type: "A",
@@ -163,6 +160,11 @@ export async function runCustomdomainRegister(
       state,
     },
     summary: `[customdomain.register] ${apexDomain}: ${state} (dns: ${dnsCreated ? "created" : "exists"}, route: ${routeCreated ? "created" : "exists"})`,
-    nextSteps: [],
+    nextSteps: [
+      {
+        action: `Verify the domain is serving: curl -I https://${apexDomain}`,
+        kind: "optional",
+      },
+    ],
   };
 }

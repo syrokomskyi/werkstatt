@@ -1,0 +1,70 @@
+.gratitude-section__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--ds-spacing-lg, 1.5rem);
+  margin-top: var(--ds-spacing-lg, 1.5rem);
+}
+
+@media (max-width: 768px) {
+  .gratitude-section__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gratitude-card {
+  position: relative;
+  padding: var(--ds-spacing-lg, 1.5rem);
+  border-radius: var(--ds-radius-md, 0.75rem);
+  background: var(--ds-color-surface, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--ds-color-border, rgba(255, 255, 255, 0.1));
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-sm, 0.75rem);
+}
+
+.gratitude-card__quote-mark {
+  font-size: 2.5rem;
+  line-height: 1;
+  color: var(--ds-color-accent, inherit);
+  font-family: Georgia, serif;
+  opacity: 0.6;
+}
+
+.gratitude-card__quote {
+  margin: 0;
+  font-style: italic;
+  font-size: var(--ds-font-size-md, 1rem);
+  line-height: var(--ds-line-height-relaxed, 1.6);
+  color: var(--ds-color-text, inherit);
+}
+
+.gratitude-card__author {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: auto;
+  padding-top: var(--ds-spacing-sm, 0.75rem);
+  border-top: 1px solid var(--ds-color-border, rgba(255, 255, 255, 0.08));
+}
+
+.gratitude-card__author-name {
+  font-weight: 600;
+  font-size: var(--ds-font-size-sm, 0.875rem);
+}
+
+.gratitude-card__author-role {
+  font-size: var(--ds-font-size-xs, 0.75rem);
+  color: var(--ds-color-text-muted, rgba(255, 255, 255, 0.6));
+}
+
+.gratitude-card__evidence-link {
+  font-size: var(--ds-font-size-xs, 0.75rem);
+  color: var(--ds-color-accent, inherit);
+  text-decoration: none;
+  margin-top: 0.25rem;
+}
+
+.gratitude-card__evidence-link:hover {
+  text-decoration: underline;
+}

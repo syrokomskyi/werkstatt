@@ -63,7 +63,15 @@ export async function runIntegrityInit(
   }
 
   await runInit({ cwd: app.directory });
-  return { summary: `[integrity.init] complete for ${app.name}` };
+  return {
+    summary: `[integrity.init] complete for ${app.name}`,
+    nextSteps: [
+      {
+        action: `Update integrity manifests: pnpm exec werkstatt run integrity.update`,
+        kind: "optional",
+      },
+    ],
+  };
 }
 
 export async function runIntegrityUpdate(
@@ -78,7 +86,12 @@ export async function runIntegrityUpdate(
   }
 
   await runUpdate({ cwd: app.directory, baseRef: getStringArg(input, 0) });
-  return { summary: `[integrity.update] complete for ${app.name}` };
+  return {
+    summary: `[integrity.update] complete for ${app.name}`,
+    nextSteps: [
+      { action: `Verify integrity: pnpm exec werkstatt run integrity.verify`, kind: "optional" },
+    ],
+  };
 }
 
 export async function runIntegrityVerify(
@@ -91,6 +104,14 @@ export async function runIntegrityVerify(
     data: { ok: report.ok },
     exitCode: report.ok ? 0 : 1,
     summary: report.ok ? "Integrity verification passed." : undefined,
+    nextSteps: report.ok
+      ? undefined
+      : [
+          {
+            action: `Fix the integrity violations above, then re-run: pnpm exec werkstatt run integrity.verify`,
+            kind: "required",
+          },
+        ],
   };
 }
 
@@ -107,7 +128,12 @@ export async function runIntegrityBuildRecord(
   }
 
   await runRecordBuild({ cwd: app.directory, builder: "local", distDir });
-  return { summary: `[integrity.build-record] complete for ${app.name}` };
+  return {
+    summary: `[integrity.build-record] complete for ${app.name}`,
+    nextSteps: [
+      { action: `Sign the build: pnpm exec werkstatt run integrity.sign`, kind: "optional" },
+    ],
+  };
 }
 
 async function loadPrivateKeyPem(appDirectory: string): Promise<string> {

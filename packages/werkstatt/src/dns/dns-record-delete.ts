@@ -98,7 +98,12 @@ export async function runDnsRecordDelete(
           state: "not-found",
         },
         summary: `[dns.record.delete] ${systemId}: no records found for ${recordType}:${name}`,
-        nextSteps: [],
+        nextSteps: [
+          {
+            action: `List existing records: pnpm exec werkstatt run dns.record.list --site ${systemId}`,
+            kind: "optional",
+          },
+        ],
       };
     }
 
@@ -122,6 +127,13 @@ export async function runDnsRecordDelete(
       state: dryRun ? "dry-run" : "deleted",
     },
     summary: `[dns.record.delete] ${systemId}: ${deleted.length} record(s) ${dryRun ? "would be deleted" : "deleted"} in zone ${zoneDomain}`,
-    nextSteps: [],
+    nextSteps: dryRun
+      ? [
+          {
+            action: `Delete for real: pnpm exec werkstatt run dns.record.delete --site ${systemId} --type ${recordType} --name ${name}`,
+            kind: "optional",
+          },
+        ]
+      : undefined,
   };
 }

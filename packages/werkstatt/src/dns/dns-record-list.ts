@@ -81,6 +81,11 @@ export async function runDnsRecordList(
       })),
     },
     summary: `[dns.record.list] ${systemId}: ${records.length} records in zone ${zoneDomain}`,
-    nextSteps: [],
+    nextSteps: [
+      {
+        action: `Validate DNS records: pnpm exec werkstatt run dns.record.validate --site ${systemId}`,
+        kind: "optional",
+      },
+    ],
   };
 }

@@ -1,0 +1,28 @@
+id: gratitude-section
+uniName: gratitude-section
+layer: section
+semanticId: gratitude
+archetype: gratitude
+cosmicName: Gonggong
+role: client-gratitude
+version: 1.0.0
+numbered: false
+intent:
+  - build-trust
+  - differentiation
+industryFit: []
+contentSchemaKey: gratitude-section
+contentTypesPath: ./gratitude-section.types.generated.ts
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - header
+  properties:
+    tag:
+      type: string

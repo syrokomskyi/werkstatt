@@ -1,0 +1,145 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Gratitude section — loads published client-testimonial PBP entities and renders quote cards (RFC-0900).</purpose>
+<non-goals>
+  <item>Does not render testimonials on Nachweis detail pages — gratitude is listing-page only.</item>
+  <item>Does not fabricate testimonials — content is human-authored from real client quotes.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0900: established gratitude section for client testimonial display on Nachweise page.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { getCollection, type CollectionEntry } from "astro:content";
+import type { SectionProps } from "@warpgogol/werkstatt-shared/share/page";
+import { need, cast, resolveSectionAnchor } from "@warpgogol/werkstatt-site/share";
+import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
+import type { GratitudeSectionContent } from "./gratitude-section.types.generated.ts";
+import "./gratitude-section.css";
+
+const { lang, pageOverride, sectionNumber } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "gratitude");
+const props = cast<GratitudeSectionContent>(pageOverride);
+
+interface TestimonialData {
+  id: string;
+  quote: string;
+  authorName: string;
+  authorRole?: string;
+  authorOrganization?: string;
+  evidenceRef?: string;
+}
+
+const allEntries = await getCollection(
+  "business-profile",
+  (entry: CollectionEntry<"business-profile">) =>
+    entry.id.startsWith(`${lang}/trust/testimonials/`),
+);
+
+const testimonials: TestimonialData[] = allEntries
+  .filter((entry) => {
+    const data = entry.data as { type?: string; status?: string };
+    return data.type === "client-testimonial" && data.status === "published";
+  })
+  .map((entry) => {
+    const data = entry.data as {
+      quote?: string;
+      authorName?: string;
+      authorRole?: string;
+      authorOrganization?: string;
+      evidenceRef?: string;
+    };
+    return {
+      id: entry.id,
+      quote: need("quote", data.quote),
+      authorName: need("authorName", data.authorName),
+      authorRole: data.authorRole,
+      authorOrganization: data.authorOrganization,
+      evidenceRef: data.evidenceRef,
+    };
+  });
+
+if (testimonials.length === 0) {
+  return;
+}
+
+const evidenceSourceEntries = await getCollection(
+  "business-profile",
+  (entry: CollectionEntry<"business-profile">) =>
+    entry.id.startsWith(`${lang}/`) &&
+    (entry.data as { type?: string }).type === "evidence-source",
+);
+
+const evidenceSlugById = new Map<string, string>();
+for (const entry of evidenceSourceEntries) {
+  const data = entry.data as { id?: string; slug?: string };
+  if (data.id && data.slug) {
+    evidenceSlugById.set(data.id, data.slug);
+  }
+}
+
+function resolveEvidenceLink(evidenceRef?: string): string | null {
+  if (!evidenceRef) return null;
+  const slug = evidenceSlugById.get(evidenceRef);
+  if (!slug) return null;
+  return `/${lang}/nachweise/${slug}`;
+}
+---
+
+<SectionShell
+  slug="gratitude"
+  sectionId={sectionId}
+  sectionNumber={sectionNumber}
+  ariaLabelledBy="gratitude-title"
+  background={props.background}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <SectionHeader
+    sectionNumber={sectionNumber}
+    heading={need("header.heading", props.header?.heading)}
+    subheading={props.header?.subheading}
+    align={props.header?.align ?? "left"}
+    level={props.header?.level ?? 2}
+    hideSectionNumber={props.header?.hideSectionNumber}
+    id="gratitude-title"
+    lang={lang}
+  />
+
+  <div class="gratitude-section__grid">
+    {
+      testimonials.map((testimonial) => {
+        const evidenceLink = resolveEvidenceLink(testimonial.evidenceRef);
+        return (
+          <article class="gratitude-card">
+            <span class="gratitude-card__quote-mark" aria-hidden="true">
+              &ldquo;
+            </span>
+            <blockquote class="gratitude-card__quote">
+              {testimonial.quote}
+            </blockquote>
+            <footer class="gratitude-card__author">
+              <span class="gratitude-card__author-name">{testimonial.authorName}</span>
+              {testimonial.authorRole && (
+                <span class="gratitude-card__author-role">
+                  {testimonial.authorRole}
+                  {testimonial.authorOrganization && `, ${testimonial.authorOrganization}`}
+                </span>
+              )}
+              {evidenceLink && (
+                <a class="gratitude-card__evidence-link" href={evidenceLink}>
+                  {lang === "de" ? "Zum Nachweis" : "To evidence"} &rarr;
+                </a>
+              )}
+            </footer>
+          </article>
+        );
+      })
+    }
+  </div>
+</SectionShell>

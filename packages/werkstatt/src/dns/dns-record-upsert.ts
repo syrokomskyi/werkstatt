@@ -80,7 +80,12 @@ export async function runDnsRecordUpsert(
         summary: { created: 0, updated: 0, skipped: 0, total: 0, errors: 0 },
       },
       summary: `[dns.record.upsert] ${systemId}: skipped — no dns-records.yaml found`,
-      nextSteps: [],
+      nextSteps: [
+        {
+          action: `Create a dns-records.yaml file for ${systemId} and re-run: pnpm exec werkstatt run dns.record.upsert --site ${systemId}`,
+          kind: "optional",
+        },
+      ],
     };
   }
 
@@ -157,7 +162,27 @@ export async function runDnsRecordUpsert(
       summary: { created, updated, skipped, total, errors },
     },
     summary: `[dns.record.upsert] ${systemId}: ${created} created, ${updated} updated, ${skipped} skipped, ${errors} error(s) (${total} total)${dryRun ? " [dry-run]" : ""}`,
-    nextSteps: [],
+    nextSteps:
+      errors > 0
+        ? [
+            {
+              action: `Fix the ${errors} error(s) above, then re-run: pnpm exec werkstatt run dns.record.upsert --site ${systemId}`,
+              kind: "required",
+            },
+          ]
+        : dryRun
+          ? [
+              {
+                action: `Apply for real: pnpm exec werkstatt run dns.record.upsert --site ${systemId}`,
+                kind: "optional",
+              },
+            ]
+          : [
+              {
+                action: `Validate DNS records: pnpm exec werkstatt run dns.record.validate --site ${systemId}`,
+                kind: "optional",
+              },
+            ],
   };
 }
 

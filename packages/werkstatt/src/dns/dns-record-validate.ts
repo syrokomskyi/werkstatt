@@ -133,6 +133,14 @@ export async function runDnsRecordValidate(
       counts: { match, mismatch, missing, extra },
     },
     summary: `[dns.record.validate] ${systemId}: ${state} (${match} match, ${mismatch} mismatch, ${missing} missing, ${extra} extra)`,
-    nextSteps: [],
+    nextSteps:
+      state === "valid"
+        ? undefined
+        : [
+            {
+              action: `Fix DNS records: ${mismatch} mismatch(es), ${missing} missing, ${extra} extra — then re-run: pnpm exec werkstatt run dns.record.validate --site ${systemId}`,
+              kind: "required",
+            },
+          ],
   };
 }

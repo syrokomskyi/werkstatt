@@ -103,7 +103,14 @@ export async function runDnsRecordsSchemaValidate(
       state,
     },
     summary: `[dns.records.schema.validate] ${checkedFiles.length} file(s) checked: ${state}`,
-    nextSteps: [],
+    nextSteps: allValid
+      ? undefined
+      : [
+          {
+            action: `Fix the schema violations above, then re-run: pnpm exec werkstatt run dns.records.schema.validate`,
+            kind: "required",
+          },
+        ],
     ...(allValid ? {} : { exitCode: 1 }),
   };
 }
