@@ -251,7 +251,7 @@ Validation diagnostics are emitted by the existing `page.blocks.extract.validate
   7. Update `blocks-renderer.astro` to pass `block.id` as `blockId` prop to section components.
   8. Remove `anchorId` from `UNIVERSAL_BLOCK_PROPS` in `page-block.ts`.
 - **New sites** automatically comply: `mission.materialize` generates page content via codegen, and the plugin's `scaffoldProject` hook (legacy: `onboarding.scaffold`, removed by RFC-0532) seeds initial content. The codegen templates must include `blocks[].id` for all scaffolded pages.
-- **Pipeline integration:** No new pipeline step. The existing `page.blocks.extract.validate` (already in `SITES_CHECK_AUTHOR_PIPELINE`) is extended with format validation. `page.block.validate` already checks duplicates (B-05).
+- **Pipeline integration:** `page.blocks.extract.validate` is registered in `command-tables/09-build-artifacts.ts` but NOT currently in any pipeline. This RFC adds it to `SITES_CHECK_AUTHOR_PIPELINE` after `page.block.validate` (line 41). `page.block.validate` already checks duplicates (B-05).
 - **RFC-0048 anchor registry removal:** `resolveAnchorFragment` and `resolveSectionAnchor` in `packages/werkstatt-site/src/domain/share/astro/routes/anchors.ts` are simplified. The `anchors` map in `system.md` is no longer read. The `anchors` field on `LocalizedRouteEntry` in `registry.ts` is removed. Navigation `targets[].semanticTarget.anchor` is a block id, used directly as the HTML `id` attribute. `content-links.ts` `resolveAnchor` is simplified to use the block id directly.
 
 ### Prop flow after registry removal
@@ -287,7 +287,7 @@ After this RFC:
 ## Acceptance criteria
 
 - [ ] `block.id.generate` command is registered in `command-tables/04-content-quality.ts` with `scope: app` and backfills missing ids using `slugify(heading)` with `-2`, `-3` suffix deduplication
-- [ ] `page.blocks.extract.validate` is extended with `BLOCK-ID-INVALID` format check (`/^[a-z0-9]+(-[a-z0-9]+)*$/`)
+- [ ] `page.blocks.extract.validate` is added to `SITES_CHECK_AUTHOR_PIPELINE` after `page.block.validate` and extended with `BLOCK-ID-INVALID` format check (`/^[a-z0-9]+(-[a-z0-9]+)*$/`)
 - [ ] `extractContentBlocks` in `packages/werkstatt-shared/src/share/semantic/build-page.ts` removes the `block-${result.length}` fallback and requires `blocks[].id`
 - [ ] `BlockEntrySchema.id` in `packages/werkstatt-shared/src/ontology/schemas/page-entry.ts` transitions from `.optional()` to required
 - [ ] RFC-0048 `anchors` registry in `system.md` is removed; `resolveAnchorFragment` and `resolveSectionAnchor` in `packages/werkstatt-site/src/domain/share/astro/routes/anchors.ts` use block id directly as HTML id
