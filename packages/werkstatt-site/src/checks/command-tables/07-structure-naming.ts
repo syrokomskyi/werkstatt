@@ -44,6 +44,7 @@ import { runWarningDiagnosticsLint } from "../warning-diagnostics-lint.ts";
 import { runKernelFlagsLint } from "../kernel-flags-lint.ts";
 import { runKernelIoLint } from "../kernel-io-lint.ts";
 import { runCloudflareWorkersImportLint } from "../cloudflare-workers-import-lint.ts";
+import { runNachweisPropsCoverageLint } from "../nachweis-props-coverage-lint.ts";
 import { runCheckFixtureLint } from "../check-fixture-lint.ts";
 import { runCommandArgsValidate } from "../command-args-validate.ts";
 import { runPipelineLogHygieneValidate } from "../pipeline/pipeline-log-hygiene.ts";
@@ -211,6 +212,23 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
       "packages/werkstatt-shared/src/**/*.ts",
     ],
     execute: runCloudflareWorkersImportLint,
+  },
+  {
+    name: "nachweis.props.coverage.lint",
+    description:
+      "Static lint (NACHWEIS-PROPS-01): cross-references required props in nachweis-detail and nachweis-card " +
+      "component interfaces against prop assignments in resolveNachweisEvidenceProps. Flags required fields " +
+      "that the resolver never assigns, preventing runtime crashes from undefined prop access.",
+    scope: "workspace",
+    supportsAllSites: true,
+    cacheable: false,
+    flags: {},
+    reads: [
+      "packages/werkstatt-site/src/domain/ui/components/nachweis-detail/nachweis-detail-component.astro",
+      "packages/werkstatt-site/src/domain/ui/components/nachweis-card/nachweis-card-component.astro",
+      "packages/werkstatt-site/src/domain/share/astro/page-handler/resolve-route.ts",
+    ],
+    execute: runNachweisPropsCoverageLint,
   },
   /* RFC-0610 */
   {

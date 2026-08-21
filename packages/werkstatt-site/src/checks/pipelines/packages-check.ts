@@ -145,6 +145,8 @@ export const PACKAGES_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "kernel.io.lint" },
   // Prevent static import from cloudflare:workers — causes ERR_UNSUPPORTED_ESM_URL_SCHEME during Astro build.
   { command: "cloudflare.workers.import.lint" },
+  // Cross-reference nachweis component required props against resolver assignments.
+  { command: "nachweis.props.coverage.lint" },
   // RFC-0610: flag-only argument pattern enforcement — no input.args reads, no dual-path fallbacks.
   { command: "command.args.validate" },
   // RFC-0261: shrink-only ratchet on *.validate/*.lint fixture coverage (DSL-04 rides the existing diagnostic.shape.lint step above).

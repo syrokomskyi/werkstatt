@@ -179,6 +179,13 @@ export const CORE_INFRA_RULES: Record<string, RuleDescriptor> = {
     "cloudflare.workers.import.lint",
   ),
 
+  // nachweis.props.coverage.lint — prevents runtime crashes from missing prop mapping.
+  "NACHWEIS-PROPS-01": rule(
+    "NACHWEIS-PROPS-01",
+    "resolveNachweisEvidenceProps does not assign a required component prop",
+    "nachweis.props.coverage.lint",
+  ),
+
   // RFC-0303: shared fs/text helper dedup + oversized-file guard rails.
   "WALK-01": rule(
     "WALK-01",
