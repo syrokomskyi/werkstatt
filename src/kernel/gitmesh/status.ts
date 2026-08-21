@@ -51,7 +51,13 @@ export async function runGitMeshStatus(
         diagnostics: ["gitmesh.status: no werkstatt.gitmesh.json found — run gitmesh.sync first"],
       },
       exitCode: 1,
-      summary: "gitmesh.status: no werkstatt.gitmesh.json found — run gitmesh.sync first",
+      summary: "[gitmesh.status] no werkstatt.gitmesh.json found — run gitmesh.sync first",
+      nextSteps: [
+        {
+          action: "Run gitmesh.sync first to configure gitmesh, then re-run gitmesh.status",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -102,7 +108,7 @@ export async function runGitMeshStatus(
     },
     exitCode: 0,
     summary:
-      `gitmesh.status: ${behind} behind, ${ahead} ahead` +
+      `[gitmesh.status] ${behind} behind, ${ahead} ahead` +
       (lastSync ? `, last sync: ${lastSync}` : ", never synced"),
   };
 }
