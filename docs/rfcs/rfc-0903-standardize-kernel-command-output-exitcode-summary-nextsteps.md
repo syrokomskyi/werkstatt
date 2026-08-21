@@ -43,9 +43,9 @@ satisfies:
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - werkstatt.commands.validate
-  added: []
   changed: []
   removed: []
 appsImpacted: []
@@ -118,7 +118,7 @@ Every kernel command handler in `packages/werkstatt/src/` and `packages/werkstat
 - **RFC-0542**: Established self-documenting output for forge CLI commands. This RFC extends the same principle (structured `nextSteps`, consistent output) to the engine and site plugin kernel commands, which are a separate runtime surface.
 - **RFC-0579**: Introduced `nextSteps` as an optional `KernelCommandResult` field. This RFC makes `nextSteps` mandatory on failure paths, building on RFC-0579's foundation.
 - **RFC-0609**: Standardized command argument patterns to flag-only. This RFC standardizes command output format — the two are complementary (input standard + output standard).
-- **Site OS operator model**: `werkstatt.commands.validate` is a `scope: workspace` command registered in the engine kernel via the `werkstatt-shared-validate` module (existing module in `packages/werkstatt/src/os/werkstatt-shared-validate-module.ts`). It scans handler files in `packages/werkstatt/src/`, `packages/werkstatt-site/src/`, and `packages/werkstatt-shared/src/` without executing commands.
+- **Site OS operator model**: `werkstatt.commands.validate` is a `scope: workspace` command registered in the engine kernel via the `werkstatt-commands-validate` module (new module in `packages/werkstatt/os/werkstatt-commands-validate.module.ts`). It scans handler files in `packages/werkstatt/src/`, `packages/werkstatt-site/src/`, and `packages/werkstatt-shared/src/` without executing commands.
 - **Compass sync**: `docs/verification-plan.xml` does not need updating during gated adoption — the command is not in any pipeline. When a future RFC adds `werkstatt.commands.validate` to `PACKAGES_CHECK_PIPELINE`, that RFC must also add a `<check-set>` entry to `docs/verification-plan.xml`.
 - **AGENTS.md sync**: `packages/werkstatt/AGENTS.md` "Command handler patterns" section must be updated with the output standard rules (explicit `exitCode`, `[command.name]`-prefixed `summary`, failure `nextSteps`). Root `AGENTS.md` does not need changes — it covers monorepo layout, not command handler patterns.
 
@@ -268,17 +268,17 @@ In pretty mode, violations are listed grouped by file with rule ID and message.
 
 ## Acceptance criteria
 
-- [ ] DNA-82 is documented in `docs/architecture-dna.md` (evidence: `docs/architecture-dna.md:343-345`)
-- [ ] `werkstatt.commands.validate` command is registered in the engine kernel with `scope: workspace`
-- [ ] `werkstatt.commands.validate` produces `CMD-OUTPUT-01`, `CMD-OUTPUT-02`, `CMD-OUTPUT-03` diagnostics
-- [ ] `werkstatt.commands.validate` exempts returns that delegate to `passResult`/`failResult`/`diagnosticsResult`/`resultFromViolations`/`buildAuditResult`
-- [ ] `--json` output format is documented and stable (evidence: `--json` output includes `command`, `status`, `diagnostics`, `summary`)
-- [ ] `--mode=warning|error` flag is implemented (default: `error`)
-- [ ] Unit tests cover all three rule IDs and helper-exempt returns
-- [ ] `packages/werkstatt-shared/src/checks/result-helpers.ts` `passResult` returns explicit `exitCode: 0` and `[command.name]`-prefixed `summary` (evidence: `packages/werkstatt-shared/src/checks/result-helpers.ts:88-93`)
-- [ ] `packages/werkstatt-shared/src/checks/result-helpers.ts` `failResult` returns `[command.name]`-prefixed `summary` (evidence: `packages/werkstatt-shared/src/checks/result-helpers.ts:104-121`)
-- [ ] `packages/werkstatt/AGENTS.md` "Command handler patterns" section documents the output standard (explicit `exitCode`, `[command.name]`-prefixed `summary`, failure `nextSteps`)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] DNA-82 is documented in `docs/architecture-dna.md` (evidence: `docs/architecture-dna.md:343-345`)
+- [x] `werkstatt.commands.validate` command is registered in the engine kernel with `scope: workspace` (evidence: `packages/werkstatt/os/werkstatt-commands-validate.module.ts:27`, `tools/kernel.config.ts:173`)
+- [x] `werkstatt.commands.validate` produces `CMD-OUTPUT-01`, `CMD-OUTPUT-02`, `CMD-OUTPUT-03` diagnostics (evidence: `packages/werkstatt/src/plugin/commands-validate.ts:170-194`, smoke test reported 367 violations)
+- [x] `werkstatt.commands.validate` exempts returns that delegate to `passResult`/`failResult`/`diagnosticsResult`/`resultFromViolations`/`buildAuditResult` (evidence: `packages/werkstatt/src/plugin/commands-validate.ts:31-37`, `packages/werkstatt/src/tests/commands-validate.test.ts` helper-exempt tests)
+- [x] `--json` output format is documented and stable (evidence: `--json` output includes `command`, `status`, `diagnostics`, `summary` — `packages/werkstatt/src/plugin/commands-validate.ts:213-220`)
+- [x] `--mode=warning|error` flag is implemented (default: `error`) (evidence: `packages/werkstatt/os/werkstatt-commands-validate.module.ts:34-38`, `packages/werkstatt/src/plugin/commands-validate.ts:200-206`)
+- [x] Unit tests cover all three rule IDs and helper-exempt returns (evidence: `packages/werkstatt/src/tests/commands-validate.test.ts` — 15 tests, all pass)
+- [x] `packages/werkstatt-shared/src/checks/result-helpers.ts` `passResult` returns explicit `exitCode: 0` and `[command.name]`-prefixed `summary` (evidence: `packages/werkstatt-shared/src/checks/result-helpers.ts:88-93`)
+- [x] `packages/werkstatt-shared/src/checks/result-helpers.ts` `failResult` returns `[command.name]`-prefixed `summary` (evidence: `packages/werkstatt-shared/src/checks/result-helpers.ts:104-121`)
+- [x] `packages/werkstatt/AGENTS.md` "Command handler patterns" section documents the output standard (explicit `exitCode`, `[command.name]`-prefixed `summary`, failure `nextSteps`) (evidence: `packages/werkstatt/AGENTS.md:281`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0903 --json` — zero errors)
 
 ## Implementation notes for agents
 
