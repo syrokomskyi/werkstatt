@@ -21,7 +21,18 @@
 */
 
 import { defineMiddleware } from "astro:middleware";
-import { env } from "cloudflare:workers";
+
+// cloudflare:workers is only available in the Cloudflare Workers runtime.
+// In Astro build (Node.js) the static import fails — resolve lazily so the
+// middleware still loads; ACCESS_PIN is undefined in build (no runtime binding).
+async function resolveAccessPin(): Promise<string | undefined> {
+  try {
+    const { env } = await import("cloudflare:workers");
+    return (env.ACCESS_PIN as string | undefined) ?? undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 const NOINDEX_HEADER = "noindex, nofollow, noai, noimageai";
 
@@ -62,7 +73,7 @@ export const accessProtectionMiddleware = defineMiddleware(async (context: any, 
     return next();
   }
 
-  const pin = (env.ACCESS_PIN as string | undefined) ?? undefined;
+  const pin = await resolveAccessPin();
 
   // No PIN set — allow access but still set noindex headers
   if (!pin) {
