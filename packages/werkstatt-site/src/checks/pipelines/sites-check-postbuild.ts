@@ -37,6 +37,9 @@ export const SITES_CHECK_POSTBUILD_PIPELINE: KernelPipelineStep[] = [
   // RFC-0318: generated public trees must not retain stale twins or empty directories.
   { command: "public.orphans.validate" },
   { command: "redirect.map.validate" },
+  // RFC-0905: redirect shadow detection — cross-reference _redirects against
+  // dist/client/ static files and Worker route patterns.
+  { command: "redirect.shadow.validate" },
   // RFC-0165: a noindex page must never appear in the sitemap.
   { command: "robots.page.validate" },
   // RFC-0165: the RSS feed is well-formed.

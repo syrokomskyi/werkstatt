@@ -36,6 +36,7 @@ import {
   runSecurityTxtGenerate,
   runSecurityTxtValidate,
 } from "../public-surface.ts";
+import { runRedirectShadowValidate } from "../redirect-shadow.ts";
 import { runCspOriginsValidate } from "../csp-origins.ts";
 import { runCspElementsValidate } from "../csp-elements.ts";
 import { runHeadersCoverageValidate } from "../headers-coverage.ts";
@@ -207,6 +208,22 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
       "result-helpers.ts",
     ],
     execute: runRedirectMapValidate,
+  },
+  {
+    name: "redirect.shadow.validate",
+    description:
+      "Cross-reference _redirects sources against dist/client/ static files and Worker route patterns for shadow detection (RFC-0905).",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/public/_redirects", "<app>/dist/client/**/*.html", "<app>/wrangler.jsonc"],
+    modulePaths: [
+      "redirect-shadow.ts",
+      "public-surface/managed-public.ts",
+      "public-surface/shared.ts",
+      "result-helpers.ts",
+    ],
+    execute: runRedirectShadowValidate,
   },
   {
     name: "indexnow.key.generate",
