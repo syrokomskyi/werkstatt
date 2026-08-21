@@ -40,11 +40,11 @@ export interface MirrorEntry {
 }
 
 export async function writeSystemConfig(root: string, mirrors: MirrorEntry[]): Promise<void> {
-  const cacheDir = join(root, "..", "systems-cache", "test-site");
+  const cacheDir = join(root, "..", "systems-cache", "test-bundle");
   await mkdir(cacheDir, { recursive: true });
   const config = {
     schemaVersion: "system-config/v1",
-    id: "test-site",
+    id: "test-bundle",
     cosmicStar: "Vega",
     mirrors,
     pinnedPlatform: "4.5.0",
@@ -56,7 +56,7 @@ export async function writeSystemConfig(root: string, mirrors: MirrorEntry[]): P
 
   const pin = {
     schemaVersion: "system-pin/v1",
-    systemId: "test-site",
+    systemId: "test-bundle",
     cosmicStar: "Vega",
     pinnedAt: "2026-01-01T00:00:00Z",
     platform: {

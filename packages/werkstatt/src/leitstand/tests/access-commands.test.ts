@@ -33,14 +33,14 @@ describe("RFC-0899: leitstand.access.status", () => {
   it("reports protected when accessPin is set", async () => {
     vi.mocked(readSystemStateSmart).mockResolvedValueOnce({
       schemaVersion: "1.0.0",
-      systemId: "test-site",
+      systemId: "test-bundle",
       currentMission: null,
       lastRelease: null,
       lastPropagated: {},
       accessPin: "1234",
     });
     const result = await runLeitstandAccessStatus(
-      makeInput({ site: "test-site" }),
+      makeInput({ site: "test-bundle" }),
       makeContext("/tmp/test"),
     );
     expect(result.data!.protected).toBe(true);
@@ -51,14 +51,14 @@ describe("RFC-0899: leitstand.access.status", () => {
   it("reports unprotected when accessPin is null", async () => {
     vi.mocked(readSystemStateSmart).mockResolvedValueOnce({
       schemaVersion: "1.0.0",
-      systemId: "test-site",
+      systemId: "test-bundle",
       currentMission: null,
       lastRelease: null,
       lastPropagated: {},
       accessPin: null,
     });
     const result = await runLeitstandAccessStatus(
-      makeInput({ site: "test-site" }),
+      makeInput({ site: "test-bundle" }),
       makeContext("/tmp/test"),
     );
     expect(result.data!.protected).toBe(false);

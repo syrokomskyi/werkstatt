@@ -23,7 +23,7 @@ function makeEntry(
 ): SystemConfig {
   return {
     schemaVersion: "system-config/v1",
-    id: "test-site",
+    id: "test-bundle",
     cosmicStar: "Vega",
     mirrors,
     pinnedPlatform: "4.5.0",
@@ -69,15 +69,15 @@ describe("inferMirrorProtocol", () => {
   });
 
   test("defaults to file protocol for local paths", () => {
-    expect(inferMirrorProtocol("../systems-git/test-site")).toBe("file");
-    expect(inferMirrorProtocol("./systems/test-site")).toBe("file");
+    expect(inferMirrorProtocol("../systems-git/test-bundle")).toBe("file");
+    expect(inferMirrorProtocol("./systems/test-bundle")).toBe("file");
     expect(inferMirrorProtocol("/absolute/path")).toBe("file");
   });
 });
 
 describe("isGitAccessible", () => {
   test("returns true for git protocols (file, ssh, https)", () => {
-    expect(isGitAccessible("../systems-git/test-site")).toBe(true);
+    expect(isGitAccessible("../systems-git/test-bundle")).toBe(true);
     expect(isGitAccessible("git@github.com:foo/bar.git")).toBe(true);
     expect(isGitAccessible("https://github.com/foo/bar.git")).toBe(true);
   });
@@ -91,11 +91,11 @@ describe("isGitAccessible", () => {
 
 describe("resolveMirrorPath", () => {
   test("resolves relative paths against workspaceRoot", () => {
-    expect(resolveMirrorPath(WORKSPACE, "../systems-git/test-site")).toBe(
-      join(WORKSPACE, "..", "systems-git", "test-site"),
+    expect(resolveMirrorPath(WORKSPACE, "../systems-git/test-bundle")).toBe(
+      join(WORKSPACE, "..", "systems-git", "test-bundle"),
     );
-    expect(resolveMirrorPath(WORKSPACE, "./systems/test-site")).toBe(
-      join(WORKSPACE, "systems", "test-site"),
+    expect(resolveMirrorPath(WORKSPACE, "./systems/test-bundle")).toBe(
+      join(WORKSPACE, "systems", "test-bundle"),
     );
   });
 
@@ -104,8 +104,8 @@ describe("resolveMirrorPath", () => {
   });
 
   test("strips file:// prefix and resolves relative", () => {
-    expect(resolveMirrorPath(WORKSPACE, "file://../systems-git/test-site")).toBe(
-      join(WORKSPACE, "..", "systems-git", "test-site"),
+    expect(resolveMirrorPath(WORKSPACE, "file://../systems-git/test-bundle")).toBe(
+      join(WORKSPACE, "..", "systems-git", "test-bundle"),
     );
   });
 
@@ -121,45 +121,45 @@ describe("resolveMirrorPath", () => {
 
 describe("resolveMirrors", () => {
   test("single non-bare mirror — cache only, no git or backup mirrors", () => {
-    const entry = makeEntry([{ path: "./systems/test-site", storageType: "non-bare" }]);
+    const entry = makeEntry([{ path: "./systems/test-bundle", storageType: "non-bare" }]);
     const result = resolveMirrors(WORKSPACE, entry);
-    expect(result.cachePath).toBe(join(WORKSPACE, "systems", "test-site"));
+    expect(result.cachePath).toBe(join(WORKSPACE, "systems", "test-bundle"));
     expect(result.gitMirrors).toHaveLength(0);
     expect(result.backupMirrors).toHaveLength(0);
   });
 
   test("non-bare + bare + external — cache, two git mirrors, no backup", () => {
     const entry = makeEntry([
-      { path: "./systems/test-site", storageType: "non-bare" },
-      { path: "../systems-git/test-site", storageType: "bare" },
+      { path: "./systems/test-bundle", storageType: "non-bare" },
+      { path: "../systems-git/test-bundle", storageType: "bare" },
       { path: "git@github.com:foo/test.git", storageType: "bare" },
     ]);
     const result = resolveMirrors(WORKSPACE, entry);
-    expect(result.cachePath).toBe(join(WORKSPACE, "systems", "test-site"));
+    expect(result.cachePath).toBe(join(WORKSPACE, "systems", "test-bundle"));
     expect(result.gitMirrors).toHaveLength(2);
-    expect(result.gitMirrors[0].path).toBe("../systems-git/test-site");
+    expect(result.gitMirrors[0].path).toBe("../systems-git/test-bundle");
     expect(result.gitMirrors[1].path).toBe("git@github.com:foo/test.git");
     expect(result.backupMirrors).toHaveLength(0);
   });
 
   test("non-bare + bare + external + bundle — cache, two git, one backup", () => {
     const entry = makeEntry([
-      { path: "./systems/test-site", storageType: "non-bare" },
-      { path: "../systems-git/test-site", storageType: "bare" },
+      { path: "./systems/test-bundle", storageType: "non-bare" },
+      { path: "../systems-git/test-bundle", storageType: "bare" },
       { path: "git@github.com:foo/test.git", storageType: "bare" },
-      { path: "s3://bucket/backups/test-site.bundle", storageType: "bundle" },
+      { path: "s3://bucket/backups/test-bundle.bundle", storageType: "bundle" },
     ]);
     const result = resolveMirrors(WORKSPACE, entry);
-    expect(result.cachePath).toBe(join(WORKSPACE, "systems", "test-site"));
+    expect(result.cachePath).toBe(join(WORKSPACE, "systems", "test-bundle"));
     expect(result.gitMirrors).toHaveLength(2);
     expect(result.backupMirrors).toHaveLength(1);
-    expect(result.backupMirrors[0].path).toBe("s3://bucket/backups/test-site.bundle");
+    expect(result.backupMirrors[0].path).toBe("s3://bucket/backups/test-bundle.bundle");
   });
 
   test("non-bare + bundle only — cache, no git, one backup", () => {
     const entry = makeEntry([
-      { path: "./systems/test-site", storageType: "non-bare" },
-      { path: "ftp://server/backups/test-site.bundle", storageType: "bundle" },
+      { path: "./systems/test-bundle", storageType: "non-bare" },
+      { path: "ftp://server/backups/test-bundle.bundle", storageType: "bundle" },
     ]);
     const result = resolveMirrors(WORKSPACE, entry);
     expect(result.gitMirrors).toHaveLength(0);
@@ -168,7 +168,7 @@ describe("resolveMirrors", () => {
 
   test("non-bare + rsync — rsync is not git-accessible, goes to backup", () => {
     const entry = makeEntry([
-      { path: "./systems/test-site", storageType: "non-bare" },
+      { path: "./systems/test-bundle", storageType: "non-bare" },
       { path: "rsync://server/path", storageType: "bare" },
     ]);
     const result = resolveMirrors(WORKSPACE, entry);
@@ -178,9 +178,9 @@ describe("resolveMirrors", () => {
 
   test("cache path resolved from mirrors[0] with file:// prefix", () => {
     const entry = makeEntry([
-      { path: "file://../systems-cache/test-site", storageType: "non-bare" },
+      { path: "file://../systems-cache/test-bundle", storageType: "non-bare" },
     ]);
     const result = resolveMirrors(WORKSPACE, entry);
-    expect(result.cachePath).toBe(join(WORKSPACE, "..", "systems-cache", "test-site"));
+    expect(result.cachePath).toBe(join(WORKSPACE, "..", "systems-cache", "test-bundle"));
   });
 });

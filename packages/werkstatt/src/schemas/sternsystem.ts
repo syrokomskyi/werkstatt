@@ -24,6 +24,7 @@ RFC-0790: add systemConfigSchema, systemStateSchema, servicesRegistrySchema for 
   <item>RFC-0751: extend serviceEntrySchema with kind, url, publicEndpoints, routes, upstreams, lastDeployed, healthCheckPath.</item>
   <item>RFC-0790: add systemConfigSchema, systemStateSchema, servicesRegistrySchema for convention-based discovery.</item>
   <item>RFC-0806: add lastDevDeployed to serviceEntrySchema, add cloudflare-worker to kind enum.</item>
+  <item>RFC-0902: update kebabRe error messages to mention "no TLD suffix".</item>
 </CHANGE_SUMMARY>
 */
 
@@ -38,7 +39,9 @@ const didWebRe = /^did:web:[a-z0-9.-]+#.+$/;
 
 export const systemPinSchema = z.object({
   schemaVersion: z.string().min(1),
-  systemId: z.string().regex(kebabRe, "systemId must be kebab-case, lowercase, latin-only"),
+  systemId: z
+    .string()
+    .regex(kebabRe, "systemId must be kebab-case, lowercase, latin-only, no TLD suffix"),
   cosmicStar: starNameSchema,
   pinnedAt: z.string().datetime(),
   platform: z.object({
@@ -76,7 +79,9 @@ export const serviceSubdomainSchema = z.object({
 });
 
 export const serviceEntrySchema = z.object({
-  id: z.string().regex(kebabRe, "service id must be kebab-case, lowercase, latin-only"),
+  id: z
+    .string()
+    .regex(kebabRe, "service id must be kebab-case, lowercase, latin-only, no TLD suffix"),
   kind: z.enum(["proxy-worker", "scheduled-worker", "cloudflare-worker"]),
   workerName: z.string().min(1, "workerName must be non-empty"),
   hostedBy: z.enum(["studio"]),
@@ -108,7 +113,7 @@ export const serviceEntrySchema = z.object({
 
 export const systemConfigSchema = z.object({
   schemaVersion: z.string().min(1),
-  id: z.string().regex(kebabRe, "id must be kebab-case, lowercase, latin-only"),
+  id: z.string().regex(kebabRe, "id must be kebab-case, lowercase, latin-only, no TLD suffix"),
   cosmicStar: starNameSchema,
   mirrors: z.array(mirrorEntrySchema).min(1, "mirrors must contain at least 1 entry"),
   pinnedPlatform: z.string().regex(semverRe, "pinnedPlatform must be x.y.z"),
@@ -130,7 +135,9 @@ export const systemConfigSchema = z.object({
 
 export const systemStateSchema = z.object({
   schemaVersion: z.string().min(1),
-  systemId: z.string().regex(kebabRe, "systemId must be kebab-case, lowercase, latin-only"),
+  systemId: z
+    .string()
+    .regex(kebabRe, "systemId must be kebab-case, lowercase, latin-only, no TLD suffix"),
   currentMission: z.string().nullable().default(null),
   lastRelease: z.string().nullable().default(null),
   lastPropagated: z

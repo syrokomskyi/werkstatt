@@ -100,7 +100,7 @@ test("amend fails when id is not provided", async () => {
 test("register fails when cosmicStar is not provided (non-amend)", async () => {
   await expect(
     runSternsystemRegister(
-      makeInput({ id: "test-site", mirrors: "git@github.com:foo/test.git" }),
+      makeInput({ id: "test-bundle", mirrors: "git@github.com:foo/test.git" }),
       makeContext(workspaceRoot),
     ),
   ).rejects.toThrow(/requires --cosmicStar/);
@@ -109,7 +109,7 @@ test("register fails when cosmicStar is not provided (non-amend)", async () => {
 test("register fails when mirrors is not provided (non-amend)", async () => {
   await expect(
     runSternsystemRegister(
-      makeInput({ id: "test-site", cosmicStar: "Vega" }),
+      makeInput({ id: "test-bundle", cosmicStar: "Vega" }),
       makeContext(workspaceRoot),
     ),
   ).rejects.toThrow(/requires --mirrors/);
@@ -150,11 +150,33 @@ test("createContentStub is a no-op when brief does not exist", async () => {
   expect(existsSync(systemMdPath)).toBe(false);
 });
 
+test("register rejects TLD-suffixed IDs (RFC-0902)", async () => {
+  await expect(
+    runSternsystemRegister(
+      makeInput({
+        id: "warpgogol-com",
+        cosmicStar: "Vega",
+        mirrors: "git@github.com:foo/test.git",
+      }),
+      makeContext(workspaceRoot),
+    ),
+  ).rejects.toThrow(/TLD suffix/);
+});
+
+test("register rejects TLD-suffixed IDs with --amend (RFC-0902)", async () => {
+  await expect(
+    runSternsystemRegister(
+      makeInput({ id: "warpgogol-com", amend: true }),
+      makeContext(workspaceRoot),
+    ),
+  ).rejects.toThrow(/TLD suffix/);
+});
+
 test("register rolls back registry entry when materialize fails", async () => {
   // Register will fail at mission.materialize because the mirrors point to a
   // non-existent local path — git clone fails immediately instead of hanging on SSH.
   const result = await runSternsystemRegister(
-    makeInput({ id: "test-site", cosmicStar: "Vega", mirrors: "./nonexistent-repo-path" }),
+    makeInput({ id: "test-bundle", cosmicStar: "Vega", mirrors: "./nonexistent-repo-path" }),
     makeContext(workspaceRoot),
   );
 
@@ -162,8 +184,8 @@ test("register rolls back registry entry when materialize fails", async () => {
   expect(result.exitCode).toBe(1);
   expect(expectData(result).diagnostics.some((d) => d.includes("failed"))).toBe(true);
 
-  // systems-cache should be cleaned up (no system-config.yaml for test-site)
-  const cacheDir = join(workspaceRoot, "..", "systems-cache", "test-site");
+  // systems-cache should be cleaned up (no system-config.yaml for test-bundle)
+  const cacheDir = join(workspaceRoot, "..", "systems-cache", "test-bundle");
   const configPath = join(cacheDir, "system-config.yaml");
   expect(existsSync(configPath)).toBe(false);
 });

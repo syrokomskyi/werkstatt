@@ -41,24 +41,24 @@ describe("dht/cache", () => {
   });
 
   it("setCachedEntry and getCachedEntry round-trip", async () => {
-    const entry = makeEntry("test-site");
-    await setCachedEntry(tmpDir, "test-site", entry, 300000);
+    const entry = makeEntry("test-bundle");
+    await setCachedEntry(tmpDir, "test-bundle", entry, 300000);
 
     const cache = await loadCache(tmpDir);
-    const cached = getCachedEntry(cache, "test-site");
+    const cached = getCachedEntry(cache, "test-bundle");
     expect(cached).not.toBeNull();
-    expect(cached!.siteId).toBe("test-site");
+    expect(cached!.siteId).toBe("test-bundle");
     expect(cached!.owner).toBe("did:web:example.com#v1");
   });
 
   it("getCachedEntry returns null for expired entries", async () => {
-    const entry = makeEntry("test-site");
+    const entry = makeEntry("test-bundle");
     // Set with 1ms TTL, then wait for expiry
-    await setCachedEntry(tmpDir, "test-site", entry, 1);
+    await setCachedEntry(tmpDir, "test-bundle", entry, 1);
     await new Promise((resolve) => setTimeout(resolve, 10));
 
     const cache = await loadCache(tmpDir);
-    const cached = getCachedEntry(cache, "test-site");
+    const cached = getCachedEntry(cache, "test-bundle");
     expect(cached).toBeNull();
   });
 
@@ -69,12 +69,12 @@ describe("dht/cache", () => {
   });
 
   it("clearCachedEntry removes entry", async () => {
-    const entry = makeEntry("test-site");
-    await setCachedEntry(tmpDir, "test-site", entry, 300000);
-    await clearCachedEntry(tmpDir, "test-site");
+    const entry = makeEntry("test-bundle");
+    await setCachedEntry(tmpDir, "test-bundle", entry, 300000);
+    await clearCachedEntry(tmpDir, "test-bundle");
 
     const cache = await loadCache(tmpDir);
-    expect(cache.entries["test-site"]).toBeUndefined();
+    expect(cache.entries["test-bundle"]).toBeUndefined();
   });
 
   it("saveCache and loadCache round-trip", async () => {

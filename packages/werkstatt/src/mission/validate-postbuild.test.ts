@@ -99,14 +99,14 @@ function makePipelineReport(
 
 test("dist/ missing → exit code 1 with error message", async () => {
   mockResolveSiteWorkspace.mockResolvedValue({
-    name: "test-site",
+    name: "test-bundle",
     directory: tmpDir,
     toolsDirectory: path.join(tmpDir, "tools"),
     configPath: path.join(tmpDir, "tools", "kernel.config.ts"),
   } as never);
 
   const result = await runValidatePostbuild(
-    { flags: { site: "test-site" } } as never,
+    { flags: { site: "test-bundle" } } as never,
     makeContext(tmpDir),
   );
 
@@ -120,7 +120,7 @@ test("dist/ exists → runs all validators via executeKernelPipeline", async () 
   await fs.mkdir(path.join(tmpDir, "dist"), { recursive: true });
 
   mockResolveSiteWorkspace.mockResolvedValue({
-    name: "test-site",
+    name: "test-bundle",
     directory: tmpDir,
     toolsDirectory: path.join(tmpDir, "tools"),
     configPath: path.join(tmpDir, "tools", "kernel.config.ts"),
@@ -134,7 +134,7 @@ test("dist/ exists → runs all validators via executeKernelPipeline", async () 
   );
 
   const result = await runValidatePostbuild(
-    { flags: { site: "test-site" } } as never,
+    { flags: { site: "test-bundle" } } as never,
     makeContext(tmpDir),
   );
 
@@ -150,7 +150,7 @@ test("dist/ exists with --skip-slow → slow steps skipped, fast steps run indiv
   await fs.mkdir(path.join(tmpDir, "dist"), { recursive: true });
 
   mockResolveSiteWorkspace.mockResolvedValue({
-    name: "test-site",
+    name: "test-bundle",
     directory: tmpDir,
     toolsDirectory: path.join(tmpDir, "tools"),
     configPath: path.join(tmpDir, "tools", "kernel.config.ts"),
@@ -178,7 +178,7 @@ test("dist/ exists with --skip-slow → slow steps skipped, fast steps run indiv
   } as never);
 
   const result = await runValidatePostbuild(
-    { flags: { site: "test-site", "skip-slow": true } } as never,
+    { flags: { site: "test-bundle", "skip-slow": true } } as never,
     makeContext(tmpDir),
   );
 
@@ -202,13 +202,13 @@ test("dist/ exists with --skip-slow → slow steps skipped, fast steps run indiv
 });
 
 test("--mission resolves workpiece via readMissionManifest", async () => {
-  const missionDir = path.join(tmpDir, "missions", "test-site-m000001");
+  const missionDir = path.join(tmpDir, "missions", "test-bundle-m000001");
   const workpieceDir = path.join(missionDir, "workpiece");
   await fs.mkdir(path.join(workpieceDir, "dist"), { recursive: true });
 
   mockReadMissionManifest.mockResolvedValue({
-    missionId: "test-site-m000001",
-    systemId: "test-site",
+    missionId: "test-bundle-m000001",
+    systemId: "test-bundle",
     brief: "test",
     status: "materialized",
   } as never);
@@ -221,27 +221,27 @@ test("--mission resolves workpiece via readMissionManifest", async () => {
   );
 
   const result = await runValidatePostbuild(
-    { flags: { mission: "test-site-m000001" } } as never,
+    { flags: { mission: "test-bundle-m000001" } } as never,
     makeContext(tmpDir),
   );
 
   expect(result.exitCode).toBe(0);
   expect(result.data?.status).toBe("pass");
-  expect(mockReadMissionManifest).toHaveBeenCalledWith(tmpDir, "test-site-m000001");
-  expect(mockResolveMissionDir).toHaveBeenCalledWith(tmpDir, "test-site-m000001");
+  expect(mockReadMissionManifest).toHaveBeenCalledWith(tmpDir, "test-bundle-m000001");
+  expect(mockResolveMissionDir).toHaveBeenCalledWith(tmpDir, "test-bundle-m000001");
   const pipelineCall = mockExecuteKernelPipeline.mock.calls[0]![0] as {
     siteWorkspace: { directory: string };
     siteName: string;
   };
   expect(pipelineCall.siteWorkspace.directory).toBe(workpieceDir);
-  expect(pipelineCall.siteName).toBe("test-site");
+  expect(pipelineCall.siteName).toBe("test-bundle");
 });
 
 test("stale dist/ warning is always printed", async () => {
   await fs.mkdir(path.join(tmpDir, "dist"), { recursive: true });
 
   mockResolveSiteWorkspace.mockResolvedValue({
-    name: "test-site",
+    name: "test-bundle",
     directory: tmpDir,
     toolsDirectory: path.join(tmpDir, "tools"),
     configPath: path.join(tmpDir, "tools", "kernel.config.ts"),
@@ -264,7 +264,7 @@ test("stale dist/ warning is always printed", async () => {
       getEvents: vi.fn(() => []),
     },
   } as never;
-  await runValidatePostbuild({ flags: { site: "test-site" } } as never, ctx);
+  await runValidatePostbuild({ flags: { site: "test-bundle" } } as never, ctx);
 
   expect(warnSpy).toHaveBeenCalledWith(
     "dist/ may be stale — run mission.validate for a full check.",
@@ -281,7 +281,7 @@ test("step failure → exit code 1 with fail status", async () => {
   await fs.mkdir(path.join(tmpDir, "dist"), { recursive: true });
 
   mockResolveSiteWorkspace.mockResolvedValue({
-    name: "test-site",
+    name: "test-bundle",
     directory: tmpDir,
     toolsDirectory: path.join(tmpDir, "tools"),
     configPath: path.join(tmpDir, "tools", "kernel.config.ts"),
@@ -295,7 +295,7 @@ test("step failure → exit code 1 with fail status", async () => {
   );
 
   const result = await runValidatePostbuild(
-    { flags: { site: "test-site" } } as never,
+    { flags: { site: "test-bundle" } } as never,
     makeContext(tmpDir),
   );
 

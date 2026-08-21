@@ -116,11 +116,15 @@ afterEach(async () => {
 
 test("register fails on duplicate id", async () => {
   // Pre-create a system config to simulate an existing Sternsystem
-  await writeSystemConfigFile("test-site");
+  await writeSystemConfigFile("test-bundle");
 
   await expect(
     runSternsystemRegister(
-      makeInput({ id: "test-site", cosmicStar: "Sirius", mirrors: "../systems-cache/test-site" }),
+      makeInput({
+        id: "test-bundle",
+        cosmicStar: "Sirius",
+        mirrors: "../systems-cache/test-bundle",
+      }),
       makeContext(workspaceRoot),
     ),
   ).rejects.toThrow(/already exists/);
@@ -129,24 +133,28 @@ test("register fails on duplicate id", async () => {
 test("register fails on invalid cosmicStar", async () => {
   await expect(
     runSternsystemRegister(
-      makeInput({ id: "test-site", cosmicStar: "NotAStar", mirrors: "../systems-cache/test-site" }),
+      makeInput({
+        id: "test-bundle",
+        cosmicStar: "NotAStar",
+        mirrors: "../systems-cache/test-bundle",
+      }),
       makeContext(workspaceRoot),
     ),
   ).rejects.toThrow(/not in StarCatalog/);
 });
 
 test("register fails on apps/ collision", async () => {
-  await mkdir(join(workspaceRoot, "apps", "test-site"), { recursive: true });
+  await mkdir(join(workspaceRoot, "apps", "test-bundle"), { recursive: true });
   await expect(
     runSternsystemRegister(
-      makeInput({ id: "test-site", cosmicStar: "Vega", mirrors: "../systems-cache/test-site" }),
+      makeInput({ id: "test-bundle", cosmicStar: "Vega", mirrors: "../systems-cache/test-bundle" }),
       makeContext(workspaceRoot),
     ),
   ).rejects.toThrow(/extract first/);
 });
 
 test("validate passes for a system with a local path repo", async () => {
-  await writeSystemConfigFile("test-site");
+  await writeSystemConfigFile("test-bundle");
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
   expect(expectData(result).violations).toHaveLength(0);
@@ -162,7 +170,7 @@ test("list returns all registered systems", async () => {
 });
 
 test("validate passes on a clean registry", async () => {
-  await writeSystemConfigFile("test-site");
+  await writeSystemConfigFile("test-bundle");
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
   expect(expectData(result).validated).toBe(1);
@@ -171,8 +179,8 @@ test("validate passes on a clean registry", async () => {
 });
 
 test("validate detects apps/ collision", async () => {
-  await writeSystemConfigFile("test-site");
-  await mkdir(join(workspaceRoot, "apps", "test-site"), { recursive: true });
+  await writeSystemConfigFile("test-bundle");
+  await mkdir(join(workspaceRoot, "apps", "test-bundle"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
   expect(expectData(result).violations).toHaveLength(1);
@@ -180,21 +188,32 @@ test("validate detects apps/ collision", async () => {
   expect(result.exitCode).toBe(1);
 });
 
+test("validate detects TLD-suffixed IDs (RFC-0902 STERN-ID-TLD)", async () => {
+  await writeSystemConfigFile("warpgogol-com");
+
+  const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
+  const tldViolation = expectData(result).violations.find((v) => v.rule === "STERN-ID-TLD");
+  expect(tldViolation).toBeDefined();
+  expect(tldViolation?.systemId).toBe("warpgogol-com");
+  expect(tldViolation?.message).toContain("warpgogol-com");
+  expect(result.exitCode).toBe(1);
+});
+
 test("pin writes system.pin.json and activates the system", async () => {
-  await writeSystemConfigFile("test-site");
+  await writeSystemConfigFile("test-bundle");
 
   const result = await runSternsystemPin(
-    makeInput({ id: "test-site", platform: "4.5.0" }),
+    makeInput({ id: "test-bundle", platform: "4.5.0" }),
     makeContext(workspaceRoot),
   );
-  expect(expectData(result).systemId).toBe("test-site");
+  expect(expectData(result).systemId).toBe("test-bundle");
   expect(expectData(result).platform).toBe("4.5.0");
 
-  const pinPath = join(cacheRoot, "test-site", "system.pin.json");
+  const pinPath = join(cacheRoot, "test-bundle", "system.pin.json");
   expect(existsSync(pinPath)).toBe(true);
 
   const pin = JSON.parse(await readFile(pinPath, "utf8"));
-  expect(pin.systemId).toBe("test-site");
+  expect(pin.systemId).toBe("test-bundle");
   expect(pin.cosmicStar).toBe("Vega");
   expect(pin.platform.version).toBe("4.5.0");
   expect(pin.platform.platformSemanticHash).toMatch(/^sha256:[0-9a-f]{64}$/);
@@ -226,18 +245,18 @@ test("pin writes system.pin.json and activates the system", async () => {
 });
 
 test("pin refuses downgrade", async () => {
-  await writeSystemConfigFile("test-site");
+  await writeSystemConfigFile("test-bundle");
 
   // Write an initial pin at 4.5.0
   await runSternsystemPin(
-    makeInput({ id: "test-site", platform: "4.5.0" }),
+    makeInput({ id: "test-bundle", platform: "4.5.0" }),
     makeContext(workspaceRoot),
   );
 
   // Attempt to pin to an older version
   await expect(
     runSternsystemPin(
-      makeInput({ id: "test-site", platform: "4.4.0" }),
+      makeInput({ id: "test-bundle", platform: "4.4.0" }),
       makeContext(workspaceRoot),
     ),
   ).rejects.toThrow(/never downgraded/);
