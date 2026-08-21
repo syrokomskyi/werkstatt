@@ -42,10 +42,10 @@ function gitCommit(dir: string): void {
 
 test("STERN-MANIFEST-01 not emitted when manifests are present in HEAD", async () => {
   await writeSystemConfig(workspaceRoot, [
-    { path: "../systems-cache/test-site", storageType: "non-bare" },
+    { path: "../systems-cache/test-bundle", storageType: "non-bare" },
   ]);
 
-  const cacheDir = join(workspaceRoot, "..", "systems-cache", "test-site");
+  const cacheDir = join(workspaceRoot, "..", "systems-cache", "test-bundle");
   initGitRepo(cacheDir);
   await mkdir(join(cacheDir, "src"), { recursive: true });
   await writeFile(join(cacheDir, "src", "image-variants.generated.yaml"), "version: 1\n", "utf8");
@@ -65,10 +65,10 @@ test("STERN-MANIFEST-01 not emitted when manifests are present in HEAD", async (
 
 test("STERN-MANIFEST-01 emitted for tracked manifest missing from HEAD", async () => {
   await writeSystemConfig(workspaceRoot, [
-    { path: "../systems-cache/test-site", storageType: "non-bare" },
+    { path: "../systems-cache/test-bundle", storageType: "non-bare" },
   ]);
 
-  const cacheDir = join(workspaceRoot, "..", "systems-cache", "test-site");
+  const cacheDir = join(workspaceRoot, "..", "systems-cache", "test-bundle");
   initGitRepo(cacheDir);
   await mkdir(join(cacheDir, "src"), { recursive: true });
   await writeFile(join(cacheDir, "src", "image-variants.generated.yaml"), "version: 1\n", "utf8");
@@ -93,10 +93,10 @@ test("STERN-MANIFEST-01 emitted for tracked manifest missing from HEAD", async (
 
 test("STERN-MANIFEST-01 not emitted for new systems without tracked manifests", async () => {
   await writeSystemConfig(workspaceRoot, [
-    { path: "../systems-cache/test-site", storageType: "non-bare" },
+    { path: "../systems-cache/test-bundle", storageType: "non-bare" },
   ]);
 
-  const cacheDir = join(workspaceRoot, "..", "systems-cache", "test-site");
+  const cacheDir = join(workspaceRoot, "..", "systems-cache", "test-bundle");
   initGitRepo(cacheDir);
   // No manifest files at all — new system
   await writeFile(join(cacheDir, "README.md"), "# test\n", "utf8");

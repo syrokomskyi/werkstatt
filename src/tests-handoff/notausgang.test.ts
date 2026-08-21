@@ -124,7 +124,7 @@ behaviorSnapshotHash: sha256:snap-abc
   await writeFile(join(siteContentDir, "test.md"), "# Test\n", "utf8");
   await writeFile(
     join(workspace, "apps", systemId, "package.json"),
-    JSON.stringify({ name: "test-site", version: "1.0.0" }),
+    JSON.stringify({ name: "test-bundle", version: "1.0.0" }),
     "utf8",
   );
 }
@@ -133,16 +133,16 @@ beforeEach(async () => {
   testRoot = await mkdtemp(join(tmpdir(), "notausgang-test-"));
   workspaceRoot = join(testRoot, "workspace");
   await mkdir(workspaceRoot, { recursive: true });
-  const cacheDir = join(testRoot, "systems-cache", "test-site");
+  const cacheDir = join(testRoot, "systems-cache", "test-bundle");
   await mkdir(cacheDir, { recursive: true });
   await writeFile(
     join(cacheDir, "system-config.yaml"),
     stringifyYaml({
       schemaVersion: "system-config/v1",
-      id: "test-site",
+      id: "test-bundle",
       cosmicStar: "Vega",
       status: "active",
-      mirrors: [{ path: "../systems-cache/test-site", storageType: "non-bare" }],
+      mirrors: [{ path: "../systems-cache/test-bundle", storageType: "non-bare" }],
       pinnedPlatform: "4.5.0",
       registeredAt: "2026-07-12T10:00:00.000Z",
       notes: "",
@@ -162,7 +162,7 @@ beforeEach(async () => {
     "export const x = 1;\n",
     "utf8",
   );
-  await setupRelease(testRoot, "test-site", "test-site-r202607");
+  await setupRelease(testRoot, "test-bundle", "test-bundle-r202607");
 });
 
 afterEach(async () => {
@@ -174,14 +174,14 @@ test("export writes YAML artifacts (not JSON)", async () => {
 
   const result = await runNotausgangExport(
     makeInput({
-      system: "test-site",
-      release: "test-site-r202607",
+      system: "test-bundle",
+      release: "test-bundle-r202607",
       output: "notausgang-export",
     }),
     makeContext(workspaceRoot),
   );
 
-  expect(expectData(result).systemId).toBe("test-site");
+  expect(expectData(result).systemId).toBe("test-bundle");
   expect(existsSync(join(outputDir, "notausgang-manifest.yaml"))).toBe(true);
   expect(existsSync(join(outputDir, "notausgang-manifest.json"))).toBe(false);
   expect(existsSync(join(outputDir, "system.pin.yaml"))).toBe(true);
@@ -193,8 +193,8 @@ test("export writes YAML artifacts (not JSON)", async () => {
 test("export hashes use sha256: prefix from @warpgogol/werkstatt/fingerprint", async () => {
   const result = await runNotausgangExport(
     makeInput({
-      system: "test-site",
-      release: "test-site-r202607",
+      system: "test-bundle",
+      release: "test-bundle-r202607",
       output: "notausgang-export",
     }),
     makeContext(workspaceRoot),
@@ -208,8 +208,8 @@ test("export hashes use sha256: prefix from @warpgogol/werkstatt/fingerprint", a
 test("validate passes on a valid export package", async () => {
   await runNotausgangExport(
     makeInput({
-      system: "test-site",
-      release: "test-site-r202607",
+      system: "test-bundle",
+      release: "test-bundle-r202607",
       output: "notausgang-export",
     }),
     makeContext(workspaceRoot),
@@ -239,8 +239,8 @@ test("validate passes on a valid export package", async () => {
 test("validate fails on dist hash mismatch (tampered dist file)", async () => {
   await runNotausgangExport(
     makeInput({
-      system: "test-site",
-      release: "test-site-r202607",
+      system: "test-bundle",
+      release: "test-bundle-r202607",
       output: "notausgang-export",
     }),
     makeContext(workspaceRoot),
@@ -261,8 +261,8 @@ test("validate fails on dist hash mismatch (tampered dist file)", async () => {
 test("validate fails on manifest schema violation (corrupted manifest)", async () => {
   await runNotausgangExport(
     makeInput({
-      system: "test-site",
-      release: "test-site-r202607",
+      system: "test-bundle",
+      release: "test-bundle-r202607",
       output: "notausgang-export",
     }),
     makeContext(workspaceRoot),
@@ -286,8 +286,8 @@ test("validate fails on manifest schema violation (corrupted manifest)", async (
 test("validate fails on Bordbuch line parse error", async () => {
   await runNotausgangExport(
     makeInput({
-      system: "test-site",
-      release: "test-site-r202607",
+      system: "test-bundle",
+      release: "test-bundle-r202607",
       output: "notausgang-export",
     }),
     makeContext(workspaceRoot),
@@ -310,8 +310,8 @@ test("validate fails on Bordbuch line parse error", async () => {
 test("validate fails on pin content mismatch (systemId)", async () => {
   await runNotausgangExport(
     makeInput({
-      system: "test-site",
-      release: "test-site-r202607",
+      system: "test-bundle",
+      release: "test-bundle-r202607",
       output: "notausgang-export",
     }),
     makeContext(workspaceRoot),
@@ -334,8 +334,8 @@ test("validate fails on pin content mismatch (systemId)", async () => {
 test("validate fails on legacy notausgang-manifest.json", async () => {
   await runNotausgangExport(
     makeInput({
-      system: "test-site",
-      release: "test-site-r202607",
+      system: "test-bundle",
+      release: "test-bundle-r202607",
       output: "notausgang-export",
     }),
     makeContext(workspaceRoot),
@@ -359,8 +359,8 @@ test("validate fails on legacy notausgang-manifest.json", async () => {
 test("validate fails on legacy system.pin.json", async () => {
   await runNotausgangExport(
     makeInput({
-      system: "test-site",
-      release: "test-site-r202607",
+      system: "test-bundle",
+      release: "test-bundle-r202607",
       output: "notausgang-export",
     }),
     makeContext(workspaceRoot),
@@ -383,8 +383,8 @@ test("validate fails on legacy system.pin.json", async () => {
 test("validate fails on missing behavior-snapshots directory", async () => {
   await runNotausgangExport(
     makeInput({
-      system: "test-site",
-      release: "test-site-r202607",
+      system: "test-bundle",
+      release: "test-bundle-r202607",
       output: "notausgang-export",
     }),
     makeContext(workspaceRoot),
@@ -406,8 +406,8 @@ test("validate fails on missing behavior-snapshots directory", async () => {
 test("validate fails on secret detected outside safe locations", async () => {
   await runNotausgangExport(
     makeInput({
-      system: "test-site",
-      release: "test-site-r202607",
+      system: "test-bundle",
+      release: "test-bundle-r202607",
       output: "notausgang-export",
     }),
     makeContext(workspaceRoot),
@@ -431,8 +431,8 @@ test("validate fails on secret detected outside safe locations", async () => {
 test("NotausgangValidateData uses CheckStatus enum values", async () => {
   await runNotausgangExport(
     makeInput({
-      system: "test-site",
-      release: "test-site-r202607",
+      system: "test-bundle",
+      release: "test-bundle-r202607",
       output: "notausgang-export",
     }),
     makeContext(workspaceRoot),
@@ -456,8 +456,8 @@ test("NotausgangValidateData uses CheckStatus enum values", async () => {
 test("NotausgangViolation has no severity field", async () => {
   await runNotausgangExport(
     makeInput({
-      system: "test-site",
-      release: "test-site-r202607",
+      system: "test-bundle",
+      release: "test-bundle-r202607",
       output: "notausgang-export",
     }),
     makeContext(workspaceRoot),

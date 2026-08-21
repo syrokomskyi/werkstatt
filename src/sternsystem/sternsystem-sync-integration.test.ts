@@ -61,7 +61,7 @@ interface MirrorSpec {
 async function setupSystemConfig(mirrors: MirrorSpec[]): Promise<void> {
   const config = {
     schemaVersion: "system-config/v1",
-    id: "test-site",
+    id: "test-bundle",
     cosmicStar: "Vega",
     mirrors,
     pinnedPlatform: "4.5.0",
@@ -75,7 +75,7 @@ async function setupSystemConfig(mirrors: MirrorSpec[]): Promise<void> {
 beforeEach(async () => {
   testRoot = await mkdtemp(join(tmpdir(), "sync-integration-"));
   workspaceRoot = join(testRoot, "workspace");
-  cacheDir = join(testRoot, "systems-cache", "test-site");
+  cacheDir = join(testRoot, "systems-cache", "test-bundle");
   bareDir = join(testRoot, "bare.git");
   externalDir = join(testRoot, "external.git");
 
@@ -134,7 +134,7 @@ test("sync pushes from cache clone to bare mirror", async () => {
   git(cacheDir, 'commit -m "update"');
 
   const result = await runSternsystemSync(
-    makeInput({ id: "test-site", direction: "push" }),
+    makeInput({ id: "test-bundle", direction: "push" }),
     makeContext(workspaceRoot),
   );
 
@@ -158,7 +158,7 @@ test("sync pushes to multiple external mirrors", async () => {
   git(cacheDir, 'commit -m "multi-sync"');
 
   const result = await runSternsystemSync(
-    makeInput({ id: "test-site", direction: "push" }),
+    makeInput({ id: "test-bundle", direction: "push" }),
     makeContext(workspaceRoot),
   );
 
@@ -185,7 +185,7 @@ test("sync handles per-mirror failure non-fatally", async () => {
   git(cacheDir, 'commit -m "failure-test"');
 
   const result = await runSternsystemSync(
-    makeInput({ id: "test-site", direction: "push" }),
+    makeInput({ id: "test-bundle", direction: "push" }),
     makeContext(workspaceRoot),
   );
 
@@ -210,7 +210,7 @@ test("sync with external mirrors creates refs/mirror/${branch} matching bare rep
   git(cacheDir, 'commit -m "mirror-ref-test"');
 
   const result = await runSternsystemSync(
-    makeInput({ id: "test-site", direction: "push" }),
+    makeInput({ id: "test-bundle", direction: "push" }),
     makeContext(workspaceRoot),
   );
 
@@ -234,7 +234,7 @@ test("sync without external mirrors does not create refs/mirror/${branch}", asyn
   git(cacheDir, 'commit -m "no-mirror-ref"');
 
   const result = await runSternsystemSync(
-    makeInput({ id: "test-site", direction: "push" }),
+    makeInput({ id: "test-bundle", direction: "push" }),
     makeContext(workspaceRoot),
   );
 
@@ -249,7 +249,7 @@ test("sync with single mirror (cache only) throws — no bare mirror", async () 
 
   await expect(
     runSternsystemSync(
-      makeInput({ id: "test-site", direction: "push" }),
+      makeInput({ id: "test-bundle", direction: "push" }),
       makeContext(workspaceRoot),
     ),
   ).rejects.toThrow(/no bare mirror configured/);
@@ -268,7 +268,7 @@ test("sync pushes bordbuch commit to external mirror — external HEAD matches r
   git(cacheDir, 'commit -m "bordbuch-push-test"');
 
   const result = await runSternsystemSync(
-    makeInput({ id: "test-site", direction: "push" }),
+    makeInput({ id: "test-bundle", direction: "push" }),
     makeContext(workspaceRoot),
   );
 
@@ -282,7 +282,7 @@ test("sync pushes bordbuch commit to external mirror — external HEAD matches r
   expect(externalHead).toBe(bareHead);
 
   const externalLog = git(externalDir, "log --oneline");
-  expect(externalLog).toContain("Bordbuch: mirror-sync test-site");
+  expect(externalLog).toContain("Bordbuch: mirror-sync test-bundle");
 });
 
 // RFC-0818: bundle mirror must include bordbuch commit
@@ -301,7 +301,7 @@ test("sync creates bundle including bordbuch commit", async () => {
   git(cacheDir, 'commit -m "bundle-bordbuch-test"');
 
   const result = await runSternsystemSync(
-    makeInput({ id: "test-site", direction: "push" }),
+    makeInput({ id: "test-bundle", direction: "push" }),
     makeContext(workspaceRoot),
   );
 
@@ -313,7 +313,7 @@ test("sync creates bundle including bordbuch commit", async () => {
   const cloneDir = join(testRoot, "bundle-clone");
   git(testRoot, `clone "${bundlePath}" "${cloneDir}"`);
   const cloneLog = git(cloneDir, "log --oneline");
-  expect(cloneLog).toContain("Bordbuch: mirror-sync test-site");
+  expect(cloneLog).toContain("Bordbuch: mirror-sync test-bundle");
 });
 
 // RFC-0818: regression test — residual false positive on external push failure
@@ -332,7 +332,7 @@ test("sync with failing external mirror — refs/mirror tracks bare HEAD despite
   git(cacheDir, 'commit -m "push-failure-test"');
 
   const result = await runSternsystemSync(
-    makeInput({ id: "test-site", direction: "push" }),
+    makeInput({ id: "test-bundle", direction: "push" }),
     makeContext(workspaceRoot),
   );
 

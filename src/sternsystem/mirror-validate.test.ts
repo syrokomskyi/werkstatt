@@ -31,9 +31,9 @@ afterEach(async () => {
 
 test("validate passes with single non-bare mirror (cache only)", async () => {
   await writeSystemConfig(workspaceRoot, [
-    { path: "./systems/test-site", storageType: "non-bare" },
+    { path: "./systems/test-bundle", storageType: "non-bare" },
   ]);
-  await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
+  await mkdir(join(workspaceRoot, "systems", "test-bundle"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
   expect(result.data!.violations).toHaveLength(0);
@@ -41,11 +41,11 @@ test("validate passes with single non-bare mirror (cache only)", async () => {
 
 test("validate passes with 3 mirrors (cache + bare + external)", async () => {
   await writeSystemConfig(workspaceRoot, [
-    { path: "./systems/test-site", storageType: "non-bare" },
-    { path: "../systems-git/test-site", storageType: "bare" },
+    { path: "./systems/test-bundle", storageType: "non-bare" },
+    { path: "../systems-git/test-bundle", storageType: "bare" },
     { path: "git@github.com:foo/test.git", storageType: "bare" },
   ]);
-  await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
+  await mkdir(join(workspaceRoot, "systems", "test-bundle"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
   const mirrorViolations = result.data!.violations.filter((v) => v.rule.startsWith("mirror"));
@@ -54,11 +54,11 @@ test("validate passes with 3 mirrors (cache + bare + external)", async () => {
 
 test("validate detects embedded credentials in external mirror URL", async () => {
   await writeSystemConfig(workspaceRoot, [
-    { path: "./systems/test-site", storageType: "non-bare" },
-    { path: "../systems-git/test-site", storageType: "bare" },
+    { path: "./systems/test-bundle", storageType: "non-bare" },
+    { path: "../systems-git/test-bundle", storageType: "bare" },
     { path: "https://user:pass@github.com/foo/test.git", storageType: "bare" },
   ]);
-  await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
+  await mkdir(join(workspaceRoot, "systems", "test-bundle"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
   const credViolations = result.data!.violations.filter((v) => v.rule === "mirror-credentials");
@@ -68,10 +68,10 @@ test("validate detects embedded credentials in external mirror URL", async () =>
 
 test("validate does not flag credentials when no external mirror exists", async () => {
   await writeSystemConfig(workspaceRoot, [
-    { path: "./systems/test-site", storageType: "non-bare" },
-    { path: "../systems-git/test-site", storageType: "bare" },
+    { path: "./systems/test-bundle", storageType: "non-bare" },
+    { path: "../systems-git/test-bundle", storageType: "bare" },
   ]);
-  await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
+  await mkdir(join(workspaceRoot, "systems", "test-bundle"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
   const credViolations = result.data!.violations.filter((v) => v.rule === "mirror-credentials");
@@ -80,7 +80,7 @@ test("validate does not flag credentials when no external mirror exists", async 
 
 test("validate resolves cache dir from mirrors[0].path", async () => {
   await writeSystemConfig(workspaceRoot, [
-    { path: "../systems-cache/test-site", storageType: "non-bare" },
+    { path: "../systems-cache/test-bundle", storageType: "non-bare" },
   ]);
   // Cache dir already created by writeSystemConfig
 
@@ -92,8 +92,8 @@ test("validate resolves cache dir from mirrors[0].path", async () => {
 });
 
 test("validate detects mirrors[0] with wrong storageType (bare instead of non-bare)", async () => {
-  await writeSystemConfig(workspaceRoot, [{ path: "./systems/test-site", storageType: "bare" }]);
-  await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
+  await writeSystemConfig(workspaceRoot, [{ path: "./systems/test-bundle", storageType: "bare" }]);
+  await mkdir(join(workspaceRoot, "systems", "test-bundle"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
   const cacheViolations = result.data!.violations.filter(
@@ -105,11 +105,11 @@ test("validate detects mirrors[0] with wrong storageType (bare instead of non-ba
 
 test("validate detects bundle storageType with git-accessible protocol", async () => {
   await writeSystemConfig(workspaceRoot, [
-    { path: "./systems/test-site", storageType: "non-bare" },
-    { path: "../systems-git/test-site", storageType: "bare" },
+    { path: "./systems/test-bundle", storageType: "non-bare" },
+    { path: "../systems-git/test-bundle", storageType: "bare" },
     { path: "git@github.com:foo/test.git", storageType: "bundle" },
   ]);
-  await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
+  await mkdir(join(workspaceRoot, "systems", "test-bundle"), { recursive: true });
 
   const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
   const bundleViolations = result.data!.violations.filter(

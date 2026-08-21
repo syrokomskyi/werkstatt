@@ -10,6 +10,8 @@ import {
   RELEASE_ID_POLICY,
   BORDBUCH_EVENT_ID_POLICY,
   isLatinOnly,
+  KNOWN_TLDS,
+  hasTldSuffix,
 } from "../schemas/naming-policy.ts";
 
 // ---------------------------------------------------------------------------
@@ -166,4 +168,52 @@ test("isLatinOnly returns false for non-ASCII strings", () => {
 test("NON_ASCII_REGEX matches non-ASCII characters", () => {
   expect(NON_ASCII_REGEX.test("münchen")).toBe(true);
   expect(NON_ASCII_REGEX.test("hello")).toBe(false);
+});
+
+// ---------------------------------------------------------------------------
+// RFC-0902: hasTldSuffix
+// ---------------------------------------------------------------------------
+
+test("hasTldSuffix returns true for IDs ending in a known TLD", () => {
+  expect(hasTldSuffix("warpgogol-com")).toBe(true);
+  expect(hasTldSuffix("nicaragua-projekt-org")).toBe(true);
+  expect(hasTldSuffix("example-de")).toBe(true);
+  expect(hasTldSuffix("foo-bar-baz-io")).toBe(true);
+  expect(hasTldSuffix("site-dev")).toBe(true);
+});
+
+test("hasTldSuffix returns false for IDs without TLD suffix", () => {
+  expect(hasTldSuffix("warpgogol")).toBe(false);
+  expect(hasTldSuffix("nicaragua-projekt")).toBe(false);
+  expect(hasTldSuffix("foo-bar-baz")).toBe(false);
+  expect(hasTldSuffix("a-b-c")).toBe(false);
+});
+
+test("hasTldSuffix returns false for single-segment IDs", () => {
+  expect(hasTldSuffix("com")).toBe(false);
+  expect(hasTldSuffix("org")).toBe(false);
+  expect(hasTldSuffix("warpgogol")).toBe(false);
+  expect(hasTldSuffix("")).toBe(false);
+});
+
+test("KNOWN_TLDS contains expected common TLDs", () => {
+  expect(KNOWN_TLDS.has("com")).toBe(true);
+  expect(KNOWN_TLDS.has("org")).toBe(true);
+  expect(KNOWN_TLDS.has("de")).toBe(true);
+  expect(KNOWN_TLDS.has("io")).toBe(true);
+  expect(KNOWN_TLDS.has("dev")).toBe(true);
+});
+
+test("STERNSYSTEM_ID_POLICY examples are TLD-free", () => {
+  for (const id of STERNSYSTEM_ID_POLICY.examples) {
+    expect(hasTldSuffix(id)).toBe(false);
+  }
+});
+
+test("STERNSYSTEM_ID_POLICY tldCounterExamples include TLD-suffixed IDs", () => {
+  expect(STERNSYSTEM_ID_POLICY.tldCounterExamples).toContain("warpgogol-com");
+  expect(STERNSYSTEM_ID_POLICY.tldCounterExamples).toContain("nicaragua-projekt-org");
+  for (const id of STERNSYSTEM_ID_POLICY.tldCounterExamples) {
+    expect(hasTldSuffix(id)).toBe(true);
+  }
 });

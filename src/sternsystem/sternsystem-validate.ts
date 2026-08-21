@@ -14,6 +14,7 @@
   <item>RFC-0792: add yaml-syntax-error rule for top-level YAML file syntax checking in systems-cache.</item>
   <item>RFC-0822: add ENV-PERSIST-01 warning when cache clone lacks .env* but active workpiece has them.</item>
   <item>RFC-0870: add STERN-MANIFEST-01 check for missing committed generated manifests in cache clone HEAD.</item>
+  <item>RFC-0902: add STERN-ID-TLD rule rejecting IDs ending in a known TLD suffix.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -46,6 +47,7 @@ import {
   bordbuchPathFor,
 } from "./external-edit-collector.ts";
 import { collectEnvFiles } from "../mission/env-persist.ts";
+import { hasTldSuffix } from "../schemas/naming-policy.ts";
 
 export interface SternsystemValidateData {
   validated: number;
@@ -273,6 +275,15 @@ export async function runSternsystemValidate(
         systemId: entry.id,
         rule: "valid-cosmicStar",
         message: `cosmicStar '${entry.cosmicStar}' is not in StarCatalog`,
+      });
+    }
+
+    // RFC-0902: TLD suffix check
+    if (hasTldSuffix(entry.id)) {
+      violations.push({
+        systemId: entry.id,
+        rule: "STERN-ID-TLD",
+        message: `Sternsystem ID '${entry.id}' ends in a TLD suffix — use the business ID without domain TLD (e.g. 'warpgogol' not 'warpgogol-com')`,
       });
     }
 

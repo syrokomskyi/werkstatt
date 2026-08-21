@@ -12,6 +12,7 @@ With --amend: update pin and open amend mission without creating a new registry 
   <item>RFC-0354: initial register command handler.</item>
   <item>RFC-0532: extend with pin creation, content stubs, mission.open, mission.materialize, --amend/--amend-id flags, and atomic rollback.</item>
   <item>RFC-0561: add --owner flag for VC subject id (did:web) on new registration and amend backfill.</item>
+  <item>RFC-0902: reject TLD-suffixed IDs before writing any files.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -38,6 +39,7 @@ import { runSternsystemPin } from "./sternsystem-pin.ts";
 import { runMissionOpen } from "../mission/mission-open.ts";
 import { runMissionMaterialize } from "../mission/mission-materialize.ts";
 import { runMissionAbort } from "../mission/mission-abort.ts";
+import { hasTldSuffix } from "../schemas/naming-policy.ts";
 
 export interface SternsystemRegisterData {
   command: "sternsystem.register";
@@ -150,6 +152,13 @@ export async function runSternsystemRegister(
   const amendId = flagNumber(input, "amend-id");
 
   if (!id) throw new Error("[sternsystem.register] requires --id <kebab-case-id>");
+
+  // RFC-0902: Reject TLD-suffixed IDs before any file operations.
+  if (hasTldSuffix(id)) {
+    throw new Error(
+      `[sternsystem.register] id '${id}' ends in a TLD suffix — use the business ID without domain TLD (e.g. 'warpgogol' not 'warpgogol-com')`,
+    );
+  }
 
   const diagnostics: string[] = [];
 

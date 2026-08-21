@@ -44,7 +44,7 @@ const LEAD_SUBMIT: CapabilityRecord = {
 
 function makeManifest(withAction: boolean) {
   return buildAgentSurfaceManifest({
-    site: "test-site",
+    site: "test-bundle",
     baseUrl: "https://test.example",
     languages: { default: "de", supported: ["de", "en"] },
     knowledge: [
@@ -100,7 +100,7 @@ test("initialize: returns the pinned protocol version + serverInfo", async () =>
   expect(body.result).toEqual({
     protocolVersion: "2025-06-18",
     capabilities: { tools: {}, resources: {} },
-    serverInfo: { name: "test-site agent surface", version: "1.0.0" },
+    serverInfo: { name: "test-bundle agent surface", version: "1.0.0" },
   });
 });
 
