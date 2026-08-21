@@ -788,7 +788,21 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
   const systemData = systemEntry?.data as any;
 
   const pages = Array.isArray(systemData.pages) ? systemData.pages : [];
-  const pageSystemConfig = pages.find((p: unknown) => (p as { pageId?: string }).pageId === pageId);
+  let pageSystemConfig = pages.find((p: unknown) => (p as { pageId?: string }).pageId === pageId);
+  // RFC-0708: synthetic nachweis detail/verify pageIds (nachweis:<slug>,
+  // nachweis-verify:<slug>:v1) don't match system.md entries — fall back to
+  // the template pageId (nachweis-detail / nachweis-verify) for shell config.
+  if (!pageSystemConfig) {
+    if (pageId.startsWith("nachweis:") && pageId !== "nachweis-detail") {
+      pageSystemConfig = pages.find(
+        (p: unknown) => (p as { pageId?: string }).pageId === "nachweis-detail",
+      );
+    } else if (pageId.startsWith("nachweis-verify:") && pageId !== "nachweis-verify") {
+      pageSystemConfig = pages.find(
+        (p: unknown) => (p as { pageId?: string }).pageId === "nachweis-verify",
+      );
+    }
+  }
   const requiredPageIds = Array.isArray(systemData.sharedContext?.requiredPageIds)
     ? systemData.sharedContext.requiredPageIds
     : [];
