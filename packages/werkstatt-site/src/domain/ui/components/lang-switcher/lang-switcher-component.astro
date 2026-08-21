@@ -1,7 +1,7 @@
 ---
 /*
 <MODULE_CONTRACT>
-<purpose>Renders a single-button language switcher that shows the current language and cycles to the next one on click.</purpose>
+<purpose>Renders a single-button language switcher that shows the target language and cycles to it on click.</purpose>
 <non-goals>
   <item>Do not read Astro.url inside this component — keep it testable and portable.</item>
   <item>Do not hardcode visitor-facing strings — all copy comes from content.</item>
@@ -10,6 +10,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0002: Initial creation of lang-switcher component.</item>
   <item>Refactor: single-button cycle mode — show current lang, click → next lang.</item>
+  <item>RFC-0897: show target lang instead of current lang for intuitive UX.</item>
   <item>Complete three-way mirroring: load aria-label from content instead of hardcoding.</item>
 </CHANGE_SUMMARY>
 */
@@ -84,6 +85,6 @@ const ariaLabel = content.switchAriaLabel
 ---
 
 <a href={nextUrl} class="lang-switcher__link" hreflang={nextLang} aria-label={ariaLabel}>
-  <span class="lang-switcher__lang-text">{lang.toUpperCase()}</span>
+  <span class="lang-switcher__lang-text">{nextLang.toUpperCase()}</span>
   <ArrowCircleRoundAltHoverIcon class="lang-switcher__nav-icon" size={33} />
 </a>
