@@ -25,7 +25,17 @@ export function diagnosticsResult(
     summary.error > 0 ? "fail" : summary.warning > 0 ? "warn" : "pass";
   return {
     exitCode: summary.error > 0 ? 1 : 0,
-    summary: `${command}: ${status}`,
+    summary: `[${command}] ${status}`,
     data: { command, status, diagnostics, summary },
+    ...(summary.error > 0
+      ? {
+          nextSteps: [
+            {
+              action: `Fix the ${summary.error} error(s) for ${command}, then re-run`,
+              kind: "required",
+            },
+          ],
+        }
+      : {}),
   };
 }

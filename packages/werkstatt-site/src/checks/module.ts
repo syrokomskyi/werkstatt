@@ -272,7 +272,17 @@ async function runCommandSequence(
     },
     exitCode: fail > 0 ? 1 : 0,
     summary:
-      fail > 0 ? `${command}: ${fail} step(s) failed` : `${command}: all ${ok} step(s) passed`,
+      fail > 0 ? `[${command}] ${fail} step(s) failed` : `[${command}] all ${ok} step(s) passed`,
+    ...(fail > 0
+      ? {
+          nextSteps: [
+            {
+              action: `Fix the ${fail} failing step(s) in ${command}, then re-run`,
+              kind: "required",
+            },
+          ],
+        }
+      : {}),
   };
 }
 
@@ -287,7 +297,8 @@ async function runAppsCheckImpl(
     return {
       data: { command, subResults: [], summary: { ok: 0, fail: 1, skipped: 0 } },
       exitCode: 1,
-      summary: `${command}: app not resolved (use --site <name>)`,
+      summary: `[${command}] app not resolved (use --site <name>)`,
+      nextSteps: [{ action: `Provide the --site flag and re-run ${command}`, kind: "required" }],
     };
   }
 
@@ -317,7 +328,10 @@ async function runAppsCheckImpl(
           summary: { ok: 0, fail: 1, skipped: 0 },
         },
         exitCode: 1,
-        summary: `${command}: brief.validate failed`,
+        summary: `[${command}] brief.validate failed`,
+        nextSteps: [
+          { action: `Fix the brief.validate failure, then re-run ${command}`, kind: "required" },
+        ],
       };
     }
   } catch {
@@ -336,7 +350,10 @@ async function runAppsCheckImpl(
       return {
         data: { command, app, subResults: [], summary: { ok: 0, fail: 1, skipped: 0 } },
         exitCode: 1,
-        summary: `${command}: requires dist/. Run: pnpm --filter ${app} build`,
+        summary: `[${command}] requires dist/. Run: pnpm --filter ${app} build`,
+        nextSteps: [
+          { action: `Run: pnpm --filter ${app} build, then re-run ${command}`, kind: "required" },
+        ],
       };
     }
   }

@@ -167,7 +167,7 @@ export async function runPipelineTimingReport(
       pipelines,
     },
     exitCode: 0,
-    summary: `${COMMAND.timingReport}: ${pipelines.length} standard pipeline descriptor(s) reported`,
+    summary: `[${COMMAND.timingReport}] ${pipelines.length} standard pipeline descriptor(s) reported`,
   };
 }
 

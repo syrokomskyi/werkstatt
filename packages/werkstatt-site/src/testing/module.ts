@@ -69,13 +69,19 @@ async function runServiceSmoke(
   if (!service) {
     return {
       exitCode: 1,
-      summary: "service.smoke.run: --service is required",
+      summary: "[service.smoke.run] --service is required",
+      nextSteps: [
+        { action: "Provide --service <name> and re-run service.smoke.run", kind: "required" },
+      ],
     };
   }
   if (!url) {
     return {
       exitCode: 1,
-      summary: "service.smoke.run: --url is required",
+      summary: "[service.smoke.run] --url is required",
+      nextSteps: [
+        { action: "Provide --url <endpoint> and re-run service.smoke.run", kind: "required" },
+      ],
     };
   }
 
@@ -129,22 +135,32 @@ async function runServiceSmoke(
       exitCode: result.status === "pass" ? 0 : 1,
       summary:
         result.status === "pass"
-          ? `service.smoke.run: ${result.checks.length} check(s) passed`
-          : `service.smoke.run: ${failed.length}/${result.checks.length} check(s) failed`,
+          ? `[service.smoke.run] ${result.checks.length} check(s) passed`
+          : `[service.smoke.run] ${failed.length}/${result.checks.length} check(s) failed`,
+      ...(result.status !== "pass"
+        ? {
+            nextSteps: [
+              {
+                action: `Fix the ${failed.length} failing smoke check(s) for ${service}, then re-run`,
+                kind: "required",
+              },
+            ],
+          }
+        : {}),
     };
   } catch (err) {
     if (err instanceof SmokeConfigNotFoundError) {
       context.logger.warn(`[service.smoke.run] ${err.message}`);
       return {
         exitCode: 0,
-        summary: `service.smoke.run: skipped (no smoke config)`,
+        summary: `[service.smoke.run] skipped (no smoke config)`,
       };
     }
     if (err instanceof SmokeEntryNotFoundError) {
       context.logger.warn(`[service.smoke.run] ${err.message}`);
       return {
         exitCode: 0,
-        summary: `service.smoke.run: skipped (no smoke config for ${service})`,
+        summary: `[service.smoke.run] skipped (no smoke config for ${service})`,
       };
     }
     throw err;
@@ -161,13 +177,17 @@ async function runSiteSmoke(
   if (!site) {
     return {
       exitCode: 1,
-      summary: "site.smoke.run: --site is required",
+      summary: "[site.smoke.run] --site is required",
+      nextSteps: [{ action: "Provide --site <name> and re-run site.smoke.run", kind: "required" }],
     };
   }
   if (!url) {
     return {
       exitCode: 1,
-      summary: "site.smoke.run: --url is required",
+      summary: "[site.smoke.run] --url is required",
+      nextSteps: [
+        { action: "Provide --url <endpoint> and re-run site.smoke.run", kind: "required" },
+      ],
     };
   }
 
@@ -222,22 +242,32 @@ async function runSiteSmoke(
       exitCode: result.status === "pass" ? 0 : 1,
       summary:
         result.status === "pass"
-          ? `site.smoke.run: ${result.checks.length} check(s) passed`
-          : `site.smoke.run: ${failed.length}/${result.checks.length} check(s) failed`,
+          ? `[site.smoke.run] ${result.checks.length} check(s) passed`
+          : `[site.smoke.run] ${failed.length}/${result.checks.length} check(s) failed`,
+      ...(result.status !== "pass"
+        ? {
+            nextSteps: [
+              {
+                action: `Fix the ${failed.length} failing smoke check(s) for ${site}, then re-run`,
+                kind: "required",
+              },
+            ],
+          }
+        : {}),
     };
   } catch (err) {
     if (err instanceof SmokeConfigNotFoundError) {
       context.logger.warn(`[site.smoke.run] ${err.message}`);
       return {
         exitCode: 0,
-        summary: `site.smoke.run: skipped (no smoke config)`,
+        summary: `[site.smoke.run] skipped (no smoke config)`,
       };
     }
     if (err instanceof SmokeEntryNotFoundError) {
       context.logger.warn(`[site.smoke.run] ${err.message}`);
       return {
         exitCode: 0,
-        summary: `site.smoke.run: skipped (no smoke config for ${site})`,
+        summary: `[site.smoke.run] skipped (no smoke config for ${site})`,
       };
     }
     throw err;
@@ -254,13 +284,19 @@ async function runServiceIntegration(
   if (!service) {
     return {
       exitCode: 1,
-      summary: "service.integration.run: --service is required",
+      summary: "[service.integration.run] --service is required",
+      nextSteps: [
+        { action: "Provide --service <name> and re-run service.integration.run", kind: "required" },
+      ],
     };
   }
   if (!url) {
     return {
       exitCode: 1,
-      summary: "service.integration.run: --url is required",
+      summary: "[service.integration.run] --url is required",
+      nextSteps: [
+        { action: "Provide --url <endpoint> and re-run service.integration.run", kind: "required" },
+      ],
     };
   }
 
@@ -282,7 +318,7 @@ async function runServiceIntegration(
       return {
         data: result,
         exitCode: 0,
-        summary: `service.integration.run: skipped (no integration tests for ${service})`,
+        summary: `[service.integration.run] skipped (no integration tests for ${service})`,
       };
     }
 
@@ -314,15 +350,25 @@ async function runServiceIntegration(
       exitCode: result.status === "pass" ? 0 : 1,
       summary:
         result.status === "pass"
-          ? `service.integration.run: ${result.summary.passed}/${result.summary.total} test(s) passed`
-          : `service.integration.run: ${result.summary.failed}/${result.summary.total} test(s) failed`,
+          ? `[service.integration.run] ${result.summary.passed}/${result.summary.total} test(s) passed`
+          : `[service.integration.run] ${result.summary.failed}/${result.summary.total} test(s) failed`,
+      ...(result.status !== "pass"
+        ? {
+            nextSteps: [
+              {
+                action: `Fix the ${result.summary.failed} failing integration test(s) for ${service}, then re-run`,
+                kind: "required",
+              },
+            ],
+          }
+        : {}),
     };
   } catch (err) {
     if (err instanceof IntegrationTestDirNotFoundError) {
       context.logger.warn(`[service.integration.run] ${err.message}`);
       return {
         exitCode: 0,
-        summary: `service.integration.run: skipped (no integration test directory for ${service})`,
+        summary: `[service.integration.run] skipped (no integration test directory for ${service})`,
       };
     }
     throw err;
@@ -339,7 +385,8 @@ async function runSiteE2e(
   if (!site) {
     return {
       exitCode: 1,
-      summary: "site.e2e.run: --site is required",
+      summary: "[site.e2e.run] --site is required",
+      nextSteps: [{ action: "Provide --site <name> and re-run site.e2e.run", kind: "required" }],
     };
   }
 
@@ -357,7 +404,7 @@ async function runSiteE2e(
       return {
         data: result,
         exitCode: 0,
-        summary: `site.e2e.run: skipped (no E2E tests for ${site})`,
+        summary: `[site.e2e.run] skipped (no E2E tests for ${site})`,
       };
     }
 
@@ -389,15 +436,31 @@ async function runSiteE2e(
       exitCode: result.status === "pass" ? 0 : 1,
       summary:
         result.status === "pass"
-          ? `site.e2e.run: ${result.testsPassed} test(s) passed`
-          : `site.e2e.run: ${result.testsFailed}/${result.testsPassed + result.testsFailed} test(s) failed`,
+          ? `[site.e2e.run] ${result.testsPassed} test(s) passed`
+          : `[site.e2e.run] ${result.testsFailed}/${result.testsPassed + result.testsFailed} test(s) failed`,
+      ...(result.status !== "pass"
+        ? {
+            nextSteps: [
+              {
+                action: `Fix the ${result.testsFailed} failing E2E test(s) for ${site}, then re-run`,
+                kind: "required",
+              },
+            ],
+          }
+        : {}),
     };
   } catch (err) {
     if (err instanceof ChromiumNotInstalledError) {
       context.logger.warn(`[site.e2e.run] ${err.message}`);
       return {
         exitCode: 1,
-        summary: `site.e2e.run: Chromium not installed — run \`pnpm exec playwright install chromium\``,
+        summary: `[site.e2e.run] Chromium not installed — run \`pnpm exec playwright install chromium\``,
+        nextSteps: [
+          {
+            action: "Run `pnpm exec playwright install chromium`, then re-run site.e2e.run",
+            kind: "required",
+          },
+        ],
       };
     }
     throw err;
@@ -418,19 +481,31 @@ async function runTestEvidenceVerify(
   if (!effectiveTarget) {
     return {
       exitCode: 1,
-      summary: "test.evidence.verify: --target or --service is required",
+      summary: "[test.evidence.verify] --target or --service is required",
+      nextSteps: [
+        {
+          action: "Provide --target <name> or --service <name> and re-run test.evidence.verify",
+          kind: "required",
+        },
+      ],
     };
   }
   if (!levelsStr) {
     return {
       exitCode: 1,
-      summary: "test.evidence.verify: --levels is required (e.g. L4,L5)",
+      summary: "[test.evidence.verify] --levels is required (e.g. L4,L5)",
+      nextSteps: [
+        { action: "Provide --levels L4,L5 and re-run test.evidence.verify", kind: "required" },
+      ],
     };
   }
   if (!commitSha) {
     return {
       exitCode: 1,
-      summary: "test.evidence.verify: --commit-sha is required",
+      summary: "[test.evidence.verify] --commit-sha is required",
+      nextSteps: [
+        { action: "Provide --commit-sha <sha> and re-run test.evidence.verify", kind: "required" },
+      ],
     };
   }
 
@@ -456,7 +531,17 @@ async function runTestEvidenceVerify(
   return {
     data: result,
     exitCode: result.status === "pass" ? 0 : 1,
-    summary: result.summary,
+    summary: `[test.evidence.verify] ${result.summary}`,
+    ...(result.status !== "pass"
+      ? {
+          nextSteps: [
+            {
+              action: `Fix the evidence verification failures for ${effectiveTarget}, then re-run`,
+              kind: "required",
+            },
+          ],
+        }
+      : {}),
   };
 }
 
@@ -471,7 +556,13 @@ async function runTestEvidenceList(
   if (!effectiveTarget) {
     return {
       exitCode: 1,
-      summary: "test.evidence.list: --target or --service is required",
+      summary: "[test.evidence.list] --target or --service is required",
+      nextSteps: [
+        {
+          action: "Provide --target <name> or --service <name> and re-run test.evidence.list",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -490,7 +581,7 @@ async function runTestEvidenceList(
   return {
     data: result,
     exitCode: 0,
-    summary: `test.evidence.list: ${result.evidence.length} evidence file(s) for ${effectiveTarget}`,
+    summary: `[test.evidence.list] ${result.evidence.length} evidence file(s) for ${effectiveTarget}`,
   };
 }
 

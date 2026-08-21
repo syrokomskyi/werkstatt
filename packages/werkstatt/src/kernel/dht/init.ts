@@ -50,7 +50,7 @@ export async function runDhtNodeInit(
         ],
       },
       exitCode: 0,
-      summary: `dht.node.init: config already exists at ${CONFIG_FILENAME}`,
+      summary: `[dht.node.init] config already exists at ${CONFIG_FILENAME}`,
     };
   } catch {
     // Config doesn't exist — create it

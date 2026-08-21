@@ -46,7 +46,10 @@ export async function runPreviewImagesValidate(
   if (!app) {
     return {
       exitCode: 1,
-      summary: "This command must be run inside an app context.",
+      summary: "[preview.images.validate] This command must be run inside an app context.",
+      nextSteps: [
+        { action: "Run this command from within a site mission context", kind: "required" },
+      ],
     };
   }
 
@@ -120,14 +123,22 @@ export async function runPreviewImagesValidate(
   if (violations.some((v) => v.severity === "error")) {
     return {
       exitCode: 1,
-      summary: `Failed social preview verification: ${violations.filter((v) => v.severity === "error").length} errors found.`,
+      summary: `[preview.images.validate] Failed social preview verification: ${violations.filter((v) => v.severity === "error").length} errors found.`,
       data: { violations },
+      nextSteps: [
+        {
+          action:
+            "Fix the preview image violations listed above, then re-run preview.images.validate",
+          kind: "required",
+        },
+      ],
     };
   }
 
   return {
     exitCode: 0,
-    summary: "All pages resolve deterministic preview assets successfully.",
+    summary:
+      "[preview.images.validate] All pages resolve deterministic preview assets successfully.",
     data: { violations },
   };
 }
@@ -214,7 +225,10 @@ export async function runPreviewImagesGenerate(
   if (!app) {
     return {
       exitCode: 1,
-      summary: "This command must be run inside an app context.",
+      summary: "[preview.images.generate] This command must be run inside an app context.",
+      nextSteps: [
+        { action: "Run this command from within a site mission context", kind: "required" },
+      ],
     };
   }
 
@@ -239,7 +253,14 @@ export async function runPreviewImagesGenerate(
   } catch (err: unknown) {
     return {
       exitCode: 1,
-      summary: `Failed to load system manifest: ${(err as Error).message}`,
+      summary: `[preview.images.generate] Failed to load system manifest: ${(err as Error).message}`,
+      nextSteps: [
+        {
+          action:
+            "Ensure src/content/system.md exists and is valid, then re-run preview.images.generate",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -481,7 +502,7 @@ export async function runPreviewImagesGenerate(
 
   return {
     exitCode: 0,
-    summary: `Preview generation finished: generated ${generatedCount}, skipped-existing ${skippedCount}, opt-out ${optOutCount}, failed ${items.filter((i) => i.status === "failed").length}.`,
+    summary: `[preview.images.generate] Preview generation finished: generated ${generatedCount}, skipped-existing ${skippedCount}, opt-out ${optOutCount}, failed ${items.filter((i) => i.status === "failed").length}.`,
     data: {
       items,
       summary: {

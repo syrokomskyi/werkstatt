@@ -43,7 +43,10 @@ export async function runPrintPdfGenerate(
   if (!app) {
     return {
       exitCode: 1,
-      summary: "This command must be run inside an app context.",
+      summary: "[print.pdf.generate] This command must be run inside an app context.",
+      nextSteps: [
+        { action: "Run this command from within a site mission context", kind: "required" },
+      ],
     };
   }
 
@@ -61,14 +64,21 @@ export async function runPrintPdfGenerate(
   } catch {
     return {
       exitCode: 1,
-      summary: "Failed to load system manifest.",
+      summary: "[print.pdf.generate] Failed to load system manifest.",
+      nextSteps: [
+        {
+          action:
+            "Ensure src/content/system.md exists and is valid, then re-run print.pdf.generate",
+          kind: "required",
+        },
+      ],
     };
   }
 
   if ((manifest.output as Record<string, unknown> | undefined)?.printPdf !== true) {
     return {
       exitCode: 0,
-      summary: "PDF generation disabled for this app.",
+      summary: "[print.pdf.generate] PDF generation disabled for this app.",
       data: {
         generated: 0,
         skipped: 0,
@@ -83,7 +93,10 @@ export async function runPrintPdfGenerate(
   if (!existsSync(distDir)) {
     return {
       exitCode: 1,
-      summary: `dist/client not found at ${relative(appDir, distDir)}. Run the Astro build first.`,
+      summary: `[print.pdf.generate] dist/client not found at ${relative(appDir, distDir)}. Run the Astro build first.`,
+      nextSteps: [
+        { action: "Run the Astro build first, then re-run print.pdf.generate", kind: "required" },
+      ],
     };
   }
 
@@ -168,7 +181,7 @@ export async function runPrintPdfGenerate(
     );
     return {
       exitCode: 0,
-      summary: `PDF cache hit (hash: ${compositeHash.slice(0, 12)}). ${targets.length} PDFs in cache.`,
+      summary: `[print.pdf.generate] PDF cache hit (hash: ${compositeHash.slice(0, 12)}). ${targets.length} PDFs in cache.`,
       data: {
         generated: 0,
         skipped: targets.length,
@@ -239,7 +252,14 @@ export async function runPrintPdfGenerate(
   if (port === 0) {
     return {
       exitCode: 1,
-      summary: "Failed to start static file server for PDF generation.",
+      summary: "[print.pdf.generate] Failed to start static file server for PDF generation.",
+      nextSteps: [
+        {
+          action:
+            "Check that port 0 is available and no other process is interfering, then re-run print.pdf.generate",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -310,7 +330,14 @@ export async function runPrintPdfGenerate(
   } catch (err: unknown) {
     return {
       exitCode: 1,
-      summary: `Playwright error: ${(err as Error).message ?? String(err)}. Ensure Playwright Chromium is installed (pnpm exec playwright install chromium).`,
+      summary: `[print.pdf.generate] Playwright error: ${(err as Error).message ?? String(err)}. Ensure Playwright Chromium is installed (pnpm exec playwright install chromium).`,
+      nextSteps: [
+        {
+          action:
+            "Install Playwright Chromium (pnpm exec playwright install chromium), then re-run print.pdf.generate",
+          kind: "required",
+        },
+      ],
       data: {
         generated,
         skipped: 0,
@@ -348,14 +375,20 @@ export async function runPrintPdfGenerate(
   if (errors.length > 0) {
     return {
       exitCode: 1,
-      summary: `Generated ${generated} PDFs, ${errors.length} error${errors.length === 1 ? "" : "s"}.`,
+      summary: `[print.pdf.generate] Generated ${generated} PDFs, ${errors.length} error${errors.length === 1 ? "" : "s"}.`,
+      nextSteps: [
+        {
+          action: "Fix the PDF generation errors listed above, then re-run print.pdf.generate",
+          kind: "required",
+        },
+      ],
       data: result,
     };
   }
 
   return {
     exitCode: 0,
-    summary: `Generated ${generated} PDFs to .cache/pdf/${compositeHash.slice(0, 12)}/.`,
+    summary: `[print.pdf.generate] Generated ${generated} PDFs to .cache/pdf/${compositeHash.slice(0, 12)}/.`,
     data: result,
   };
 }
@@ -372,7 +405,10 @@ export async function runPrintPdfCopy(
   if (!app) {
     return {
       exitCode: 1,
-      summary: "This command must be run inside an app context.",
+      summary: "[print.pdf.copy] This command must be run inside an app context.",
+      nextSteps: [
+        { action: "Run this command from within a site mission context", kind: "required" },
+      ],
     };
   }
 
@@ -384,7 +420,8 @@ export async function runPrintPdfCopy(
   if (!existsSync(manifestPath)) {
     return {
       exitCode: 0,
-      summary: "No PDF manifest found at .cache/pdf/manifest.json. Nothing to copy.",
+      summary:
+        "[print.pdf.copy] No PDF manifest found at .cache/pdf/manifest.json. Nothing to copy.",
       data: {
         command: "print.pdf.copy",
         status: "pass",
@@ -403,7 +440,13 @@ export async function runPrintPdfCopy(
   } catch (err: unknown) {
     return {
       exitCode: 1,
-      summary: `Failed to read PDF manifest: ${(err as Error).message ?? String(err)}`,
+      summary: `[print.pdf.copy] Failed to read PDF manifest: ${(err as Error).message ?? String(err)}`,
+      nextSteps: [
+        {
+          action: "Re-run print.pdf.generate to recreate the manifest, then re-run print.pdf.copy",
+          kind: "required",
+        },
+      ],
       data: {
         command: "print.pdf.copy",
         status: "fail",
@@ -416,7 +459,7 @@ export async function runPrintPdfCopy(
   if (!manifest.entries || manifest.entries.length === 0) {
     return {
       exitCode: 0,
-      summary: "PDF manifest is empty. Nothing to copy.",
+      summary: "[print.pdf.copy] PDF manifest is empty. Nothing to copy.",
       data: {
         command: "print.pdf.copy",
         status: "pass",
@@ -446,7 +489,14 @@ export async function runPrintPdfCopy(
   if (missing.length > 0) {
     return {
       exitCode: 1,
-      summary: `Copied ${copied} PDFs, ${missing.length} missing in cache.`,
+      summary: `[print.pdf.copy] Copied ${copied} PDFs, ${missing.length} missing in cache.`,
+      nextSteps: [
+        {
+          action:
+            "Re-run print.pdf.generate to regenerate missing PDFs, then re-run print.pdf.copy",
+          kind: "required",
+        },
+      ],
       data: {
         command: "print.pdf.copy",
         status: "fail",
@@ -459,7 +509,7 @@ export async function runPrintPdfCopy(
 
   return {
     exitCode: 0,
-    summary: `Copied ${copied} PDFs to dist/client/_print/.`,
+    summary: `[print.pdf.copy] Copied ${copied} PDFs to dist/client/_print/.`,
     data: { command: "print.pdf.copy", status: "pass", copied, outputDir: "dist/client/_print" },
   };
 }
@@ -476,7 +526,10 @@ export async function runPrintPdfValidate(
   if (!app) {
     return {
       exitCode: 1,
-      summary: "This command must be run inside an app context.",
+      summary: "[print.pdf.validate] This command must be run inside an app context.",
+      nextSteps: [
+        { action: "Run this command from within a site mission context", kind: "required" },
+      ],
     };
   }
 
@@ -493,21 +546,34 @@ export async function runPrintPdfValidate(
   } catch {
     return {
       exitCode: 1,
-      summary: "Failed to load system manifest.",
+      summary: "[print.pdf.validate] Failed to load system manifest.",
+      nextSteps: [
+        {
+          action:
+            "Ensure src/content/system.md exists and is valid, then re-run print.pdf.validate",
+          kind: "required",
+        },
+      ],
     };
   }
 
   if ((manifest.output as Record<string, unknown> | undefined)?.printPdf !== true) {
     return {
       exitCode: 0,
-      summary: "PDF generation disabled for this app. Nothing to validate.",
+      summary: "[print.pdf.validate] PDF generation disabled for this app. Nothing to validate.",
     };
   }
 
   if (!existsSync(printDir)) {
     return {
       exitCode: 1,
-      summary: `Print directory not found: ${relative(appDir, printDir)}. Run print.pdf.generate first.`,
+      summary: `[print.pdf.validate] Print directory not found: ${relative(appDir, printDir)}. Run print.pdf.generate first.`,
+      nextSteps: [
+        {
+          action: "Run print.pdf.generate first, then re-run print.pdf.validate",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -580,14 +646,21 @@ export async function runPrintPdfValidate(
     }
     return {
       exitCode: 1,
-      summary: `${missing.length} missing, ${empty.length} empty PDF${missing.length + empty.length === 1 ? "" : "s"}.`,
+      summary: `[print.pdf.validate] ${missing.length} missing, ${empty.length} empty PDF${missing.length + empty.length === 1 ? "" : "s"}.`,
+      nextSteps: [
+        {
+          action:
+            "Re-run print.pdf.generate to regenerate missing/empty PDFs, then re-run print.pdf.validate",
+          kind: "required",
+        },
+      ],
       data: { expected: expected.length, missing: missing.length, empty: empty.length, violations },
     };
   }
 
   return {
     exitCode: 0,
-    summary: `All ${expected.length} expected PDF${expected.length === 1 ? "" : "s"} are present and non-empty.`,
+    summary: `[print.pdf.validate] All ${expected.length} expected PDF${expected.length === 1 ? "" : "s"} are present and non-empty.`,
     data: { expected: expected.length, missing: 0, empty: 0 },
   };
 }

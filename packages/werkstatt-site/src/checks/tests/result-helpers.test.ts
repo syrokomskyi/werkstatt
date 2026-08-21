@@ -81,7 +81,7 @@ describe("passResult", () => {
 
   it("uses default summary when none provided", () => {
     const result = passResult("test.cmd");
-    expect(result.summary).toBe("test.cmd: OK");
+    expect(result.summary).toBe("[test.cmd] OK");
   });
 
   it("uses custom summary when provided", () => {

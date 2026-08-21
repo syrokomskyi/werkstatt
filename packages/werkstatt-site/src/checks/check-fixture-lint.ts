@@ -237,7 +237,7 @@ export async function runCheckFixtureLint(
     return {
       data: { file: BASELINE_PATH, commands: baseline.commands.length },
       exitCode: 0,
-      summary: `check.fixture.lint: wrote ${baseline.commands.length} baseline entr(y/ies) to ${BASELINE_PATH}`,
+      summary: `[check.fixture.lint] wrote ${baseline.commands.length} baseline entr(y/ies) to ${BASELINE_PATH}`,
     };
   }
 
