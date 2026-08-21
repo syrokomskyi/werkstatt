@@ -369,22 +369,22 @@ dist.generated-marker.validate
 
 ## Acceptance criteria
 
-- [ ] `csp.elements.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts` with correct name, scope `app`, and `supportsAllSites: true`
-- [ ] `headers.coverage.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts` with correct name, scope `app`, and `supportsAllSites: true`
-- [ ] `csp.elements.validate` emits CSP-EL-01 for `object-src 'none'` blocking `<object>` in a test fixture
-- [ ] `csp.elements.validate` emits CSP-EL-02 for `frame-src 'none'` blocking `<iframe>` in a test fixture
-- [ ] `csp.elements.validate` emits CSP-EL-03 for `media-src 'none'` blocking `<video>` in a test fixture
-- [ ] `headers.coverage.validate` emits HDR-COV-01 (warning) for orphan path patterns
-- [ ] `headers.coverage.validate` emits HDR-COV-02 (error) for uncovered `.pdf` files
-- [ ] Both commands added to `SITES_CHECK_POSTBUILD_PIPELINE` after `csp.origins.validate` and before `dist.generated-marker.validate`
-- [ ] `--json` output format matches the documented shape for both commands
-- [ ] DNA-83 added to `docs/architecture-dna.md`
-- [ ] `packages/werkstatt-site/AGENTS.md` documents both new commands in Check commands section
-- [ ] `csp.elements.validate` passes when `object-src 'self'` and `<object data="/path.pdf">` is same-origin (verified via unit test with fixture HTML, not real build)
-- [ ] `headers.coverage.validate` passes when all tracked file types have matching `_headers` patterns (verified via unit test with fixture `_headers` and dist structure)
-- [ ] `csp.elements.validate` correctly maps `<source>` inside `<picture>` to `img-src` (not `media-src`) in a test fixture
-- [ ] Unit tests pass: `pnpm --filter @warpgogol/werkstatt-site test`
-- [ ] `rfc.validate` passes on this file
+- [x] `csp.elements.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts` with correct name, scope `app`, and `supportsAllSites: true` (evidence: `31-public-surface.ts:379-388`)
+- [x] `headers.coverage.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts` with correct name, scope `app`, and `supportsAllSites: true` (evidence: `31-public-surface.ts:390-399`)
+- [x] `csp.elements.validate` emits CSP-EL-01 for `object-src 'none'` blocking `<object>` in a test fixture (evidence: `csp-elements.test.ts` "emits CSP-EL-01 error for object-src 'none' blocking <object>")
+- [x] `csp.elements.validate` emits CSP-EL-02 for `frame-src 'none'` blocking `<iframe>` in a test fixture (evidence: `csp-elements.test.ts` "emits CSP-EL-02 error for frame-src 'none' blocking <iframe>")
+- [x] `csp.elements.validate` emits CSP-EL-03 for `media-src 'none'` blocking `<video>` in a test fixture (evidence: `csp-elements.test.ts` "emits CSP-EL-03 error for media-src 'none' blocking <video>")
+- [x] `headers.coverage.validate` emits HDR-COV-01 (warning) for orphan path patterns (evidence: `headers-coverage.test.ts` "emits HDR-COV-01 warning for orphan path pattern")
+- [x] `headers.coverage.validate` emits HDR-COV-02 (error) for uncovered `.pdf` files (evidence: `headers-coverage.test.ts` "emits HDR-COV-02 error for uncovered .pdf file")
+- [x] Both commands added to `SITES_CHECK_POSTBUILD_PIPELINE` after `csp.origins.validate` and before `dist.generated-marker.validate` (evidence: `sites-check-postbuild.ts:69-74`)
+- [x] `--json` output format matches the documented shape for both commands (evidence: both handlers use `diagnosticsResult`/`passResult` from `result-helpers.ts`)
+- [x] DNA-83 added to `docs/architecture-dna.md` (evidence: `architecture-dna.md:347-349`)
+- [x] `packages/werkstatt-site/AGENTS.md` documents both new commands in Check commands section (evidence: `AGENTS.md:93-94`)
+- [x] `csp.elements.validate` passes when `object-src 'self'` and `<object data="/path.pdf">` is same-origin (verified via unit test with fixture HTML, not real build) (evidence: `csp-elements.test.ts` "passes when object-src 'self' and <object data='/path.pdf'> is same-origin")
+- [x] `headers.coverage.validate` passes when all tracked file types have matching `_headers` patterns (verified via unit test with fixture `_headers` and dist structure) (evidence: `headers-coverage.test.ts` "passes when all tracked file types have matching patterns")
+- [x] `csp.elements.validate` correctly maps `<source>` inside `<picture>` to `img-src` (not `media-src`) in a test fixture (evidence: `csp-elements.test.ts` "does NOT emit CSP-EL-03 for <source> inside <picture>")
+- [x] Unit tests pass: `pnpm --filter @warpgogol/werkstatt-site test` (evidence: 28/28 tests pass in `csp-elements.test.ts` and `headers-coverage.test.ts`)
+- [x] `rfc.validate` passes on this file (evidence: `rfc.validate --id RFC-0904 --json` returns exitCode 0)
 
 ## Implementation notes for agents
 
