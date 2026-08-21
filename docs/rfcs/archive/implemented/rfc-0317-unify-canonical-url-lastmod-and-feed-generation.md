@@ -17,7 +17,8 @@ amends:
   - RFC-0049
   - RFC-0165
   - RFC-0184
-amendedBy: []
+amendedBy:
+  - RFC-0906
 related:
   - RFC-0143
   - RFC-0160

@@ -343,3 +343,15 @@ The workshop extends Axiom post-deploy monitoring with a `mobile-layout` instrum
 ## DNA-82 · Kernel command output standard
 
 Every kernel command handler in `packages/werkstatt/src/` and `packages/werkstatt-site/src/` MUST return a `KernelCommandResult` where: (1) `exitCode` is explicitly set on every return path (both success `0` and failure `1`), never relying on runtime default `?? 0`; (2) `summary` is present on every return path and starts with the `[command.name]` prefix (e.g. `[nachweis.sign]`); (3) `nextSteps` is present and non-empty when `exitCode` is `1` (failure), containing at least one `KernelNextStep` with `kind: "required"`. On success, `nextSteps` is optional. Enforced by `werkstatt.commands.validate` (static analysis of return statements in handler files). Established by this RFC.
+
+## DNA-84 · Redirect effectiveness gate
+
+Every redirect rule in `public/_redirects` MUST be checked for static-file and Worker-route shadowing before deployment. A redirect that is shadowed by a static file in `dist/client/` or by a Cloudflare Worker route pattern will never fire — Google crawls the stale content instead of following the redirect. The check cross-references each redirect source against `dist/client/` file existence and Worker route patterns from `wrangler.toml`/`wrangler.jsonc`. Enforced by `redirect.shadow.validate` (RSHAD-01..03) and enhanced `redirect.map.validate` (REDIR-07). Established by RFC-0905.
+
+## DNA-85 · Canonical URL trailing-slash parity gate
+
+Every canonical URL emitted in rendered HTML (`<link rel="canonical">`, `<meta property="og:url">`, JSON-LD `url`) MUST be byte-identical to the `canonicalPageUrl` output used by the sitemap, feed, and llms generators. The `trailingSlash` policy declared in `CanonicalUrlOptions` is the single source of truth — no URL construction path (including `pageUrl` in `resolve-route.ts`) may bypass it by using `localizeUrl` or `Astro.url.toString()` directly. Divergence causes Google to index duplicate URL variants. Enforced by `canonical.html-parity.validate` (CANON-HTML-01..03) and enhanced `canonical.url.validate` (CANON-04). Established by RFC-0906.
+
+## DNA-86 · Host canonicalization and URL normalization gate
+
+Every site MUST redirect non-canonical host variants (www→apex or apex→www) and non-canonical trailing-slash variants to the canonical form before deployment. The canonical host is declared in `astro.config.mjs` `site` field. The canonical trailing-slash policy is declared in `canonicalPageUrl` `trailingSlash` option. Both MUST be enforced via `_redirects` rules or Worker configuration, and the Astro `build.format` MUST be consistent with the `trailingSlash` policy. Without these redirects, Google indexes duplicate URL variants, splitting link equity. Enforced by `host.canonical.config.validate` (HOST-CANON-01..03) and `trailing.slash.config.validate` (SLASH-01..03). Established by RFC-0908.
