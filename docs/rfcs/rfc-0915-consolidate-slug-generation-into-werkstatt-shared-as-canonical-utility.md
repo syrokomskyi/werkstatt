@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-21
 updatedAt: 2026-08-21
+enhancedAt: 2026-08-21
 implementedAt:
 closedAt:
 supersedes: []
@@ -103,7 +104,7 @@ DNA-53 establishes the pattern for fingerprint utilities: "New ad hoc direct has
 
 - **DNA-53** (Semantic fingerprint governance) — establishes the canonical-package pattern: shared utility lives in one package, ad hoc reimplementations outside are forbidden. This RFC extends the same pattern to slug generation.
 - **DNA-74** (Canonical Diagnostic schema ownership) — establishes the sole-ownership pattern: one package owns the schema, no duplication or aliasing. This RFC applies the same principle to slug utilities.
-- **DNA-88** (new) — Canonical slug generation ownership, established by this RFC.
+- **DNA-88** (new) — Canonical slug generation ownership, established by this RFC. DNA-88 will be added to `docs/architecture-dna.md` during implementation. Since DNA-88 does not exist yet, it cannot be listed in `satisfies[]` — the RFC body establishes it, and the invariant entry is written as part of the rollout.
 - **RFC-0916** (Utility provenance validator) — companion RFC that adds automated enforcement via `utility.provenance.validate`, using the slug module as its initial registry entries.
 
 ## Design
@@ -159,9 +160,14 @@ class HeadingSlugger {
 | `packages/werkstatt-shared/src/share/slug/slug-id.ts` | Created — semantic block ID generation |
 | `packages/werkstatt-shared/src/share/slug/heading-slugger.ts` | Created — heading anchor deduplication |
 | `packages/werkstatt-shared/src/share/slug/strategies.ts` | Created — DE/UK/default strategies |
-| `packages/werkstatt-shared/src/share/semantic/extract.ts` | Modified — replace custom `slugify()` with `slugId()` re-export |
-| `packages/werkstatt-shared/src/share/semantic/page-utils.ts` | Modified — import `slugId` from `../slug/` instead of `./extract.ts` |
+| `packages/werkstatt-shared/src/share/semantic/extract.ts` | Modified — remove custom `slugify()`, no re-export (no external consumers found) |
+| `packages/werkstatt-shared/src/share/semantic/page-utils.ts` | Modified — import `slugId` from `../slug/` instead of `./extract.ts`, remove `export { slugify }` line, update internal calls from `slugify(block.heading)` to `slugId(block.heading)` |
 | `packages/werkstatt-site/src/domain/geo/slug.ts` | Deleted — logic moved to werkstatt-shared |
+| `packages/werkstatt-site/src/domain/geo/index.ts` | Modified — replace `export { citySlug } from "./slug.ts"` with `export { slugUrl as citySlug } from "@warpgogol/werkstatt-shared/share/slug"` (preserves public API) |
+| `packages/werkstatt-site/src/domain/geo/cities.ts` | Modified — import `slugUrl` from `@warpgogol/werkstatt-shared/share/slug` instead of `citySlug` from `./slug.ts` |
+| `packages/werkstatt-site/src/domain/geo/service.ts` | Modified — import `slugUrl` from `@warpgogol/werkstatt-shared/share/slug` instead of `citySlug` from `./slug.ts` |
+| `packages/werkstatt-site/src/domain/geo/tests/city-slug.pbt.test.ts` | Modified — import `slugUrl` from `@warpgogol/werkstatt-shared/share/slug` instead of `citySlug` from `../slug.ts` |
+| `packages/werkstatt-site/src/domain/geo/types.ts` | Modified — remove `SlugStrategy` interface (moved to `werkstatt-shared/src/share/slug/strategies.ts` as internal) |
 | `packages/werkstatt-site/src/checks/person-create.ts` | Modified — remove local `slugify()`, import `slugUrl` from `@warpgogol/werkstatt-shared/share/slug` |
 | `packages/werkstatt-site/src/domain/ui/sections/markdown/prose-pipeline.ts` | Modified — import `HeadingSlugger` from `@warpgogol/werkstatt-shared/share/slug` |
 | `packages/werkstatt-shared/package.json` | Modified — add `@sindresorhus/slugify`, `cyrillic-to-translit-js`, `github-slugger` dependencies |
@@ -208,6 +214,8 @@ This RFC introduces no new commands. Failure modes are limited to:
 8. **Run unit tests** — verify slug output compatibility.
 
 No flag day, no migration period — all changes are internal import-path refactoring with identical external behavior. New apps automatically comply because the canonical module is the only available import path.
+
+**Migration details**: The custom `slugify()` in `extract.ts` has zero external consumers (grep confirmed no imports of `slugify` from `@warpgogol/werkstatt-shared` outside `page-utils.ts`). The `export { slugify }` line in `page-utils.ts` is removed; `page-utils.ts` imports and uses `slugId` directly. The `citySlug` function in `geo/slug.ts` is replaced by `slugUrl` — geo consumers (`cities.ts`, `service.ts`, `index.ts`, tests) are updated to import `slugUrl` from `@warpgogol/werkstatt-shared/share/slug`. The `index.ts` re-export preserves the public API name `citySlug` as an alias of `slugUrl` to avoid breaking external importers of `@warpgogol/werkstatt-site/domain/geo`. The `SlugStrategy` interface becomes internal to the slug module (not re-exported).
 
 ## Alternatives considered
 

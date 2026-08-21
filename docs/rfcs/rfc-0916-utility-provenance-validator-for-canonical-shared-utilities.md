@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-21
 updatedAt: 2026-08-21
+enhancedAt: 2026-08-21
 implementedAt:
 closedAt:
 supersedes: []
@@ -42,8 +43,7 @@ versionBump: patch
 commands:
   proposed:
     - utility.provenance.validate
-  added:
-    - utility.provenance.validate
+  added: []
   changed: []
   removed: []
 appsImpacted: []
@@ -194,6 +194,7 @@ interface UtilityProvenanceViolation {
 | Path | Role |
 | --- | --- |
 | `packages/werkstatt-shared/src/share/utility-registry.yaml` | Created — utility registry |
+| `packages/werkstatt-shared/AGENTS.md` | Modified — document registry location and utility addition process |
 | `packages/werkstatt-site/src/checks/utility-provenance.ts` | Created — validator implementation |
 | `packages/werkstatt-site/src/checks/command-tables/infra-contracts.ts` | Modified — register `utility.provenance.validate` command |
 | `packages/werkstatt-site/src/checks/pipelines/packages-check.ts` | Modified — add `utility.provenance.validate` to `PACKAGES_CHECK_PIPELINE` |
@@ -223,7 +224,8 @@ interface UtilityProvenanceViolation {
 
 - **Warning mode** (default during migration): violations are emitted as `severity: "warning"`, exit code 0. This allows existing codebases to adopt the validator without breaking CI.
 - **Fail mode**: violations are emitted as `severity: "error"`, exit code 1. Used after migration is complete.
-- **Registry parse error**: if `utility-registry.yaml` is missing or invalid, the command fails with a `UTIL-REG-01` error and exit code 1.
+- **Registry parse error**: if `utility-registry.yaml` is missing or invalid YAML, the command fails with a `UTIL-REG-01` error and exit code 1.
+- **Invalid regex pattern**: if a `patterns[].regex` string in the registry is an invalid regex (e.g., unbalanced parentheses), the command catches the regex compilation error and emits a `UTIL-REG-02` diagnostic with exit code 1, instead of crashing.
 - **False positives**: pattern-based heuristics may match unrelated code. Mitigated by the allowlist mechanism — each allowlist entry requires a `reason` field.
 
 ## Rollout
