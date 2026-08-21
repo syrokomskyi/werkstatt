@@ -460,6 +460,13 @@ entries:
     auditedAt: 2026-08-21T17:07:03.056Z
     verdict: baseline
     agent: system:baseline
+  - path: missions/warpgogol-m000085/workpiece/src/styles/local.css
+    entityId: ""
+    auditedRevision: 1
+    auditedHash: sha256-3a41c324027cd722aec21822b0088c0c4f50cce98ecf3a77c98dab11f4046a1d
+    auditedAt: 2026-08-21T21:23:22.127Z
+    verdict: baseline
+    agent: system:baseline
   - path: packages/agent-gate/src/action-pipeline.ts
     entityId: ""
     auditedRevision: 1

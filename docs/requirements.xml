@@ -298,6 +298,9 @@
     <requirement id="req-38">
       Ratgeber depth-1 article pages emit Article JSON-LD with structured Person author (from `authorRecord`), `description`, `mainEntityOfPage` as canonical URL string, and `dateModified` derived from `reviewedAt` or latest `changelog[].date`. FAQPage JSON-LD is prohibited on ratgeber depth-1 pages — FAQ content is rendered as visible HTML blocks only. The C-contract (`jsonld-types.yaml`) declares `FAQPage` in ratgeber depth-1 `prohibitedTypes` and `description`/`mainEntityOfPage` in Article `optional` fields. `seo.structured-data.validate` enforces SD-RAT-01..04 and `surface.contract.validate` checks the C-contract compliance.
     </requirement>
+    <requirement id="req-39">
+      RFC-0901: Cross-locale structural parity validation. `translation.parity.validate` compares section, paragraph, and sentence counts between locale variants of translated content across `pages`, `prose`, `business-profile`, `navigation`, `faq`, `people`, and `site` domains. Emits `PARITY-SECTION-COUNT`, `PARITY-PARAGRAPH-COUNT`, `PARITY-SENTENCE-COUNT` with `error` severity for legal documents and `warning` for non-legal. Respects RFC-0097 locale scoping via `pages[].locales`. Supports `--source-locale` flag. Suppressions via `translation-parity.suppressions.yaml` with `PARITY-SUP-02` (stale) and `PARITY-SUP-03` (duplicate) guards. `translation.parity.review` generates a review manifest. `translation.parity.suppress` adds suppression records. Integrated into `SITES_CHECK_AUTHOR_PIPELINE` after `mirroring.validate`.
+    </requirement>
   </repository-requirements>
 
   <source-file-contract-requirements>

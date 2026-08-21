@@ -1,7 +1,7 @@
 ---
 id: RFC-0901
 title: "Cross-locale structural parity validation for translated content"
-status: accepted
+status: implemented
 kind: command
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-21
 updatedAt: 2026-08-21
 enhancedAt: 2026-08-21
-implementedAt:
+implementedAt: 2026-08-21
 closedAt:
 supersedes: []
 supersededBy:
@@ -175,7 +175,7 @@ Three hierarchical checks, applied per matched file pair. File-level presence is
 | `PARITY-PARAGRAPH-COUNT` | Paragraph count per block matches    | block     |
 | `PARITY-SENTENCE-COUNT`  | Sentence count per paragraph matches | paragraph |
 
-**Block matching:** Uses `loadSemanticSiteModel` from `@warpgogol/werkstatt-site/content` to load the semantic page model per locale. Blocks are matched by `blockId` (language-neutral, mandatory per RFC-0914). Since RFC-0914 makes block IDs mandatory, no index-based fallback is needed — all blocks have explicit, stable IDs.
+**Block matching:** For `pages` domain, extracts blocks from frontmatter `blocks[]` array via `extractPageSections` (direct frontmatter parsing with `id` field extraction). For `prose` and other domains, uses `splitMarkdownSections` to extract H2-headed sections. Blocks/sections are matched by `id` (language-neutral, mandatory per RFC-0914 for page blocks; slug-derived from heading for prose sections). Since RFC-0914 makes block IDs mandatory for pages, no index-based fallback is needed — all page blocks have explicit, stable IDs. Prose sections use slug-derived IDs from headings, which are stable across locales when headings are translated (slugs are locale-aware via `slugId`).
 
 **Paragraph counting:** Uses `extractParagraphs` from `@warpgogol/werkstatt-shared/share/semantic/extract` on each block's body. A paragraph is a block of text separated by one or more blank lines.
 
@@ -281,7 +281,7 @@ interface ParityValidateResult {
   status: "pass" | "warn" | "fail";
   findings: ParityFinding[];
   suppressed: ParityFinding[];
-  summary: {
+  paritySummary: {
     filesChecked: number;
     errors: number;
     warnings: number;
@@ -357,7 +357,7 @@ interface ParityValidateResult {
       "message": "Suppressed: DE has additional TMG §5 disclaimer not required under Ukrainian law"
     }
   ],
-  "summary": {
+  "paritySummary": {
     "filesChecked": 42,
     "errors": 1,
     "warnings": 0,
@@ -429,25 +429,25 @@ The following `docs/*.xml` files require synchronization during implementation:
 
 ## Acceptance criteria
 
-- [ ] `translation.parity.validate` command registered with `scope: app` in `packages/werkstatt-site/src/checks/command-tables/04-content-quality.ts`
-- [ ] Detects block count mismatches between locale variants (using `loadSemanticSiteModel` + `blockId` matching per RFC-0914)
-- [ ] Detects paragraph count mismatches per section
-- [ ] Detects sentence count mismatches per paragraph
-- [ ] Legal documents (`impressum.md`, `datenschutz.md`, `agb.md`, `widerruf.md`, `barrierefreiheit.md`) produce error-severity diagnostics
-- [ ] Non-legal content produces warning-severity diagnostics
-- [ ] Respects RFC-0097 `pages[].locales` scoping in `system.md`
-- [ ] Suppression file `translation-parity.suppressions.yaml` loaded from workpiece root
-- [ ] Suppressed findings excluded from diagnostics and reported separately
-- [ ] `translation.parity.review` generates a review manifest with all unsuppressed findings
-- [ ] `translation.parity.suppress` adds records to the suppression file with schema validation
-- [ ] Integrated into `SITES_CHECK_AUTHOR_PIPELINE` after `mirroring.validate`
-- [ ] `--json` output format documented and stable
-- [ ] Each finding includes `sourceFile`, `targetFile`, `fixHint`, and `missingItems` for agent-actionable remediation
-- [ ] `sourceExcerpt` includes the source-locale text of missing sections/paragraphs so agents can translate without re-reading files
-- [ ] `translation.parity.validate` and `translation.parity.review` accept `--source-locale` flag (default = `defaultLang` from `system.md`)
-- [ ] Each command handler returns `KernelCommandResult` with `exitCode` explicitly set on every return path, `summary` prefixed with `[command.name]`, and `nextSteps` non-empty on failure (DNA-82)
-- [ ] Unit tests cover: section count, paragraph count, sentence count, suppression matching, stale suppression detection, locale scoping, legal vs non-legal severity
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `translation.parity.validate` command registered with `scope: app` in `packages/werkstatt-site/src/checks/command-tables/04-content-quality.ts` (evidence: packages/werkstatt-site/src/checks/command-tables/04-content-quality.ts:912)
+- [x] Detects block count mismatches between locale variants (using frontmatter block extraction + `blockId` matching per RFC-0914) (evidence: packages/werkstatt-site/src/checks/translation-parity.ts:201-214,336-377)
+- [x] Detects paragraph count mismatches per section (evidence: packages/werkstatt-site/src/checks/translation-parity.ts:381-423)
+- [x] Detects sentence count mismatches per paragraph (evidence: packages/werkstatt-site/src/checks/translation-parity.ts:426-463)
+- [x] Legal documents (`impressum.md`, `datenschutz.md`, `agb.md`, `widerruf.md`, `barrierefreiheit.md`) produce error-severity diagnostics (evidence: packages/werkstatt-site/src/checks/translation-parity.ts:93-99,140-142,497)
+- [x] Non-legal content produces warning-severity diagnostics (evidence: packages/werkstatt-site/src/checks/tests/translation-parity.test.ts:198-222)
+- [x] Respects RFC-0097 `pages[].locales` scoping in `system.md` (evidence: packages/werkstatt-site/src/checks/translation-parity.ts:302-319,518-522)
+- [x] Suppression file `translation-parity.suppressions.yaml` loaded from workpiece root (evidence: packages/werkstatt-site/src/checks/translation-parity.ts:224-244)
+- [x] Suppressed findings excluded from diagnostics and reported separately (evidence: packages/werkstatt-site/src/checks/translation-parity.ts:614-625, tests:275-308)
+- [x] `translation.parity.review` generates a review manifest with all unsuppressed findings (evidence: packages/werkstatt-site/src/checks/translation-parity.ts:684-758, tests:344-368)
+- [x] `translation.parity.suppress` adds records to the suppression file with schema validation (evidence: packages/werkstatt-site/src/checks/translation-parity.ts:765-832, tests:424-445)
+- [x] Integrated into `SITES_CHECK_AUTHOR_PIPELINE` after `mirroring.validate` (evidence: packages/werkstatt-site/src/checks/pipelines/sites-check-author.ts:343)
+- [x] `--json` output format documented and stable (evidence: packages/werkstatt-site/src/checks/translation-parity.ts:629-677)
+- [x] Each finding includes `sourceFile`, `targetFile`, `fixHint`, and `missingItems` for agent-actionable remediation (evidence: packages/werkstatt-site/src/checks/translation-parity.ts:51-73,362-376)
+- [x] `sourceExcerpt` includes the source-locale text of missing sections/paragraphs so agents can translate without re-reading files (evidence: packages/werkstatt-site/src/checks/translation-parity.ts:374,416-418,458-459)
+- [x] `translation.parity.validate` and `translation.parity.review` accept `--source-locale` flag (default = `defaultLang` from `system.md`) (evidence: packages/werkstatt-site/src/checks/translation-parity.ts:582-583,693-694)
+- [x] Each command handler returns `KernelCommandResult` with `exitCode` explicitly set on every return path, `summary` prefixed with `[command.name]`, and `nextSteps` non-empty on failure (DNA-82) (evidence: packages/werkstatt-site/src/checks/translation-parity.ts:590,630-657,659-677,741-758,816-831)
+- [x] Unit tests cover: section count, paragraph count, sentence count, suppression matching, stale suppression detection, locale scoping, legal vs non-legal severity (evidence: packages/werkstatt-site/src/checks/tests/translation-parity.test.ts:108-341)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate run 2026-08-21)
 
 ## Implementation notes for agents
 

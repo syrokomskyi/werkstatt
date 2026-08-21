@@ -806,6 +806,7 @@
       <links>
         <link rel="depends-on" target="packages.werkstatt" />
         <link rel="governed-by" target="docs.rfcs.rfc-0855" />
+        <link rel="implements" target="docs.rfcs.rfc-0901" />
       </links>
     </node>
 
@@ -882,6 +883,18 @@
         <link rel="reconciles" target="spec.release-certification" />
         <link rel="transitions" target="packages.werkstatt" />
         <link rel="transitions" target="packages.werkstatt-site" />
+      </links>
+    </node>
+
+    <node id="docs.rfcs.rfc-0901" type="compass-doc">
+      <name>RFC-0901 Cross-locale Structural Parity Validation</name>
+      <path>`docs/rfcs/rfc-0901-cross-locale-structural-parity-validation.md`</path>
+      <role>Cross-locale structural parity validation for translated content. Adds `splitSentences` to semantic extract, `translation.parity.validate`/`review`/`suppress` commands, and suppression file `translation-parity.suppressions.yaml`.</role>
+      <links>
+        <link rel="implemented-by" target="packages.werkstatt-site" />
+        <link rel="depends-on" target="docs.rfcs.rfc-0914" />
+        <link rel="depends-on" target="docs.rfcs.rfc-0097" />
+        <link rel="informs" target="packages.share.semantic" />
       </links>
     </node>
   </nodes>
