@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0303: extracted managed-public commands from public-surface.ts into public-surface/managed-public.ts.</item>
   <item>RFC-0589: REDIR-03 rejects 410 for cloudflare-workers adapter sites. Valid statuses expanded to [200, 301, 302, 303, 307, 308]. Adapter resolved from systems/registry.yaml.</item>
+  <item>RFC-0905: export normalizeUrlPath, sitemapPaths, checkStaticFileShadow for redirect shadow validation. Add REDIR-07 static file shadow check.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -36,7 +37,7 @@ import {
 import { passResult } from "../result-helpers.ts";
 import { parseRedirectRules } from "@warpgogol/werkstatt-shared/share/redirects";
 
-function normalizeUrlPath(pathname: string): string {
+export function normalizeUrlPath(pathname: string): string {
   const clean = pathname.trim().replace(/^\/+|\/+$/g, "");
   return clean ? `/${clean}/` : "/";
 }
@@ -66,7 +67,27 @@ function routePathVariants(pathname: string): string[] {
   return normalized === noSlash ? [normalized] : [normalized, noSlash];
 }
 
-async function sitemapPaths(
+export async function checkStaticFileShadow(
+  context: KernelRuntimeContext,
+  distClientDir: string,
+  sourcePath: string,
+): Promise<boolean> {
+  if (sourcePath.includes("*") || sourcePath.includes(":")) return false;
+  const normalized = normalizeUrlPath(sourcePath);
+  const noSlash = normalized === "/" ? "/" : normalized.replace(/\/$/, "");
+  const candidates = [
+    join(distClientDir, noSlash, "index.html"),
+    join(distClientDir, `${noSlash}.html`),
+    join(distClientDir, `${normalized}index.html`),
+    join(distClientDir, `${normalized.replace(/\/$/, "")}.html`),
+  ];
+  for (const candidate of candidates) {
+    if (await context.io.exists(candidate)) return true;
+  }
+  return false;
+}
+
+export async function sitemapPaths(
   context: KernelRuntimeContext,
   app: AppPublicContext,
 ): Promise<Set<string>> {
@@ -269,6 +290,18 @@ export async function runRedirectMapValidate(
         message: `REDIR-04 redirect source is still a live canonical route: ${rule.from}`,
         fixHint: "Remove the redirect or retire the live route explicitly.",
       });
+    }
+    if (!fromPattern) {
+      const distClientDir = join(app.appDirectory, "dist", "client");
+      if (await checkStaticFileShadow(context, distClientDir, rule.from)) {
+        messages.push({
+          severity: "error",
+          file: appRel(app.appDirectory, redirectsPath),
+          message: `REDIR-07 static file shadows redirect source: ${rule.from} — redirect will never fire`,
+          fixHint:
+            "Remove the static file from dist/client/ or remove the redirect from _redirects",
+        });
+      }
     }
     if (rule.status === 410 || !rule.to || /^https?:\/\//i.test(rule.to)) continue;
     if (rule.to.includes(":") || rule.to.includes("*")) continue;
