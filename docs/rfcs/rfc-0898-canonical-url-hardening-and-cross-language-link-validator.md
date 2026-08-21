@@ -1,7 +1,7 @@
 ---
 id: RFC-0898
 title: "Canonical URL hardening and cross-language link validator"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-21
 updatedAt: 2026-08-21
 enhancedAt: 2026-08-21
-implementedAt:
+implementedAt: 2026-08-21
 closedAt:
 supersedes: []
 supersededBy:
@@ -196,16 +196,16 @@ The layout's own fallback (`canonicalUrlOverride ?? Astro.url.toString()`) remai
 
 ## Acceptance criteria
 
-- [ ] `seo.domain.validate` command registered in `05-seo-audit.ts` command table
-- [ ] `seo.cross-lang-links.validate` command registered in `05-seo-audit.ts` command table
-- [ ] Both commands added to `SITES_CHECK_POSTBUILD_PIPELINE`
-- [ ] `SEO-DOMAIN-01` through `SEO-DOMAIN-05` rules implemented
-- [ ] `SEO-XLANG-01` rule implemented
-- [ ] Page templates pass `canonicalUrl` explicitly to `BaseLayout` (no `Astro.url.toString()` fallback)
-- [ ] `docs/verification-plan.xml` updated with verification mappings for `SEO-DOMAIN-*` and `SEO-XLANG-01` rules
-- [ ] `packages/werkstatt-site/AGENTS.md` updated with `seo.domain.validate` and `seo.cross-lang-links.validate` entries in Check commands section
-- [ ] Unit tests for each rule (passing and failing cases)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `seo.domain.validate` command registered in `05-seo-audit.ts` command table (evidence: packages/werkstatt-site/src/checks/command-tables/05-seo-audit.ts:237-246)
+- [x] `seo.cross-lang-links.validate` command registered in `05-seo-audit.ts` command table (evidence: packages/werkstatt-site/src/checks/command-tables/05-seo-audit.ts:247-255)
+- [x] Both commands added to `SITES_CHECK_POSTBUILD_PIPELINE` (evidence: packages/werkstatt-site/src/checks/pipelines/sites-check-postbuild.ts:46-49)
+- [x] `SEO-DOMAIN-01` through `SEO-DOMAIN-05` rules implemented (evidence: packages/werkstatt-site/src/checks/audit/validators/seo-domain.ts:117-195)
+- [x] `SEO-XLANG-01` rule implemented (evidence: packages/werkstatt-site/src/checks/audit/validators/seo-cross-lang-links.ts:183-194)
+- [x] Page templates pass `canonicalUrl` explicitly to `BaseLayout` (no `Astro.url.toString()` fallback) (evidence: packages/werkstatt-site/src/codegen/templates/app-boilerplate/src/pages/[...slug].template.astro:59,94 and packages/werkstatt-site/src/codegen/templates/app-boilerplate/src/pages/[lang]/[...slug].template.astro:75,123)
+- [x] `docs/verification-plan.xml` updated with verification mappings for `SEO-DOMAIN-*` and `SEO-XLANG-01` rules (evidence: docs/verification-plan.xml:537-540)
+- [x] `packages/werkstatt-site/AGENTS.md` updated with `seo.domain.validate` and `seo.cross-lang-links.validate` entries in Check commands section (evidence: packages/werkstatt-site/AGENTS.md:97-98)
+- [x] Unit tests for each rule (passing and failing cases) (evidence: packages/werkstatt-site/src/checks/tests/seo-domain.test.ts:1-175, packages/werkstatt-site/src/checks/tests/seo-cross-lang-links.test.ts:1-174)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate run after stamping)
 
 ## Implementation notes for agents
 
