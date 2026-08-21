@@ -127,6 +127,12 @@ export async function runMissionMigrate(
           migratedAt: new Date().toISOString(),
         },
         summary: `[mission.migrate] ${missionId} report-only: ${toApply.length} pending`,
+        nextSteps: [
+          {
+            action: `Apply migrations: pnpm exec werkstatt run mission.migrate --mission ${missionId}`,
+            kind: "optional",
+          },
+        ],
       };
     }
 
@@ -248,6 +254,12 @@ export async function runMissionMigrate(
         },
         exitCode: 1,
         summary: `[mission.migrate] ${missionId} blocked at ${blockedMigrator}`,
+        nextSteps: [
+          {
+            action: `Fix the blocking migrator '${blockedMigrator}', then re-run: pnpm exec werkstatt run mission.migrate --mission ${missionId}`,
+            kind: "required",
+          },
+        ],
       };
     }
 
@@ -266,6 +278,12 @@ export async function runMissionMigrate(
         migratedAt: now,
       },
       summary: `[mission.migrate] ${missionId} — ${appliedMigrators.length} migrator(s) applied`,
+      nextSteps: [
+        {
+          action: `Validate the mission: pnpm exec werkstatt run mission.validate --mission ${missionId}`,
+          kind: "optional",
+        },
+      ],
     };
   } finally {
     await releaseLock(workspaceRoot, `mission:${missionId}`);
