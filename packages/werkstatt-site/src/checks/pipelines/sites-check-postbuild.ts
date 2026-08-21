@@ -46,6 +46,8 @@ export const SITES_CHECK_POSTBUILD_PIPELINE: KernelPipelineStep[] = [
   { command: "feed.validate" },
   // RFC-0317: canonical URL parity across sitemap, feed, llms, and HTML.
   { command: "canonical.url.validate" },
+  // RFC-0906: HTML <link rel=canonical> and og:url parity against canonicalPageUrl.
+  { command: "canonical.html-parity.validate" },
   // RFC-0898: canonical domain origin + dev/staging pattern leakage check.
   { command: "seo.domain.validate" },
   // RFC-0898: cross-language internal link consistency.

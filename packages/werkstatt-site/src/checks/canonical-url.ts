@@ -24,8 +24,15 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
-import { canonicalPageUrl, type CanonicalUrlOptions } from "@warpgogol/werkstatt-site/share/astro/canonical-url";
-import { resolvePageUpdateStamp, isValidStampDate } from "@warpgogol/werkstatt-shared/share/semantic";
+import {
+  canonicalPageUrl,
+  type CanonicalUrlOptions,
+} from "@warpgogol/werkstatt-site/share/astro/canonical-url";
+import {
+  resolvePageUpdateStamp,
+  isValidStampDate,
+} from "@warpgogol/werkstatt-shared/share/semantic";
+import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
 import { diagnosticsResult } from "./result-helpers.ts";
 import type { Diagnostic } from "@warpgogol/werkstatt/kernel";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
@@ -176,6 +183,40 @@ export async function runCanonicalUrlValidate(
           severity: "warning",
           message: `llms.txt URL not in expected canonical set: ${url}`,
           fixHint: "Regenerate llms with canonicalPageUrl.",
+        });
+      }
+    }
+  }
+
+  // RFC-0906: CANON-04 — check HTML <link rel="canonical"> hrefs against expected set
+  const distClientDir = join(paths.appDirectory, "dist", "client");
+  if (existsSync(distClientDir)) {
+    const htmlFiles = await collectFiles(distClientDir, {
+      extensions: [".html"],
+      ignore: () => false,
+    });
+    for (const htmlFile of htmlFiles) {
+      let rawHtml: string;
+      try {
+        rawHtml = await readFile(htmlFile, "utf8");
+      } catch {
+        continue;
+      }
+      // Skip redirect pages — they don't carry meaningful canonical tags
+      if (/<meta[^>]+http-equiv=["']refresh["']/i.test(rawHtml)) {
+        continue;
+      }
+      const canonicalMatch = rawHtml.match(
+        /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i,
+      );
+      const canonicalHref = canonicalMatch?.[1];
+      if (canonicalHref && !expectedUrls.has(canonicalHref)) {
+        diagnostics.push({
+          ruleId: "CANON-04",
+          severity: "warning",
+          message: `HTML canonical href not in expected canonical set: ${canonicalHref}`,
+          fixHint:
+            "Ensure pageUrl in resolve-route.ts uses canonicalPageUrl with trailingSlash: always",
         });
       }
     }

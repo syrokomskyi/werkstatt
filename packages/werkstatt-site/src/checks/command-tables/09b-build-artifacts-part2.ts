@@ -54,6 +54,7 @@ import { runBreadcrumbTrailValidate } from "../breadcrumb.ts";
 import { runSurfaceEnrich, runSurfaceEnrichReview, runEnrichValidate } from "../surface-enrich.ts";
 import { runFeedGenerate, runFeedValidate } from "../feed.ts";
 import { runCanonicalUrlValidate, runContentUpdateStampsValidate } from "../canonical-url.ts";
+import { runCanonicalHtmlParityValidate } from "../canonical-html-parity.ts";
 import { runContentSourceValidate } from "../content-source-adapter.ts";
 import { runCmsSchemaGenerate, runCmsSchemaParity } from "../cms.ts";
 import { runAiGenerate, runAiValidate } from "../ai.ts";
@@ -759,6 +760,18 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     ],
     modulePaths: ["canonical-url.ts"],
     execute: runCanonicalUrlValidate,
+  },
+  /* RFC-0906: canonical HTML parity — <link rel=canonical> and og:url vs canonicalPageUrl */
+  {
+    name: "canonical.html-parity.validate",
+    description:
+      "Validate HTML <link rel=canonical> and og:url against canonicalPageUrl output (RFC-0906).",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/dist/client/**/*.html", "<app>/src/content/system.md"],
+    modulePaths: ["canonical-html-parity.ts"],
+    execute: runCanonicalHtmlParityValidate,
   },
   {
     name: "content.update-stamps.validate",
