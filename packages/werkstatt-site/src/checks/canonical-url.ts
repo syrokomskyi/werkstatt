@@ -37,6 +37,7 @@ import { diagnosticsResult } from "./result-helpers.ts";
 import type { Diagnostic } from "@warpgogol/werkstatt/kernel";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
+import { isHtmlRedirectPage } from "./audit/validators/helpers.ts";
 
 function extractSitemapUrls(xml: string): string[] {
   const urls: string[] = [];
@@ -203,7 +204,7 @@ export async function runCanonicalUrlValidate(
         continue;
       }
       // Skip redirect pages — they don't carry meaningful canonical tags
-      if (/<meta[^>]+http-equiv=["']refresh["']/i.test(rawHtml)) {
+      if (isHtmlRedirectPage(rawHtml)) {
         continue;
       }
       const canonicalMatch = rawHtml.match(

@@ -36,6 +36,7 @@ import {
 import { diagnosticsResult } from "./result-helpers.ts";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
+import { isHtmlRedirectPage } from "./audit/validators/helpers.ts";
 
 function extractCanonicalHref(html: string): string | null {
   const match = html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i);
@@ -45,13 +46,6 @@ function extractCanonicalHref(html: string): string | null {
 function extractOgUrl(html: string): string | null {
   const match = html.match(/<meta[^>]+property=["']og:url["'][^>]+content=["']([^"']+)["']/i);
   return match?.[1] ?? null;
-}
-
-function isHtmlRedirectPage(html: string): boolean {
-  return (
-    /<meta[^>]+http-equiv=["']refresh["']/i.test(html) ||
-    /window\.location\.(replace|href)/i.test(html)
-  );
 }
 
 export async function runCanonicalHtmlParityValidate(
@@ -96,7 +90,6 @@ export async function runCanonicalHtmlParityValidate(
   });
 
   const diagnostics: Diagnostic[] = [];
-  let checkedPages = 0;
 
   for (const htmlFile of htmlFiles) {
     let rawHtml: string;
@@ -116,8 +109,6 @@ export async function runCanonicalHtmlParityValidate(
     if (!canonicalHref && !ogUrl) {
       continue;
     }
-
-    checkedPages++;
 
     if (canonicalHref && !expectedUrls.has(canonicalHref)) {
       diagnostics.push({
