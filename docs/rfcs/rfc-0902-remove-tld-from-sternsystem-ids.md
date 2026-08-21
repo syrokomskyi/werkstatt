@@ -1,7 +1,7 @@
 ---
 id: RFC-0902
 title: "Remove TLD suffix from Sternsystem IDs — business ID only"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
