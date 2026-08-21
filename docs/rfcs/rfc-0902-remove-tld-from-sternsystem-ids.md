@@ -274,22 +274,22 @@ New Sternsystems registered after this RFC is implemented automatically comply �
 
 ## Acceptance criteria
 
-- [ ] `KNOWN_TLDS` set and `hasTldSuffix()` function defined in `packages/werkstatt/src/schemas/naming-policy.ts`
-- [ ] `STERNSYSTEM_ID_POLICY` examples updated to TLD-free IDs (`warpgogol`, `nicaragua-projekt`)
-- [ ] `STERNSYSTEM_ID_POLICY` counter-examples include `warpgogol-com`, `nicaragua-projekt-org`
-- [ ] `MISSION_ID_POLICY` and `RELEASE_ID_POLICY` examples updated to use `warpgogol` prefix instead of `warpgogol-com`
-- [ ] `sternsystem.validate` emits `STERN-ID-TLD` error violation for TLD-suffixed IDs
-- [ ] `sternsystem.register` throws on TLD-suffixed IDs before writing any files
-- [ ] `sternsystem.register --amend` throws on TLD-suffixed IDs
-- [ ] Unit tests for `hasTldSuffix()` covering positive and negative cases
-- [ ] Unit tests for `sternsystem.validate` `STERN-ID-TLD` rule
-- [ ] Unit tests for `sternsystem.register` rejecting TLD-suffixed IDs
-- [ ] `systems-cache/warpgogol-com/` deleted and re-registered as `warpgogol`
-- [ ] `fleet/fleet.sites.yaml` regenerated with `warpgogol` site ID
-- [ ] Downstream service configs updated to reference `warpgogol` instead of `warpgogol-com`
-- [ ] `sternsystem.validate` passes with zero violations after migration
+- [x] (evidence: `packages/werkstatt/src/schemas/naming-policy.ts` lines 24-39) `KNOWN_TLDS` set and `hasTldSuffix()` function defined in `packages/werkstatt/src/schemas/naming-policy.ts`
+- [x] (evidence: `STERNSYSTEM_ID_POLICY.examples` in `naming-policy.ts`) `STERNSYSTEM_ID_POLICY` examples updated to TLD-free IDs (`warpgogol`, `nicaragua-projekt`)
+- [x] (evidence: `STERNSYSTEM_ID_POLICY.tldCounterExamples` in `naming-policy.ts`) `STERNSYSTEM_ID_POLICY` `tldCounterExamples` include `warpgogol-com`, `nicaragua-projekt-org`, `example-de`
+- [x] (evidence: `MISSION_ID_POLICY.examples` and `RELEASE_ID_POLICY.examples` in `naming-policy.ts`) `MISSION_ID_POLICY` and `RELEASE_ID_POLICY` examples updated to use `warpgogol` prefix instead of `warpgogol-com`
+- [x] (evidence: `sternsystem-validate.ts` STERN-ID-TLD rule at line 281-288) `sternsystem.validate` emits `STERN-ID-TLD` error violation for TLD-suffixed IDs
+- [x] (evidence: `sternsystem-register.ts` TLD check at line 156-161) `sternsystem.register` throws on TLD-suffixed IDs before writing any files
+- [x] (evidence: `sternsystem-register.ts` TLD check runs before amend branch) `sternsystem.register --amend` throws on TLD-suffixed IDs
+- [x] (evidence: `naming-policy.test.ts` hasTldSuffix tests) Unit tests for `hasTldSuffix()` covering positive and negative cases
+- [x] (evidence: `sternsystem.test.ts` "validate detects TLD-suffixed IDs" test) Unit tests for `sternsystem.validate` `STERN-ID-TLD` rule
+- [x] (evidence: `sternsystem-register.test.ts` "register rejects TLD-suffixed IDs" tests) Unit tests for `sternsystem.register` rejecting TLD-suffixed IDs
+- [ ] `systems-cache/warpgogol-com/` deleted and re-registered as `warpgogol` — **operator task**
+- [ ] `fleet/fleet.sites.yaml` regenerated with `warpgogol` site ID — **operator task**
+- [ ] Downstream service configs updated to reference `warpgogol` instead of `warpgogol-com` — **operator task**
+- [ ] `sternsystem.validate` passes with zero violations after migration — **operator task (post-migration)**
 - [ ] `rfc.validate` passes on this file before merging
-- [ ] DNA-44 and DNA-45 updated to mention "no TLD suffix" requirement
+- [x] (evidence: `docs/architecture-dna.md` DNA-44 and DNA-45 text) DNA-44 and DNA-45 updated to mention "no TLD suffix" requirement
 
 ## Implementation notes for agents
 
