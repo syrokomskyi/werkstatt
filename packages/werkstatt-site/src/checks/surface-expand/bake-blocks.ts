@@ -11,11 +11,14 @@
 </CHANGE_SUMMARY>
 */
 
-export type Block = { type: string; props: Record<string, unknown> };
+import { slugId } from "@warpgogol/werkstatt-shared/share/slug";
+
+export type Block = { id: string; type: string; props: Record<string, unknown> };
 
 /** A markdown prose block (heading + optional lead + optional body). */
 export function md(heading: string, lead: string, body?: string): Block {
   return {
+    id: slugId(heading),
     type: "markdown",
     props: { heading, lead, hideSectionNumber: false, ...(body ? { body } : {}) },
   };
@@ -38,6 +41,7 @@ export function hero(opts: {
   secondaryTarget?: string;
 }): Block {
   return {
+    id: "hero",
     type: "hero",
     props: {
       header: { heading: opts.heading, level: 1 },
@@ -60,6 +64,7 @@ export function cardGrid(
   cards: Array<{ title: string; description?: string }>,
 ): Block {
   return {
+    id: slugId(heading),
     type: "audience-cards",
     props: {
       header: { heading },
@@ -110,6 +115,7 @@ export function linkedCardGrid(
   anchorId?: string,
 ): Block {
   return {
+    id: anchorId ?? slugId(heading),
     type: "audience-cards",
     props: {
       header: { heading },
@@ -140,6 +146,7 @@ export function ctaBlock(
   items: Array<{ label: string; pageId: string; variant?: "primary" | "secondary" }>,
 ): Block {
   return {
+    id: slugId(heading),
     type: "final-cta",
     props: {
       header: { heading },
@@ -168,6 +175,7 @@ export function articleHeader(opts: {
   readTime?: string;
 }): Block {
   return {
+    id: "article-header",
     type: "article-header",
     props: {
       header: { heading: opts.title, level: 1 },
@@ -188,6 +196,7 @@ export function articleHeader(opts: {
  */
 export function tocBlock(entries: Array<{ text: string; anchor: string }>): Block {
   return {
+    id: "toc",
     type: "toc",
     props: {
       hideSectionNumber: true,
@@ -203,6 +212,7 @@ export function changelogBlock(
   entries: Array<{ date: string; summary: string; authorId: string }>,
 ): Block {
   return {
+    id: "changelog",
     type: "changelog",
     props: {
       hideSectionNumber: true,

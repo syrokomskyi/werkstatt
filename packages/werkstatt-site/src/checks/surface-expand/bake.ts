@@ -26,6 +26,7 @@ import type {
   VirtualRouteEntry,
 } from "@warpgogol/werkstatt-shared/surface";
 import type { PageEntry } from "@warpgogol/werkstatt-shared/surface";
+import { slugId } from "@warpgogol/werkstatt-shared/share/slug";
 import {
   type Block,
   md,
@@ -271,6 +272,7 @@ function bakeIndustryDossier(
   // RFC-0325: article prose block (same as generic baker).
   if (level?.semanticType === "article") {
     blocks.push({
+      id: "article-prose",
       type: "markdown",
       props: { contentRef: `prose/${articleProseSlug(entry)}`, hideSectionNumber: true },
     });
@@ -724,6 +726,7 @@ export function bakePage(
   // for the semantic model's prose body. No heading/lead here: the hero already carries the H1/lead.
   if (level?.semanticType === "article") {
     blocks.push({
+      id: "article-prose",
       type: "markdown",
       props: { contentRef: `prose/${articleProseSlug(entry)}`, hideSectionNumber: true },
     });

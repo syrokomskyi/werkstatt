@@ -37,6 +37,7 @@ import {
   type VirtualRouteEntry,
 } from "@warpgogol/werkstatt-shared/surface";
 import { toKebabCase } from "@warpgogol/werkstatt-shared/share/string-utils";
+import { slugId } from "@warpgogol/werkstatt-shared/share/slug";
 import { heroSignature } from "./bake.ts";
 import { matchingRecordsForEntry, hasEvidenceValue, ageDays } from "./expand-helpers.ts";
 
@@ -364,8 +365,13 @@ export function insertStringEnrichedFields(
         const key = `${toKebabCase(entry.pageId)}-${toKebabCase(field.field)}`;
         const value = bulk.get(key);
         if (value) {
-          const blocks = page.blocks as Array<{ type: string; props: Record<string, unknown> }>;
+          const blocks = page.blocks as Array<{
+            id: string;
+            type: string;
+            props: Record<string, unknown>;
+          }>;
           blocks.splice(Math.max(0, blocks.length - 1), 0, {
+            id: slugId(marketSignalHeading[l] ?? marketSignalHeading[defaultLang]!),
             type: "markdown",
             props: {
               heading: marketSignalHeading[l] ?? marketSignalHeading[defaultLang]!,

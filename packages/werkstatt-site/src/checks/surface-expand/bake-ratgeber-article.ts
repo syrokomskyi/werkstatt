@@ -22,6 +22,7 @@ articles (same category), context-specific closing CTA based on articleType (RFC
 */
 
 import type { VirtualRouteEntry } from "@warpgogol/werkstatt-shared/surface";
+import { slugId } from "@warpgogol/werkstatt-shared/share/slug";
 import type { Block } from "./bake-blocks.ts";
 import { md, linkedCardGrid, ctaBlock, articleHeader, changelogBlock } from "./bake-blocks.ts";
 import type { BakeCtx } from "./bake.ts";
@@ -120,6 +121,7 @@ export function bakeRatgeberArticle(
   // 4. TOC (Metis) — auto-generated from H2 headings at render time
   //    The renderer reads the prose body from the contentRef and populates entries.
   blocks.push({
+    id: "toc",
     type: "toc",
     props: {
       hideSectionNumber: true,
@@ -136,6 +138,7 @@ export function bakeRatgeberArticle(
       const h2 = slotToH2(slot, lang);
       if (!h2) continue;
       blocks.push({
+        id: slugId(h2),
         type: "markdown",
         props: {
           contentRef: `prose/${articleProseSlug(entry)}`,
@@ -147,6 +150,7 @@ export function bakeRatgeberArticle(
   } else {
     // Single markdown block (field-presence-driven rendering)
     blocks.push({
+      id: "article-prose",
       type: "markdown",
       props: { contentRef: `prose/${articleProseSlug(entry)}`, hideSectionNumber: true },
     });
@@ -235,6 +239,7 @@ export function bakeRatgeberArticle(
   ) {
     const sCta = secondaryCtaRaw as { label: string; target: string };
     blocks.push({
+      id: slugId(lbl.closing),
       type: "final-cta",
       props: {
         header: { heading: lbl.closing },
@@ -499,6 +504,7 @@ function buildProvenanceFooter(
   if (lines.length === 0) return null;
 
   return {
+    id: "provenance-footer",
     type: "markdown",
     props: { content: lines.join("\n\n"), hideSectionNumber: true },
   };

@@ -16,6 +16,7 @@ a linkedCardGrid block into each industry page's baked pages (all languages).
 */
 
 import type { PageEntry, VirtualRouteEntry } from "@warpgogol/werkstatt-shared/surface";
+import { slugId } from "@warpgogol/werkstatt-shared/share/slug";
 
 const SERVICE_CATALOG_LABELS: Record<string, string> = {
   de: "Leistungen",
@@ -88,6 +89,7 @@ function injectServiceBlock(
   });
 
   const catalogBlock = {
+    id: slugId(label),
     type: "audience-cards",
     props: {
       header: { heading: label },
