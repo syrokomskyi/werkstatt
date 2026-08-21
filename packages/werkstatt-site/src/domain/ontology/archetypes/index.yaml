@@ -1,5 +1,5 @@
 schemaVersion: 1.0.0
-totalCount: 58
+totalCount: 59
 entries:
   - id: approach
     displayName: Approach
@@ -163,6 +163,15 @@ entries:
       - Nereid
     sourceFile: packages/werkstatt-site/src/domain/ontology/archetypes/components/footer-promo.yaml
     layer: component
+  - id: gratitude
+    displayName: Gratitude
+    semanticRole: client-gratitude
+    version: 1.0.0
+    layoutHint: card-grid
+    acceptedCosmicNames:
+      - Gonggong
+    sourceFile: packages/werkstatt-site/src/domain/ontology/archetypes/sections/gratitude.yaml
+    layer: section
   - id: hero
     displayName: Hero
     semanticRole: hero
@@ -528,6 +537,7 @@ sectionRoles:
   - article-index
   - audience-self-identification
   - breadcrumbs
+  - client-gratitude
   - client-ownership-disclosure
   - consent-gated-chat-launcher
   - credits-gallery
@@ -599,6 +609,7 @@ planetImportPaths:
   Elara: "@warpgogol/werkstatt-site/ui/sections/dynamic-status-block"
   Atlas: "@warpgogol/werkstatt-site/ui/sections/faq-list"
   Dione: "@warpgogol/werkstatt-site/ui/sections/final-cta"
+  Gonggong: "@warpgogol/werkstatt-site/ui/sections/gratitude"
   Europa: "@warpgogol/werkstatt-site/ui/sections/hero"
   Phobos: "@warpgogol/werkstatt-site/ui/sections/hero-decision-card"
   Ganymede: "@warpgogol/werkstatt-site/ui/sections/impact"
@@ -675,6 +686,7 @@ blockTypeToCosmicName:
   dynamic-status-block: Elara
   faq-list: Atlas
   final-cta: Dione
+  gratitude: Gonggong
   hero: Europa
   hero-decision-card: Phobos
   impact: Ganymede
@@ -754,6 +766,7 @@ roleByCosmicName:
   Elara: data-driven-status-indicator
   Atlas: approach
   Dione: final-cta
+  Gonggong: client-gratitude
   Europa: hero
   Phobos: hero
   Ganymede: impact

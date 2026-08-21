@@ -136,6 +136,12 @@ export async function runMissionCleanup(
     return {
       data: { missionId, removedPaths, skipped, evidenceCleaned, evidenceRetentionDays },
       summary: `[mission.cleanup] ${missionId} removed: ${removedPaths.join(", ") || "nothing"}`,
+      nextSteps: [
+        {
+          action: `Close the mission: pnpm exec werkstatt run mission.close --mission ${missionId}`,
+          kind: "optional",
+        },
+      ],
     };
   }
 
@@ -151,6 +157,12 @@ export async function runMissionCleanup(
       return {
         data: { missionId: "*", removedPaths, skipped, evidenceCleaned, evidenceRetentionDays },
         summary: `[mission.cleanup] no missions directory found`,
+        nextSteps: [
+          {
+            action: `List missions: pnpm exec werkstatt run mission.list`,
+            kind: "optional",
+          },
+        ],
       };
     }
 
@@ -227,5 +239,11 @@ export async function runMissionCleanup(
   return {
     data: { missionId: "*", removedPaths, skipped, evidenceCleaned, evidenceRetentionDays },
     summary: `[mission.cleanup] removed: ${removedPaths.length}, skipped: ${skipped.length}`,
+    nextSteps: [
+      {
+        action: `List remaining missions: pnpm exec werkstatt run mission.list`,
+        kind: "optional",
+      },
+    ],
   };
 }

@@ -239,6 +239,12 @@ export async function runSternsystemStatus(
     return {
       data: results,
       summary: `[sternsystem.status] reported ${results.length} system(s)`,
+      nextSteps: [
+        {
+          action: `Sync out-of-date systems: pnpm exec werkstatt run sternsystem.sync --id <system-id>`,
+          kind: "optional",
+        },
+      ],
     };
   }
 
@@ -252,5 +258,14 @@ export async function runSternsystemStatus(
   return {
     data: status,
     summary: `[sternsystem.status] ${id}: HEAD=${status.git.headVsOrigin} origin, ${mirrorInfo}`,
+    nextSteps:
+      status.git.headVsOrigin !== "sync" || status.git.originVsMirror !== "sync"
+        ? [
+            {
+              action: `Sync the system: pnpm exec werkstatt run sternsystem.sync --id ${id}`,
+              kind: "optional",
+            },
+          ]
+        : undefined,
   };
 }

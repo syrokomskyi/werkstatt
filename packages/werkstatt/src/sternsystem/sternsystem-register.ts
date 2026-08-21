@@ -203,6 +203,12 @@ export async function runSternsystemRegister(
         diagnostics,
       },
       summary: `[sternsystem.register] amended '${id}' — mission ${missionId} opened and materialized`,
+      nextSteps: [
+        {
+          action: `Validate the system: pnpm exec werkstatt run sternsystem.validate --id ${id}`,
+          kind: "optional",
+        },
+      ],
     };
   }
 
@@ -328,6 +334,12 @@ export async function runSternsystemRegister(
         diagnostics,
       },
       summary: `[sternsystem.register] ${id} registered with cosmicStar ${cosmicStar} — mission ${missionId} materialized`,
+      nextSteps: [
+        {
+          action: `Validate the system: pnpm exec werkstatt run sternsystem.validate --id ${id}`,
+          kind: "optional",
+        },
+      ],
     };
   } catch (error) {
     logger.info(
