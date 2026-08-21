@@ -35,7 +35,8 @@ const APP_BOILERPLATE_TEMPLATES = path.join(__dirname, "..", "templates", "app-b
 const SERVICE_TEMPLATES = path.join(__dirname, "..", "templates", "service");
 
 function readTemplate(base: string, relPath: string): string {
-  return readFileSync(path.join(base, relPath), "utf8");
+  const raw = readFileSync(path.join(base, relPath), "utf8");
+  return raw.replace(/^\/\/ @ts-nocheck.*\n/gm, "");
 }
 
 function applyTokens(template: string, tokens: Record<string, string>): string {

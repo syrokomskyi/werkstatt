@@ -1,3 +1,4 @@
+// @ts-nocheck
 {{GENERATED_HEADER}}
 /*
 <MODULE_CONTRACT>

@@ -85,7 +85,8 @@ export function normalizeAppPath(appDirectory: string, absolutePath: string): st
 }
 
 export function readTemplate(templatePath: string): string {
-  return readFileSync(path.join(TEMPLATES_DIR, templatePath), "utf8");
+  const raw = readFileSync(path.join(TEMPLATES_DIR, templatePath), "utf8");
+  return raw.replace(/^\/\/ @ts-nocheck.*\n/gm, "");
 }
 
 export function applyTokens(template: string, tokens: Record<string, string>): string {
@@ -276,7 +277,16 @@ export function getDefaultLanguage(manifest: SystemManifest): string {
 }
 
 export function getBiomeDisplayName(workspaceRoot: string, biomeId: string): string {
-  const biomePath = path.join(workspaceRoot, "packages", "werkstatt-site", "src", "domain", "ontology", "biomes", `${biomeId}.yaml`);
+  const biomePath = path.join(
+    workspaceRoot,
+    "packages",
+    "werkstatt-site",
+    "src",
+    "domain",
+    "ontology",
+    "biomes",
+    `${biomeId}.yaml`,
+  );
   try {
     const raw = readFileSync(biomePath, "utf8");
     const match = raw.match(/^displayName:\s*['"]?(.+?)['"]?\s*$/m);

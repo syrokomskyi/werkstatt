@@ -25,7 +25,8 @@ export function readTemplate(filename: string): string {
 }
 
 export function readRuntimeTemplate(filename: string): string {
-  return readFileSync(join(RUNTIME_TEMPLATES_DIR, filename), "utf8");
+  const raw = readFileSync(join(RUNTIME_TEMPLATES_DIR, filename), "utf8");
+  return raw.replace(/^\/\/ @ts-nocheck.*\n/gm, "");
 }
 
 export function applyTokens(template: string, tokens: Record<string, string>): string {
