@@ -231,11 +231,11 @@ describe("getNachweisRoutes", () => {
         },
       ]),
       [
-        makeEvidenceEntry("de/nicaragua-project", {
+        makeEvidenceEntry("de/nicaragua-projekt", {
           type: "evidence-source",
           kind: "project-confirmation",
           status: "published",
-          slug: "nicaragua-project",
+          slug: "nicaragua-projekt",
         }),
       ],
     );
@@ -243,8 +243,8 @@ describe("getNachweisRoutes", () => {
     const routes = await getNachweisRoutes();
 
     expect(routes).toHaveLength(1);
-    expect(routes[0].routes.de).toBe("nachweise/nicaragua-project");
-    expect(routes[0].routes.uk).toBe("dokazy/nicaragua-project");
+    expect(routes[0].routes.de).toBe("nachweise/nicaragua-projekt");
+    expect(routes[0].routes.uk).toBe("dokazy/nicaragua-projekt");
   });
 });
 
@@ -325,11 +325,11 @@ describe("getNachweisVerifyRoutes", () => {
         },
       ]),
       [
-        makeEvidenceEntry("de/nicaragua-project", {
+        makeEvidenceEntry("de/nicaragua-projekt", {
           type: "evidence-source",
           kind: "project-confirmation",
           status: "published",
-          slug: "nicaragua-project",
+          slug: "nicaragua-projekt",
         }),
       ],
     );

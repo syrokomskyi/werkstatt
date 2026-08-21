@@ -14,7 +14,13 @@
 
 import { getCollection, type CollectionEntry } from "astro:content";
 import type { SectionProps } from "@warpgogol/werkstatt-shared/share/page";
-import { need, cast, resolveSectionAnchor, type Effect } from "@warpgogol/werkstatt-site/share";
+import {
+  need,
+  cast,
+  resolveSectionAnchor,
+  localizeUrl,
+  type Effect,
+} from "@warpgogol/werkstatt-site/share";
 import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
 import EffectHost from "../../components/effects/effect-host.astro";
@@ -90,11 +96,22 @@ if (hasEvidenceRefs) {
   }
 }
 
+const systemEntries = await getCollection("system");
+const systemData = (systemEntries.find((e: { id: string }) => e.id === "system")?.data ?? {}) as {
+  i18n?: { default?: string };
+  pages?: Array<{ pageId?: string; routes?: Record<string, string> }>;
+};
+const defaultLang = systemData.i18n?.default ?? "de";
+const nachweisDetailPattern =
+  (systemData.pages ?? []).find((p) => p.pageId === "nachweis-detail")?.routes?.[lang] ??
+  `nachweise/[slug]`;
+
 function resolveEvidenceLink(evidenceRef?: string): string | null {
   if (!evidenceRef) return null;
   const slug = evidenceSlugById.get(evidenceRef);
   if (!slug) return null;
-  return `/${lang}/nachweise/${slug}`;
+  const path = nachweisDetailPattern.replace("[slug]", slug);
+  return localizeUrl(lang, path, { defaultLanguage: defaultLang });
 }
 ---
 
