@@ -171,8 +171,11 @@ function bakePillarHub(
     "industry-catalog",
   );
 
-  // 4. Product/price — markdown block with PBP price reference interpolation.
-  const priceBody = `${pillarLang(p.productPrice.body, lang, dl)}\n\n${p.productPrice.priceRef}`;
+  // 4. Product/price — markdown block. priceRef is optional; only append if present.
+  const priceRef = p.productPrice.priceRef;
+  const priceBody = priceRef
+    ? `${pillarLang(p.productPrice.body, lang, dl)}\n\n${priceRef}`
+    : pillarLang(p.productPrice.body, lang, dl);
   const priceBlock = md(pillarLang(p.productPrice.heading, lang, dl), "", priceBody);
 
   // 5. Final CTA.

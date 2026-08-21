@@ -52,7 +52,7 @@ export interface BlueprintPillarAdaptation {
 export interface BlueprintPillarProductPrice {
   heading: LocalizedString;
   body: LocalizedString;
-  priceRef: string;
+  priceRef?: string;
 }
 
 export interface BlueprintPillarFinalCta {

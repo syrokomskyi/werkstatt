@@ -53,7 +53,7 @@ const pillarAdaptationSchema = z.object({
 const pillarProductPriceSchema = z.object({
   heading: localizedString,
   body: localizedString,
-  priceRef: z.string().min(1),
+  priceRef: z.string().min(1).optional(),
 });
 
 const pillarFinalCtaSchema = z.object({

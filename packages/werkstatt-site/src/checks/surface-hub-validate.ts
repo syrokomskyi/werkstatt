@@ -170,27 +170,29 @@ export async function runSurfaceHubValidate(
       }
     }
 
-    // pillar-priceref-unresolvable (syntax fail, resolution warn)
+    // pillar-priceref-unresolvable (syntax fail, resolution warn) — optional field
     const priceRef = level0.pillar.productPrice.priceRef;
-    const isBraceless = priceRef.startsWith("business-profile.");
-    const isBraced = priceRef.startsWith("{business-profile.") && priceRef.endsWith("}");
-    if (!isBraceless && !isBraced) {
-      diagnostics.push({
-        ruleId: "PILLAR-PRICEREF-UNRESOLVABLE",
-        severity: "error",
-        file: `packages/werkstatt-site/src/domain/ontology/blueprints/${bp.id}.yaml`,
-        message: `pillar.productPrice.priceRef "${priceRef}" is not a valid PBP reference (expected "business-profile.…")`,
-        fixHint: "Use a business-profile.offerings/… reference for the price.",
-      });
-    } else {
-      // Syntax is valid — warn that resolution is not checked at validation time.
-      diagnostics.push({
-        ruleId: "PILLAR-PRICEREF-UNRESOLVABLE",
-        severity: "warning",
-        file: `packages/werkstatt-site/src/domain/ontology/blueprints/${bp.id}.yaml`,
-        message: `pillar.productPrice.priceRef "${priceRef}" syntax is valid but PBP resolution is not checked at validation time`,
-        fixHint: "Verify the PBP entity and field path exist in the render-time environment.",
-      });
+    if (priceRef) {
+      const isBraceless = priceRef.startsWith("business-profile.");
+      const isBraced = priceRef.startsWith("{business-profile.") && priceRef.endsWith("}");
+      if (!isBraceless && !isBraced) {
+        diagnostics.push({
+          ruleId: "PILLAR-PRICEREF-UNRESOLVABLE",
+          severity: "error",
+          file: `packages/werkstatt-site/src/domain/ontology/blueprints/${bp.id}.yaml`,
+          message: `pillar.productPrice.priceRef "${priceRef}" is not a valid PBP reference (expected "business-profile.…")`,
+          fixHint: "Use a business-profile.offerings/… reference for the price.",
+        });
+      } else {
+        // Syntax is valid — warn that resolution is not checked at validation time.
+        diagnostics.push({
+          ruleId: "PILLAR-PRICEREF-UNRESOLVABLE",
+          severity: "warning",
+          file: `packages/werkstatt-site/src/domain/ontology/blueprints/${bp.id}.yaml`,
+          message: `pillar.productPrice.priceRef "${priceRef}" syntax is valid but PBP resolution is not checked at validation time`,
+          fixHint: "Verify the PBP entity and field path exist in the render-time environment.",
+        });
+      }
     }
   }
 
