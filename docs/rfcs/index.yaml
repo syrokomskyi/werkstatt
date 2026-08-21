@@ -17303,10 +17303,10 @@ entries:
     file: docs/rfcs/archive/implemented/rfc-0900-add-client-testimonial-pbp-entity-and-gratitude-section-for-client-gratitude-display-on-nachweise-page.md
   - id: RFC-0901
     title: Cross-locale structural parity validation for translated content
-    status: accepted
+    status: implemented
     kind: command
     createdAt: 2026-08-21
-    implementedAt: ""
+    implementedAt: 2026-08-21
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -17321,7 +17321,7 @@ entries:
       - RFC-0734
       - RFC-0174
       - RFC-0914
-    file: docs/rfcs/rfc-0901-cross-locale-structural-parity-validation.md
+    file: docs/rfcs/archive/implemented/rfc-0901-cross-locale-structural-parity-validation.md
   - id: RFC-0902
     title: Remove TLD suffix from Sternsystem IDs — business ID only
     status: implemented
