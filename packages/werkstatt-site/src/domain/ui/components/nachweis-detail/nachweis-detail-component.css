@@ -23,25 +23,16 @@
   gap: var(--ds-space-6);
 }
 
-.nachweis-detail .nachweis-card {
-  background: var(--ds-color-surface-glass);
-  border: 1px solid var(--ds-color-border-glass);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  backdrop-filter: blur(16px) saturate(180%);
-  box-shadow: var(--ds-shadow-glass);
-}
-
-.nachweis-detail .nachweis-card:hover {
-  box-shadow: var(--ds-shadow-glass);
-}
+/* EffectHost integration: let the nachweis-card use its own EffectHost glass effect */
 
 .nachweis-detail__sichtpass {
   padding: var(--ds-space-6);
-  border: 1px solid var(--ds-color-border-glass);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-color-surface-glass);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  backdrop-filter: blur(16px) saturate(180%);
+}
+
+.effect-host--glass.nachweis-detail__sichtpass {
+  background: transparent;
+  border: none;
   box-shadow: var(--ds-shadow-glass);
 }
 
@@ -89,11 +80,12 @@
 
 .nachweis-detail__technical {
   padding: var(--ds-space-6);
-  border: 1px solid var(--ds-color-border-glass);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-color-surface-glass);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  backdrop-filter: blur(16px) saturate(180%);
+}
+
+.effect-host--glass.nachweis-detail__technical {
+  background: transparent;
+  border: none;
   box-shadow: var(--ds-shadow-glass);
 }
 
@@ -107,11 +99,12 @@
 
 .nachweis-detail__history {
   padding: var(--ds-space-6);
-  border: 1px solid var(--ds-color-border-glass);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-color-surface-glass);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  backdrop-filter: blur(16px) saturate(180%);
+}
+
+.effect-host--glass.nachweis-detail__history {
+  background: transparent;
+  border: none;
   box-shadow: var(--ds-shadow-glass);
 }
 
@@ -157,11 +150,12 @@
 
 .nachweis-detail__pdf {
   padding: var(--ds-space-6);
-  border: 1px solid var(--ds-color-border-glass);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-color-surface-glass);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  backdrop-filter: blur(16px) saturate(180%);
+}
+
+.effect-host--glass.nachweis-detail__pdf {
+  background: transparent;
+  border: none;
   box-shadow: var(--ds-shadow-glass);
 }
 
@@ -197,11 +191,12 @@
 
 .nachweis-detail__screenshot {
   padding: var(--ds-space-6);
-  border: 1px solid var(--ds-color-border-glass);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-color-surface-glass);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  backdrop-filter: blur(16px) saturate(180%);
+}
+
+.effect-host--glass.nachweis-detail__screenshot {
+  background: transparent;
+  border: none;
   box-shadow: var(--ds-shadow-glass);
 }
 

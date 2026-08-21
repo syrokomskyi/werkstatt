@@ -14,15 +14,20 @@
 
 import { getCollection, type CollectionEntry } from "astro:content";
 import type { SectionProps } from "@warpgogol/werkstatt-shared/share/page";
-import { need, cast, resolveSectionAnchor } from "@warpgogol/werkstatt-site/share";
+import { need, cast, resolveSectionAnchor, type Effect } from "@warpgogol/werkstatt-site/share";
 import SectionShell from "@warpgogol/werkstatt-site/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/werkstatt-site/ui/components/section-header.astro";
+import EffectHost from "../../components/effects/effect-host.astro";
 import type { GratitudeSectionContent } from "./gratitude-section.types.generated.ts";
 import "./gratitude-section.css";
 
 const { lang, pageOverride, sectionNumber } = Astro.props as SectionProps;
 const sectionId = await resolveSectionAnchor(Astro.props, "gratitude");
 const props = cast<GratitudeSectionContent>(pageOverride);
+
+const defaultGlassEffects: Effect[] = [
+  { kind: "glass", enabled: true, blur: 16, saturate: 180, tintOpacity: 0.6 },
+];
 
 interface TestimonialData {
   id: string;
@@ -120,7 +125,7 @@ function resolveEvidenceLink(evidenceRef?: string): string | null {
       testimonials.map((testimonial) => {
         const evidenceLink = resolveEvidenceLink(testimonial.evidenceRef);
         return (
-          <article class="gratitude-card">
+          <EffectHost as="article" effects={defaultGlassEffects} class="gratitude-card">
             <span class="gratitude-card__quote-mark" aria-hidden="true">
               &ldquo;
             </span>
@@ -139,7 +144,7 @@ function resolveEvidenceLink(evidenceRef?: string): string | null {
                 </a>
               )}
             </footer>
-          </article>
+          </EffectHost>
         );
       })
     }

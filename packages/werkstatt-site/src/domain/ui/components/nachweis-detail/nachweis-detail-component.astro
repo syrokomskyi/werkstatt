@@ -27,11 +27,12 @@
  */
 
 import type { SectionProps } from "@warpgogol/werkstatt-shared/share/page";
-import { cast } from "@warpgogol/werkstatt-site/share";
+import { cast, type Effect } from "@warpgogol/werkstatt-site/share";
 import SectionShell from "../section-shell/section-shell.astro";
 import NachweisCard, {
   type NachweisAssessmentDimension,
 } from "../nachweis-card/nachweis-card-component.astro";
+import EffectHost from "../effects/effect-host.astro";
 import "./nachweis-detail-component.css";
 
 interface Sichtpass {
@@ -134,6 +135,10 @@ type NachweisDetailContent =
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const props = cast<NachweisDetailContent>(pageOverride);
 
+const defaultGlassEffects: Effect[] = [
+  { kind: "glass", enabled: true, blur: 16, saturate: 180, tintOpacity: 0.6 },
+];
+
 const sichtpassHeadingId = `nachweis-detail-${props.slug}-sichtpass`;
 const historyHeadingId = `nachweis-detail-${props.slug}-history`;
 const technicalHeadingId = `nachweis-detail-${props.slug}-technical`;
@@ -225,7 +230,12 @@ function toISOString(value: unknown): string {
         />
 
         {display?.document === "visible" && (pdfUrl || pdfSha256) && (
-          <section class="nachweis-detail__pdf" aria-labelledby={pdfHeadingId}>
+          <EffectHost
+            as="section"
+            effects={defaultGlassEffects}
+            class="nachweis-detail__pdf"
+            aria-labelledby={pdfHeadingId}
+          >
             <h2 id={pdfHeadingId} class="nachweis-detail__section-title">
               PDF-Dokument
             </h2>
@@ -250,11 +260,16 @@ function toISOString(value: unknown): string {
                 <code>{pdfSha256}</code>
               </p>
             )}
-          </section>
+          </EffectHost>
         )}
 
         {display?.screenshot === "visible" && websiteScreenshot?.url && (
-          <section class="nachweis-detail__screenshot" aria-labelledby={screenshotHeadingId}>
+          <EffectHost
+            as="section"
+            effects={defaultGlassEffects}
+            class="nachweis-detail__screenshot"
+            aria-labelledby={screenshotHeadingId}
+          >
             <h2 id={screenshotHeadingId} class="nachweis-detail__section-title">
               Website-Screenshot
             </h2>
@@ -274,7 +289,7 @@ function toISOString(value: unknown): string {
                 )}
               </figcaption>
             </figure>
-          </section>
+          </EffectHost>
         )}
 
         {display?.websiteLink === "visible" && websiteUrl && domain && (
@@ -294,7 +309,12 @@ function toISOString(value: unknown): string {
         )}
 
         {props.sichtpass && (
-          <section class="nachweis-detail__sichtpass" aria-labelledby={sichtpassHeadingId}>
+          <EffectHost
+            as="section"
+            effects={defaultGlassEffects}
+            class="nachweis-detail__sichtpass"
+            aria-labelledby={sichtpassHeadingId}
+          >
             <h2 id={sichtpassHeadingId} class="nachweis-detail__sichtpass-title">
               Sichtpass
             </h2>
@@ -369,7 +389,7 @@ function toISOString(value: unknown): string {
                 </div>
               )}
             </dl>
-          </section>
+          </EffectHost>
         )}
       </article>
     )
@@ -399,7 +419,12 @@ function toISOString(value: unknown): string {
           limitation={props.limitation}
         />
 
-        <section class="nachweis-detail__technical" aria-labelledby={technicalHeadingId}>
+        <EffectHost
+          as="section"
+          effects={defaultGlassEffects}
+          class="nachweis-detail__technical"
+          aria-labelledby={technicalHeadingId}
+        >
           <h2 id={technicalHeadingId} class="nachweis-detail__section-title">
             Technische Details
           </h2>
@@ -424,10 +449,15 @@ function toISOString(value: unknown): string {
               </div>
             )}
           </dl>
-        </section>
+        </EffectHost>
 
         {props.observationHistory && props.observationHistory.length > 0 && (
-          <section class="nachweis-detail__history" aria-labelledby={historyHeadingId}>
+          <EffectHost
+            as="section"
+            effects={defaultGlassEffects}
+            class="nachweis-detail__history"
+            aria-labelledby={historyHeadingId}
+          >
             <h2 id={historyHeadingId} class="nachweis-detail__section-title">
               Beobachtungshistorie
             </h2>
@@ -462,11 +492,16 @@ function toISOString(value: unknown): string {
                 ))}
               </tbody>
             </table>
-          </section>
+          </EffectHost>
         )}
 
         {props.sichtpass && (
-          <section class="nachweis-detail__sichtpass" aria-labelledby={sichtpassHeadingId}>
+          <EffectHost
+            as="section"
+            effects={defaultGlassEffects}
+            class="nachweis-detail__sichtpass"
+            aria-labelledby={sichtpassHeadingId}
+          >
             <h2 id={sichtpassHeadingId} class="nachweis-detail__sichtpass-title">
               Sichtpass
             </h2>
@@ -541,7 +576,7 @@ function toISOString(value: unknown): string {
                 </div>
               )}
             </dl>
-          </section>
+          </EffectHost>
         )}
       </article>
     )
