@@ -1,7 +1,7 @@
 ---
 id: RFC-0898
 title: "Canonical URL hardening and cross-language link validator"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
