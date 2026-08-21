@@ -6,9 +6,11 @@ kind: architecture
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-21
 updatedAt: 2026-08-21
+enhancedAt: 2026-08-21
 implementedAt:
 closedAt:
 supersedes: []
@@ -26,8 +28,7 @@ satisfies:
 versionBump: minor
 commands:
   proposed: []
-  added:
-    - sternsystem.id.validate
+  added: []
   changed:
     - sternsystem.validate
     - sternsystem.register
@@ -57,7 +58,7 @@ Sternsystem IDs currently encode the client's domain TLD as a suffix: `warpgogol
 1. **Domain changes**: A client may switch from `warpgogol.com` to `warpgogol.de` (or move to an entirely different domain). The Sternsystem ID must not change when the domain changes — it is the durable business identifier, not a DNS record.
 2. **Multiple domains**: A client may operate multiple sites on different domains under the same business identity. The Sternsystem ID represents the business, not a specific domain.
 
-The current `STERNSYSTEM_ID_REGEX` (`/^[a-z0-9]+(-[a-z0-9]+)*$/`) already enforces lowercase Latin letters, digits, and hyphens. The charset is correct — the problem is that the *semantic convention* allows TLD segments to appear as the final hyphen-separated component, and nothing prevents or detects this.
+The current `STERNSYSTEM_ID_REGEX` (`/^[a-z0-9]+(-[a-z0-9]+)*$/`) already enforces lowercase Latin letters, digits, and hyphens. The charset is correct — the problem is that the _semantic convention_ allows TLD segments to appear as the final hyphen-separated component, and nothing prevents or detects this.
 
 DNA-44 states: "Sternsystem ids are kebab-case, lowercase, latin-only." DNA-45 states: "Each Sternsystem is discovered via convention-based per-system files in `systems-cache/{id}/`." Neither invariant currently prohibits TLD suffixes. This RFC tightens both.
 
@@ -120,7 +121,7 @@ pnpm exec werkstatt run sternsystem.validate --id warpgogol
 pnpm exec werkstatt run sternsystem.register --id warpgogol --cosmicStar Vega --mirrors ...
 ```
 
-No new standalone command is added. The TLD check is integrated into the existing `sternsystem.validate` and `sternsystem.register` commands. The `commands.added` entry `sternsystem.id.validate` in frontmatter refers to the internal validation function, not a separate CLI command — it is callable programmatically by other kernel commands.
+No new standalone command is added. The TLD check is integrated into the existing `sternsystem.validate` and `sternsystem.register` commands. The reusable `hasTldSuffix()` function in `naming-policy.ts` is callable programmatically by other modules — it is not a kernel command.
 
 ### TypeScript contracts
 
@@ -153,10 +154,8 @@ export const STERNSYSTEM_ID_POLICY = {
 
 // New violation rule added to the existing violations array:
 {
-  ruleId: "STERN-ID-TLD",
-  severity: "error",
   systemId: id,
-  field: "id",
+  rule: "STERN-ID-TLD",
   message: `Sternsystem ID '${id}' ends in TLD suffix '-${lastSegment}' — use the business ID without domain TLD (e.g. 'warpgogol' not 'warpgogol-com')`,
 }
 ```
@@ -164,8 +163,8 @@ export const STERNSYSTEM_ID_POLICY = {
 ### File system responsibilities
 
 | Path | Role |
-|---|---|
-| `packages/werkstatt/src/schemas/naming-policy.ts` | Add `KNOWN_TLDS`, `hasTldSuffix()`, update `STERNSYSTEM_ID_POLICY` examples |
+| --- | --- |
+| `packages/werkstatt/src/schemas/naming-policy.ts` | Add `KNOWN_TLDS`, `hasTldSuffix()`, update `STERNSYSTEM_ID_POLICY` examples, update `MISSION_ID_POLICY` and `RELEASE_ID_POLICY` examples (replace `warpgogol-com` prefix with `warpgogol`) |
 | `packages/werkstatt/src/sternsystem/sternsystem-validate.ts` | Add `STERN-ID-TLD` rule to validation loop |
 | `packages/werkstatt/src/sternsystem/sternsystem-register.ts` | Call `hasTldSuffix()` before creating config, throw on match |
 | `packages/werkstatt/src/schemas/sternsystem.ts` | Update `kebabRe` error messages to mention "no TLD suffix" |
@@ -181,15 +180,15 @@ export const STERNSYSTEM_ID_POLICY = {
   "status": "fail",
   "violations": [
     {
-      "ruleId": "STERN-ID-TLD",
-      "severity": "error",
       "systemId": "warpgogol-com",
-      "field": "id",
+      "rule": "STERN-ID-TLD",
       "message": "Sternsystem ID 'warpgogol-com' ends in TLD suffix '-com' — use the business ID without domain TLD (e.g. 'warpgogol' not 'warpgogol-com')"
     }
   ]
 }
 ```
+
+The violation shape matches the existing `SternsystemViolation` type: `{ systemId: string; rule: string; message: string }`. All violations in `sternsystem.validate` are error-severity by default (exitCode: 1). No `severity` or `field` fields are added — the existing type is sufficient.
 
 ### Failure modes
 
@@ -242,6 +241,9 @@ These files reference the old `warpgogol-com` site ID and must be updated manual
 - `services/lagebild-sync/.env.example` — `TENANT_WARPGOGOL_COM_*` env vars → `TENANT_WARPGOGOL_*`
 - `services/lagebild-sync/wrangler.jsonc` — comments referencing `warpgogol-com` site name
 - `fleet/fleet.sites.yaml` — regenerated by `fleet.sites.generate` after re-registration
+- `fleet/fleet.plan.generated.yaml` — regenerated after re-registration
+- `fleet/fleet.status.generated.yaml` — regenerated after re-registration
+- `fleet/agent-catalog.generated.yaml` — regenerated after re-registration
 
 ### Step 5: Verify
 
@@ -275,6 +277,7 @@ New Sternsystems registered after this RFC is implemented automatically comply �
 - [ ] `KNOWN_TLDS` set and `hasTldSuffix()` function defined in `packages/werkstatt/src/schemas/naming-policy.ts`
 - [ ] `STERNSYSTEM_ID_POLICY` examples updated to TLD-free IDs (`warpgogol`, `nicaragua-projekt`)
 - [ ] `STERNSYSTEM_ID_POLICY` counter-examples include `warpgogol-com`, `nicaragua-projekt-org`
+- [ ] `MISSION_ID_POLICY` and `RELEASE_ID_POLICY` examples updated to use `warpgogol` prefix instead of `warpgogol-com`
 - [ ] `sternsystem.validate` emits `STERN-ID-TLD` error violation for TLD-suffixed IDs
 - [ ] `sternsystem.register` throws on TLD-suffixed IDs before writing any files
 - [ ] `sternsystem.register --amend` throws on TLD-suffixed IDs

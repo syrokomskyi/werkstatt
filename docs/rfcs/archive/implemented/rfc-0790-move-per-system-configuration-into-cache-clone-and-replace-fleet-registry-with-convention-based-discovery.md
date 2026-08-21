@@ -29,6 +29,7 @@ amends:
   - RFC-0472
 amendedBy:
   - RFC-0794
+  - RFC-0902
 related:
   - DNA-1
   - DNA-44
