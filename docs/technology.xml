@@ -197,6 +197,16 @@
     </entry>
   </testing-stack>
 
+  <access-protection rfc="RFC-0899">
+    <rule id="ap-01">Dev (`dev.*`) and alt (`alt.*`) subdomains require Basic Auth with a 4-digit PIN (`ACCESS_PIN` env var) set as a Cloudflare Workers secret. The main domain is never protected.</rule>
+    <rule id="ap-02">Middleware runs first in the Astro middleware chain, before retired-tombstones, language-redirect, and markdown-negotiation. It short-circuits unauthorized requests with 401 before `next()`.</rule>
+    <rule id="ap-03">All dev/alt responses (including 401 challenges) include `X-Robots-Tag: noindex, nofollow, noai, noimageai` to prevent indexing and AI training.</rule>
+    <rule id="ap-04">PIN is stored as a Cloudflare Workers secret via `wrangler secret put ACCESS_PIN` on dev and alt channel Workers. The PIN value is also recorded in `system-state.yaml` `accessPin` field for status reporting.</rule>
+    <rule id="ap-05">When `ACCESS_PIN` env var is unset, the middleware passes through but still sets `X-Robots-Tag` headers — allowing new sites to function before protection is configured.</rule>
+    <rule id="ap-06">Auth comparison uses constant-time string comparison to prevent timing attacks. The middleware uses `import { env } from "cloudflare:workers"` (Astro v6 pattern), not `context.locals.runtime.env`.</rule>
+    <rule id="ap-07">Leitstand commands `leitstand.access.protect`, `leitstand.access.unprotect`, `leitstand.access.status` manage PIN secrets per Sternsystem. Protect sets PIN on dev+alt Workers; unprotect removes it; status reports from `system-state.yaml`.</rule>
+  </access-protection>
+
   <dependency-rules>
     <rule id="dep-01">Packages must not import from `apps/*`.</rule>
     <rule id="dep-02">Apps may consume packages through stable public APIs rather than package-private internals.</rule>
