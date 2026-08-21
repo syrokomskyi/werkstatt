@@ -19,7 +19,8 @@ implementedAt:
 closedAt:
 supersedes: []
 supersededBy:
-amends: []
+amends:
+  - RFC-0048
 amendedBy: []
 related:
   - DNA-11
@@ -39,7 +40,7 @@ satisfies:
 # produces when implemented. Required for post-cutoff implemented RFCs (V-29).
 # Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
 # major (architectural, manually reserved). Default: patch.
-versionBump: patch
+versionBump: minor
 commands:
   proposed:
     - block.id.validate
@@ -47,7 +48,6 @@ commands:
   added: []
   changed:
     - page.block.validate
-    - onboarding.scaffold
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
@@ -105,7 +105,9 @@ The operator confirmed: block ids should serve as anchor targets directly. A vis
 
 ## Decision
 
-Every block in every content type (pages, prose, business-profile, faq) MUST have a stable, language-neutral `id` field. The kernel gains `block.id.validate` (enforces presence and per-page uniqueness) and `block.id.generate` (backfills missing ids using `slugify(heading)`). The RFC-0048 `anchors` registry in `system.md` is superseded — navigation targets reference block ids directly, and section components render the block id as the HTML `id` attribute without language-specific remapping.
+Every block in page content entries MUST have a stable, language-neutral `id` field in frontmatter (`blocks[].id`). Non-page content types (prose, FAQ, business-profile) already have stable identifiers derived from their own schemas (heading slugification for prose, `slug` field for FAQ entries, entity ids for business-profile overlays). The kernel gains `block.id.validate` (enforces `blocks[].id` presence, format, and per-page uniqueness across all page content) and `block.id.generate` (backfills missing ids using `slugify(heading)`). The RFC-0048 `anchors` registry in `system.md` is amended — navigation targets reference block ids directly, and section components render the block id as the HTML `id` attribute without language-specific remapping.
+
+**Content type scope:** This RFC mandates `blocks[].id` for **page content entries** (`src/content/pages/**/*.md`) which are the only content type using the DNA-24 block-declarative model with `blocks[]` arrays. Non-page content types (prose, FAQ, business-profile, navigation, people) already have stable identifiers through their own schemas and are not affected by `block.id.validate`. RFC-0901 (cross-locale structural parity) can match these identifiers directly across locale variants.
 
 ## Architectural fit
 
@@ -113,13 +115,17 @@ Every block in every content type (pages, prose, business-profile, faq) MUST hav
 
 **DNA-11 (language mirroring).** Mandatory block ids strengthen language mirroring: the same block id must exist in all locale variants of a page, enabling reliable cross-locale structural comparison (RFC-0901).
 
-**RFC-0048 (localized page slugs and route resolution).** The `anchors` registry portion of RFC-0048 is superseded. Navigation targets reference block ids directly. The route registry (`pages[].routes`, `pages[].pageId`) remains unchanged. Full migration — no legacy compatibility.
+**RFC-0048 (localized page slugs and route resolution).** The `anchors` registry portion of RFC-0048 is amended (this RFC amends RFC-0048). Navigation targets reference block ids directly. The route registry (`pages[].routes`, `pages[].pageId`) remains unchanged. Full migration — no legacy compatibility. Note: the `anchors` field is not part of `systemManifestSchema` (Zod) — it exists only in the runtime `LocalizedRouteEntry` type (`packages/werkstatt-site/src/domain/share/astro/routes/registry.ts`) and is read dynamically from `system.md` frontmatter. This RFC removes the runtime `anchors` field from `LocalizedRouteEntry` and stops reading it from frontmatter.
 
 **RFC-0097 (per-page locale scoping).** Unaffected. Pages with `locales: [de]` still skip parity checks for other locales. Block ids are mandatory only for blocks that exist.
 
 **RFC-0901 (cross-locale structural parity validation).** This RFC is a prerequisite for RFC-0901. With mandatory block ids, RFC-0901 can match blocks by id directly, eliminating the need for index-based fallback matching.
 
 **Site OS operator model.** Two new commands (`block.id.validate`, `block.id.generate`) registered in `command-tables/04-content-quality.ts`. `block.id.validate` is integrated into `SITES_CHECK_AUTHOR_PIPELINE` after `page.block.validate`. Both commands have `scope: app`.
+
+**Relationship with existing B-05 check:** `page.block.validate` currently checks B-05 (duplicate block ids within a page) at `packages/werkstatt-site/src/checks/page-block.ts:274-285`. After this RFC, B-05 is **removed** from `page.block.validate` and superseded by `block.id.validate`, which covers presence, format, and uniqueness. This avoids redundant duplicate checks. `page.block.validate` retains B-01 through B-04, B-06, and B-07.
+
+**Compass XML synchronization:** Implementation must update `docs/architecture-dna.md` (DNA-24 entry) and `docs/source-markup.xml` if block id requirements are referenced in the source markup contract. `docs/requirements.xml` may need updates if content requirements reference block id mandatory status.
 
 ## Design
 
@@ -176,14 +182,14 @@ interface BlockIdGenerateResult {
 | Path | Role |
 | --- | --- |
 | `src/content/pages/{lang}/**/*.md` | Scanned for `blocks[].id` presence, uniqueness, format |
-| `src/content/prose/{slug}.{lang}.md` | Prose heading-derived ids checked for uniqueness within page |
-| `src/content/business-profile/{lang}/*.md` | Scanned for block ids |
-| `src/content/faq/{lang}/*.md` | Scanned for block ids |
-| `src/content/system.md` | `pages[].anchors` map removed (superseded) |
+| `src/content/prose/{slug}.{lang}.md` | Not scanned — prose uses heading-derived ids (already stable via slugification in `build-page.ts`) |
+| `src/content/business-profile/{lang}/*.md` | Not scanned — business-profile uses entity ids from its own schema |
+| `src/content/faq/{lang}/*.md` | Not scanned — FAQ entries use `slug` field as stable id |
+| `src/content/system.md` | `pages[].anchors` map no longer read from frontmatter (amended in RFC-0048) |
 | `src/content/navigation/{lang}/navigation.md` | `targets[].semanticTarget.anchor` now references block id directly |
 | `packages/werkstatt-shared/src/share/semantic/build-page.ts` | `extractContentBlocks` removes `block-N` fallback, requires `id` |
 | `packages/werkstatt-site/src/domain/share/astro/routes/anchors.ts` | `resolveAnchorFragment` and `resolveSectionAnchor` simplified — block id used directly as HTML id |
-| `packages/werkstatt-site/src/codegen/section-scaffold.ts` | Scaffolded sections render `sectionId` from block id directly |
+| `packages/werkstatt-site/src/onboarding/templates/*.template.md` | Page templates include `blocks[].id` for all declared blocks |
 
 ### Output format
 
@@ -238,7 +244,7 @@ interface BlockIdGenerateResult {
   4. Remove `pages[].anchors` from `system.md` (superseded by direct block id references).
   5. Update `navigation.md` targets to reference block ids directly (remove `anchorId` indirection).
   6. Simplify `resolveSectionAnchor` to use block id directly as HTML id.
-- **New apps** automatically comply: `onboarding.scaffold` generates `blocks[].id` for all scaffolded pages.
+- **New apps** automatically comply: page templates used by `mission.materialize` (e.g., `packages/werkstatt-site/src/onboarding/templates/index-page.template.md`, `cosmic-passport.template.md`, `cosmic-star-map.template.md`) already include `blocks[].id` where blocks are declared. The empty-blocks template (`index-page.template.md`) has `blocks: []` which trivially satisfies the requirement. No `onboarding.scaffold` command exists (removed in RFC-0532, replaced by `onboarding.synthesize`).
 - **Pipeline integration:** `block.id.validate` runs in `SITES_CHECK_AUTHOR_PIPELINE` after `page.block.validate`.
 - **RFC-0048 anchor registry removal:** `resolveAnchorFragment` and `resolveSectionAnchor` in `packages/werkstatt-site/src/domain/share/astro/routes/anchors.ts` are simplified. The `anchors` map in `system.md` is no longer read. Navigation `targets[].semanticTarget.anchor` is a block id, used directly as the HTML `id` attribute.
 
@@ -262,14 +268,14 @@ interface BlockIdGenerateResult {
 
 ## Acceptance criteria
 
-- [ ] `block.id.validate` command is registered in `command-tables/04-content-quality.ts` with `scope: app` and detects missing, duplicate, and invalid block ids across all content types (pages, prose, business-profile, faq)
+- [ ] `block.id.validate` command is registered in `command-tables/04-content-quality.ts` with `scope: app` and detects missing, duplicate, and invalid block ids in page content entries (`src/content/pages/**/*.md`)
 - [ ] `block.id.generate` command is registered in `command-tables/04-content-quality.ts` with `scope: app` and backfills missing ids using `slugify(heading)` with `-2`, `-3` suffix deduplication
 - [ ] `block.id.validate` is integrated into `SITES_CHECK_AUTHOR_PIPELINE` after `page.block.validate`
 - [ ] `extractContentBlocks` in `packages/werkstatt-shared/src/share/semantic/build-page.ts` removes the `block-${result.length}` fallback and requires `blocks[].id`
-- [ ] RFC-0048 `anchors` registry in `system.md` is removed; `resolveAnchorFragment` and `resolveSectionAnchor` in `packages/werkstatt-site/src/domain/share/astro/routes/anchors.ts` use block id directly as HTML id
-- [ ] `onboarding.scaffold` generates `blocks[].id` for all scaffolded pages
+- [ ] RFC-0048 `anchors` field removed from runtime `LocalizedRouteEntry` type; `resolveAnchorFragment` and `resolveSectionAnchor` in `packages/werkstatt-site/src/domain/share/astro/routes/anchors.ts` use block id directly as HTML id
+- [ ] Page templates in `packages/werkstatt-site/src/onboarding/templates/` include `blocks[].id` for all declared blocks
 - [ ] Each command handler returns `KernelCommandResult` with `exitCode` explicitly set on every return path, `summary` prefixed with `[command.name]`, and `nextSteps` non-empty on failure (DNA-82)
-- [ ] Unit tests cover: missing id detection, duplicate id detection, invalid format detection, generate backfill, generate deduplication, all content types, no-content pass, DNA-82 compliance
+- [ ] Unit tests cover: missing id detection, duplicate id detection, invalid format detection, generate backfill, generate deduplication, no-content pass, DNA-82 compliance
 - [ ] Existing site content migrated: `block.id.generate` run on all apps, `block.id.validate` passes with zero violations
 - [ ] `AGENTS.md` updated with block id requirement and migration instructions
 - [ ] `docs/architecture-dna.md` DNA-24 entry updated to reference this RFC for mandatory `blocks[].id`
@@ -282,8 +288,8 @@ interface BlockIdGenerateResult {
 - Agents MUST run `block.id.generate --app <app>` on all existing apps as the first implementation step to backfill missing ids before removing the `block-N` fallback.
 - Agents MUST remove the `block-${result.length}` fallback in `extractContentBlocks` — missing ids must cause a hard error, not a silent positional fallback.
 - Agents MUST update `resolveSectionAnchor` to return the block id directly as the HTML `id` attribute, without language-specific remapping through the RFC-0048 anchor registry.
-- Agents MUST remove the `anchors` map from `system.md` content and from the `systemManifestSchema` (or its local view) — no legacy compatibility.
-- Agents MUST update `onboarding.scaffold` to generate `blocks[].id` (slug from heading) for all scaffolded pages.
+- Agents MUST remove the `anchors` field from the runtime `LocalizedRouteEntry` type in `packages/werkstatt-site/src/domain/share/astro/routes/registry.ts` and stop reading `pages[].anchors` from `system.md` frontmatter. Note: `anchors` is not in `systemManifestSchema` (Zod) — it is a runtime-only field. No legacy compatibility.
+- Agents MUST ensure page templates in `packages/werkstatt-site/src/onboarding/templates/` include `blocks[].id` for all blocks. Templates with `blocks: []` (e.g. `index-page.template.md`) trivially comply. Templates with declared blocks (e.g. `cosmic-passport.template.md`) already include ids.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `rfc.supersede.propose --id RFC-0914 --reason "..." --invariant "DNA-N" instead of working around it (RFC-0334).
 - This RFC is a prerequisite for RFC-0901 (cross-locale structural parity validation). RFC-0901 implementation should follow this RFC's implementation.
