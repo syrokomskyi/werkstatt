@@ -48,3 +48,6 @@ src/content-ref-index.generated.yaml
 
 # RFC-0890: raw screenshots — binary artifacts, not git content
 trust/evidence/screenshots/
+
+# RFC-0878: .closed sentinel — written by mission.close, runtime marker only
+.closed
