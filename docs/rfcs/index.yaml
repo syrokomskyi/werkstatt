@@ -17359,10 +17359,10 @@ entries:
     file: docs/rfcs/archive/implemented/rfc-0903-standardize-kernel-command-output-exitcode-summary-nextsteps.md
   - id: RFC-0904
     title: Pre-deploy header compatibility validators
-    status: accepted
+    status: implemented
     kind: architecture
     createdAt: 2026-08-21
-    implementedAt: ""
+    implementedAt: 2026-08-21
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -17373,13 +17373,13 @@ entries:
       - DNA-83
       - RFC-0831
       - RFC-0315
-    file: docs/rfcs/rfc-0904-pre-deploy-header-compatibility-validators.md
+    file: docs/rfcs/archive/implemented/rfc-0904-pre-deploy-header-compatibility-validators.md
   - id: RFC-0905
     title: Redirect effectiveness in Worker-first deployments
-    status: draft
+    status: implemented
     kind: architecture
-    createdAt: 2026-08-22
-    implementedAt: ""
+    createdAt: 2026-08-21
+    implementedAt: 2026-08-22
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -17392,13 +17392,13 @@ entries:
       - RFC-0589
       - RFC-0495
       - RFC-0904
-    file: docs/rfcs/rfc-0905-redirect-effectiveness-in-worker-first-deployments.md
+    file: docs/rfcs/archive/implemented/rfc-0905-redirect-effectiveness-in-worker-first-deployments.md
   - id: RFC-0906
     title: Canonical URL trailing-slash parity between HTML and sitemap
-    status: draft
+    status: implemented
     kind: architecture
-    createdAt: 2026-08-22
-    implementedAt: ""
+    createdAt: 2026-08-21
+    implementedAt: 2026-08-21
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -17410,13 +17410,14 @@ entries:
       - RFC-0317
       - RFC-0898
       - RFC-0160
+      - RFC-0163
       - RFC-0904
-    file: docs/rfcs/rfc-0906-canonical-url-trailing-slash-parity.md
+    file: docs/rfcs/archive/implemented/rfc-0906-canonical-url-trailing-slash-parity.md
   - id: RFC-0907
     title: "Sitemap integrity validators: placeholder expansion and route coverage"
-    status: draft
+    status: accepted
     kind: command
-    createdAt: 2026-08-22
+    createdAt: 2026-08-21
     implementedAt: ""
     closedAt: ""
     supersedes: []
@@ -17432,9 +17433,9 @@ entries:
     file: docs/rfcs/rfc-0907-sitemap-integrity-validators.md
   - id: RFC-0908
     title: Host canonicalization and URL normalization validators
-    status: draft
+    status: accepted
     kind: architecture
-    createdAt: 2026-08-22
+    createdAt: 2026-08-21
     implementedAt: ""
     closedAt: ""
     supersedes: []
