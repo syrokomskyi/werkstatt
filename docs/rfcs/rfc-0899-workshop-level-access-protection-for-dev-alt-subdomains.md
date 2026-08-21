@@ -25,11 +25,11 @@ satisfies:
   - DNA-73
 versionBump: minor
 commands:
-  proposed:
+  proposed: []
+  added:
     - leitstand.access.protect
     - leitstand.access.unprotect
     - leitstand.access.status
-  added: []
   changed: []
   removed: []
 appsImpacted: []
