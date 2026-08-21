@@ -29,7 +29,7 @@
 </CHANGE_SUMMARY>
 */
 
-// @ts-check
+// @ts-nocheck — template file, not directly compilable (generated imports replaced at scaffold time)
 // [DNA-01] output: "static" — site is SSG by default; only routes that declare
 // `export const prerender = false` (API endpoints, language-redirect entry) render
 // on demand in the Worker.
@@ -134,7 +134,7 @@ function cleanupOrphanedJsChunks() {
 }
 
 export default defineConfig({
-  {{SITE_LINE}}
+  // WG_SITE_LINE
   output: "static",
   // The @astrojs/cloudflare adapter auto-enables Cloudflare KV sessions when no
   // explicit session driver is set, ignoring its own `needsSessionKVBinding` option.

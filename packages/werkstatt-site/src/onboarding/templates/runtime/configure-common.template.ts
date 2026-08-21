@@ -11,5 +11,6 @@
 </CHANGE_SUMMARY>
 */
 
+// @ts-nocheck — template file, not directly compilable
 // Default language for SSG. Only this language generates static HTML at build time.
 export const defaultLanguageCode = "{{DEFAULT_LANG}}" as const;

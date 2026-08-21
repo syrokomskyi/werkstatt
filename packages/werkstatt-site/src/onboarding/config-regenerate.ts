@@ -126,12 +126,15 @@ export async function runConfigRegenerate(
     },
     {
       path: join(appDir, "astro.config.mjs"),
-      content: applyTokens(readRuntimeTemplate("astro.config.template.mjs"), {
-        ...tokens,
-        SITE_LINE: tokens.DOMAIN
-          ? `  site: "https://${tokens.DOMAIN}",`
-          : "  // site: omitted (no domain configured)",
-      }),
+      content: applyTokens(
+        readRuntimeTemplate("astro.config.template.mjs").replace(
+          "// WG_SITE_LINE",
+          tokens.DOMAIN
+            ? `  site: "https://${tokens.DOMAIN}",`
+            : "  // site: omitted (no domain configured)",
+        ),
+        tokens,
+      ),
     },
     {
       path: join(appDir, "wrangler.jsonc"),

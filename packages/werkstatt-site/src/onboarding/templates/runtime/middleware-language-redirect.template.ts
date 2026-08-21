@@ -11,6 +11,7 @@
 </CHANGE_SUMMARY>
 */
 
+// @ts-nocheck — template file, not directly compilable
 // [DNA-02][RFC-0010] Language redirect middleware.
 // Runs on every request. Redirects non-root paths to /{lang}/ based on Accept-Language.
 // Root / path is SKIPPED — client-side detection in index.astro handles it for static builds.

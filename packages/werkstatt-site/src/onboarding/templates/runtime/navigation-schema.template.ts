@@ -11,6 +11,7 @@
 </CHANGE_SUMMARY>
 */
 
+// @ts-nocheck — template file, not directly compilable
 import { z } from "zod";
 
 export const navigationTargetSchema = z.object({
