@@ -66,6 +66,12 @@ export const SITES_CHECK_POSTBUILD_PIPELINE: KernelPipelineStep[] = [
   // RFC-0831: CSP origin completeness — cross-reference CSP source lists
   // against actual external origins in rendered HTML.
   { command: "csp.origins.validate" },
+  // RFC-0904: CSP element compatibility — cross-reference CSP directives
+  // against object/embed/iframe/audio/video/source elements in rendered HTML.
+  { command: "csp.elements.validate" },
+  // RFC-0904: headers coverage — cross-reference _headers path patterns
+  // against files in dist/client/ for orphan patterns and uncovered typed files.
+  { command: "headers.coverage.validate" },
   // RFC-0185: distribution artifacts must not expose the generated ownership marker
   { command: "dist.generated-marker.validate" },
   // RFC-0269: golden behavior snapshot drift check — must run before build-post's

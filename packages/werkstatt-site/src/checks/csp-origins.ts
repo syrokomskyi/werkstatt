@@ -288,7 +288,7 @@ export function extractOriginsFromHtml(html: string, filePath: string): Extracte
 
 // ─── Command handler ────────────────────────────────────────────────────────
 
-async function resolveSiteOrigin(
+export async function resolveSiteOrigin(
   paths: ReturnType<typeof requireAstroSitePaths>,
 ): Promise<string | undefined> {
   try {

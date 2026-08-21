@@ -37,6 +37,8 @@ import {
   runSecurityTxtValidate,
 } from "../public-surface.ts";
 import { runCspOriginsValidate } from "../csp-origins.ts";
+import { runCspElementsValidate } from "../csp-elements.ts";
+import { runHeadersCoverageValidate } from "../headers-coverage.ts";
 import { runIconReferencesValidate } from "../icon-references.ts";
 
 export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
@@ -373,5 +375,27 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     reads: ["<app>/public/_headers", "<app>/dist/client/**/*.html"],
     modulePaths: ["csp-origins.ts"],
     execute: runCspOriginsValidate,
+  },
+  {
+    name: "csp.elements.validate",
+    description:
+      "Cross-reference CSP directives against HTML elements (object, embed, iframe, audio, video, source) in rendered HTML (RFC-0904).",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/public/_headers", "<app>/dist/client/**/*.html"],
+    modulePaths: ["csp-elements.ts", "csp-origins.ts", "dom-helpers.ts"],
+    execute: runCspElementsValidate,
+  },
+  {
+    name: "headers.coverage.validate",
+    description:
+      "Cross-reference _headers path patterns against files in dist/client/ for orphan patterns and uncovered typed files (RFC-0904).",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/public/_headers", "<app>/dist/client/**/*"],
+    modulePaths: ["headers-coverage.ts"],
+    execute: runHeadersCoverageValidate,
   },
 ];
