@@ -33,7 +33,10 @@ import {
   getGenomeLogSize,
   isGenomeLogSizeWarning,
 } from "./genome-log.ts";
-import { WerkstattIdentityConfigSchema, type WerkstattIdentityConfig } from "@warpgogol/werkstatt-shared/passport";
+import {
+  WerkstattIdentityConfigSchema,
+  type WerkstattIdentityConfig,
+} from "@warpgogol/werkstatt-shared/passport";
 
 const IDENTITY_FILENAME = "werkstatt.identity.json";
 const PASSPORT_SIGNING_KEY_ENV = "PASSPORT_SIGNING_KEY";
@@ -139,7 +142,10 @@ export async function runSwimJoin(
         diagnostics: ["swim.join: --seed flag is required"],
       },
       exitCode: 1,
-      summary: "swim.join: --seed flag is required",
+      summary: "[swim.join] --seed flag is required",
+      nextSteps: [
+        { action: "Provide the --seed flag (host:port) and re-run swim.join", kind: "required" },
+      ],
     };
   }
 
@@ -158,7 +164,13 @@ export async function runSwimJoin(
         ],
       },
       exitCode: 1,
-      summary: `swim.join: identity not bootstrapped — run identity.bootstrap first`,
+      summary: `[swim.join] identity not bootstrapped — run identity.bootstrap first`,
+      nextSteps: [
+        {
+          action: "Run identity.bootstrap first (RFC-0558), then re-run swim.join",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -175,7 +187,13 @@ export async function runSwimJoin(
         diagnostics: [`swim.join: ${PASSPORT_SIGNING_KEY_ENV} environment variable is not set`],
       },
       exitCode: 1,
-      summary: `swim.join: ${PASSPORT_SIGNING_KEY_ENV} not set`,
+      summary: `[swim.join] ${PASSPORT_SIGNING_KEY_ENV} not set`,
+      nextSteps: [
+        {
+          action: `Set the ${PASSPORT_SIGNING_KEY_ENV} environment variable and re-run swim.join`,
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -192,7 +210,13 @@ export async function runSwimJoin(
         diagnostics: [`swim.join: seed node ${seed} is unreachable`],
       },
       exitCode: 1,
-      summary: `swim.join: seed node ${seed} is unreachable`,
+      summary: `[swim.join] seed node ${seed} is unreachable`,
+      nextSteps: [
+        {
+          action: `Check that seed node ${seed} is reachable and re-run swim.join`,
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -222,7 +246,7 @@ export async function runSwimJoin(
       members: membershipView,
     },
     exitCode: 0,
-    summary: `swim.join: joined as ${config.workshopId} via seed ${seed} (${membershipView.alive} alive, ${membershipView.total} total)`,
+    summary: `[swim.join] joined as ${config.workshopId} via seed ${seed} (${membershipView.alive} alive, ${membershipView.total} total)`,
   };
 }
 
@@ -243,7 +267,13 @@ export async function runSwimLeave(
         diagnostics: [`swim.leave: no ${CONFIG_FILENAME} found — run swim.join first`],
       },
       exitCode: 1,
-      summary: `swim.leave: no ${CONFIG_FILENAME} found`,
+      summary: `[swim.leave] no ${CONFIG_FILENAME} found`,
+      nextSteps: [
+        {
+          action: "Run swim.join first to configure SWIM, then re-run swim.leave",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -258,7 +288,13 @@ export async function runSwimLeave(
         diagnostics: [`swim.leave: ${PASSPORT_SIGNING_KEY_ENV} environment variable is not set`],
       },
       exitCode: 1,
-      summary: `swim.leave: ${PASSPORT_SIGNING_KEY_ENV} not set`,
+      summary: `[swim.leave] ${PASSPORT_SIGNING_KEY_ENV} not set`,
+      nextSteps: [
+        {
+          action: `Set the ${PASSPORT_SIGNING_KEY_ENV} environment variable and re-run swim.leave`,
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -280,7 +316,7 @@ export async function runSwimLeave(
       workshopId: config.workshopId,
     },
     exitCode: 0,
-    summary: `swim.leave: workshop ${config.workshopId} left the network`,
+    summary: `[swim.leave] workshop ${config.workshopId} left the network`,
   };
 }
 
@@ -313,7 +349,13 @@ export async function runSwimMembers(
         diagnostics: [`swim.members: no ${CONFIG_FILENAME} found — run swim.join first`],
       },
       exitCode: 1,
-      summary: `swim.members: no ${CONFIG_FILENAME} found`,
+      summary: `[swim.members] no ${CONFIG_FILENAME} found`,
+      nextSteps: [
+        {
+          action: "Run swim.join first to configure SWIM, then re-run swim.members",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -337,7 +379,7 @@ export async function runSwimMembers(
       dead: view.dead,
     },
     exitCode: 0,
-    summary: `swim.members: ${view.total} members (${view.alive} alive, ${view.suspect} suspect, ${view.dead} dead)`,
+    summary: `[swim.members] ${view.total} members (${view.alive} alive, ${view.suspect} suspect, ${view.dead} dead)`,
   };
 }
 
@@ -393,7 +435,7 @@ export async function runSwimStatus(
     },
     exitCode: 0,
     summary: config
-      ? `swim.status: workshop ${config.workshopId}, ${view.total} members (${view.alive} alive), genome log ${Math.round(genomeLogSize / 1024)}KB`
-      : `swim.status: not configured — run swim.join --seed <addr> first`,
+      ? `[swim.status] workshop ${config.workshopId}, ${view.total} members (${view.alive} alive), genome log ${Math.round(genomeLogSize / 1024)}KB`
+      : `[swim.status] not configured — run swim.join --seed <addr> first`,
   };
 }

@@ -53,8 +53,11 @@ export async function runLagebildTenantAdd(
         commandsToRun: [],
         message: "Missing required --site flag",
       },
-      summary: "lagebild.tenant.add failed: --site required",
+      summary: "[lagebild.tenant.add] --site required",
       exitCode: 1,
+      nextSteps: [
+        { action: "Provide the --site flag and re-run lagebild.tenant.add", kind: "required" },
+      ],
     };
   }
 
@@ -92,7 +95,7 @@ export async function runLagebildTenantAdd(
           commandsToRun: [],
           message: `Tenant already exists for site ${site} (tenant_id: ${existing.tenant_id}, enabled: ${existing.enabled}). Use lagebild.tenant.enable to activate.`,
         },
-        summary: `lagebild.tenant.add: skipped — tenant already exists for ${site}`,
+        summary: `[lagebild.tenant.add] skipped — tenant already exists for ${site}`,
       };
     }
 
@@ -127,7 +130,7 @@ export async function runLagebildTenantAdd(
         commandsToRun,
         message,
       },
-      summary: `lagebild.tenant.add: ${tenant.tenant_id} for ${site}`,
+      summary: `[lagebild.tenant.add] ${tenant.tenant_id} for ${site}`,
     };
   } catch (err) {
     return {
@@ -140,8 +143,11 @@ export async function runLagebildTenantAdd(
         commandsToRun,
         message: (err as Error).message,
       },
-      summary: `lagebild.tenant.add failed: ${(err as Error).message}`,
+      summary: `[lagebild.tenant.add] failed: ${(err as Error).message}`,
       exitCode: 1,
+      nextSteps: [
+        { action: "Check the error message and re-run lagebild.tenant.add", kind: "required" },
+      ],
     };
   }
 }
@@ -160,8 +166,11 @@ export async function runLagebildTenantEnable(
         site: "",
         message: "--site required",
       },
-      summary: "--site required",
+      summary: "[lagebild.tenant.enable] --site required",
       exitCode: 1,
+      nextSteps: [
+        { action: "Provide the --site flag and re-run lagebild.tenant.enable", kind: "required" },
+      ],
     };
   }
   try {
@@ -175,8 +184,14 @@ export async function runLagebildTenantEnable(
           site,
           message: `No tenant found for site ${site}. Run lagebild.tenant.add first.`,
         },
-        summary: `lagebild.tenant.enable: no tenant for ${site}`,
+        summary: `[lagebild.tenant.enable] no tenant for ${site}`,
         exitCode: 1,
+        nextSteps: [
+          {
+            action: `Run lagebild.tenant.add --site ${site} first, then re-run lagebild.tenant.enable`,
+            kind: "required",
+          },
+        ],
       };
     }
     return {
@@ -188,7 +203,7 @@ export async function runLagebildTenantEnable(
         enabled: tenant.enabled,
         message: `Tenant ${site} enabled`,
       },
-      summary: `lagebild.tenant.enable: ${site} enabled`,
+      summary: `[lagebild.tenant.enable] ${site} enabled`,
     };
   } catch (err) {
     return {
@@ -198,8 +213,11 @@ export async function runLagebildTenantEnable(
         site,
         message: (err as Error).message,
       },
-      summary: `lagebild.tenant.enable failed: ${(err as Error).message}`,
+      summary: `[lagebild.tenant.enable] failed: ${(err as Error).message}`,
       exitCode: 1,
+      nextSteps: [
+        { action: "Check the error message and re-run lagebild.tenant.enable", kind: "required" },
+      ],
     };
   }
 }
@@ -218,8 +236,11 @@ export async function runLagebildTenantDisable(
         site: "",
         message: "--site required",
       },
-      summary: "--site required",
+      summary: "[lagebild.tenant.disable] --site required",
       exitCode: 1,
+      nextSteps: [
+        { action: "Provide the --site flag and re-run lagebild.tenant.disable", kind: "required" },
+      ],
     };
   }
   try {
@@ -233,8 +254,14 @@ export async function runLagebildTenantDisable(
           site,
           message: `No tenant found for site ${site}. Run lagebild.tenant.add first.`,
         },
-        summary: `lagebild.tenant.disable: no tenant for ${site}`,
+        summary: `[lagebild.tenant.disable] no tenant for ${site}`,
         exitCode: 1,
+        nextSteps: [
+          {
+            action: `Run lagebild.tenant.add --site ${site} first, then re-run lagebild.tenant.disable`,
+            kind: "required",
+          },
+        ],
       };
     }
     return {
@@ -246,7 +273,7 @@ export async function runLagebildTenantDisable(
         enabled: tenant.enabled,
         message: `Tenant ${site} disabled`,
       },
-      summary: `lagebild.tenant.disable: ${site} disabled`,
+      summary: `[lagebild.tenant.disable] ${site} disabled`,
     };
   } catch (err) {
     return {
@@ -256,8 +283,11 @@ export async function runLagebildTenantDisable(
         site,
         message: (err as Error).message,
       },
-      summary: `lagebild.tenant.disable failed: ${(err as Error).message}`,
+      summary: `[lagebild.tenant.disable] failed: ${(err as Error).message}`,
       exitCode: 1,
+      nextSteps: [
+        { action: "Check the error message and re-run lagebild.tenant.disable", kind: "required" },
+      ],
     };
   }
 }
@@ -279,8 +309,11 @@ export async function runLagebildTenantStatus(
         deadCount: 0,
         missingSecrets: [],
       },
-      summary: "--site required",
+      summary: "[lagebild.tenant.status] --site required",
       exitCode: 1,
+      nextSteps: [
+        { action: "Provide the --site flag and re-run lagebild.tenant.status", kind: "required" },
+      ],
     };
   }
   try {
@@ -298,8 +331,14 @@ export async function runLagebildTenantStatus(
           missingSecrets: [],
           message: `No tenant found for site ${site}`,
         },
-        summary: `lagebild.tenant.status: no tenant for ${site}`,
+        summary: `[lagebild.tenant.status] no tenant for ${site}`,
         exitCode: 1,
+        nextSteps: [
+          {
+            action: `Run lagebild.tenant.add --site ${site} first, then re-run lagebild.tenant.status`,
+            kind: "required",
+          },
+        ],
       };
     }
     const counts = await countOutboxByStatus(registry, tenant.tenant_id);
@@ -320,7 +359,8 @@ export async function runLagebildTenantStatus(
         deadCount: counts.dead,
         missingSecrets: [],
       },
-      summary: `lagebild.tenant.status: ${site} (enabled: ${tenant.enabled}, pending: ${counts.pending})`,
+      summary: `[lagebild.tenant.status] ${site} (enabled: ${tenant.enabled}, pending: ${counts.pending})`,
+      exitCode: 0,
     };
   } catch (err) {
     return {
@@ -334,8 +374,11 @@ export async function runLagebildTenantStatus(
         missingSecrets: [],
         message: (err as Error).message,
       },
-      summary: `lagebild.tenant.status failed: ${(err as Error).message}`,
+      summary: `[lagebild.tenant.status] failed: ${(err as Error).message}`,
       exitCode: 1,
+      nextSteps: [
+        { action: "Check the error message and re-run lagebild.tenant.status", kind: "required" },
+      ],
     };
   }
 }
@@ -357,8 +400,14 @@ export async function runLagebildTenantRotateSecret(
         kind: kind ?? "",
         message: "--site and --kind required",
       },
-      summary: "Missing flags",
+      summary: "[lagebild.tenant.rotate-secret] --site and --kind required",
       exitCode: 1,
+      nextSteps: [
+        {
+          action: "Provide the --site and --kind flags and re-run lagebild.tenant.rotate-secret",
+          kind: "required",
+        },
+      ],
     };
   }
   if (!newRef) {
@@ -370,8 +419,15 @@ export async function runLagebildTenantRotateSecret(
         kind,
         message: "--new-ref required (the new secret reference name to store in sync_tenants)",
       },
-      summary: "Missing --new-ref",
+      summary: "[lagebild.tenant.rotate-secret] --new-ref required",
       exitCode: 1,
+      nextSteps: [
+        {
+          action:
+            "Provide the --new-ref flag (the new secret reference name) and re-run lagebild.tenant.rotate-secret",
+          kind: "required",
+        },
+      ],
     };
   }
   try {
@@ -386,8 +442,14 @@ export async function runLagebildTenantRotateSecret(
           kind,
           message: `No tenant found for site ${site}`,
         },
-        summary: `lagebild.tenant.rotate-secret: no tenant for ${site}`,
+        summary: `[lagebild.tenant.rotate-secret] no tenant for ${site}`,
         exitCode: 1,
+        nextSteps: [
+          {
+            action: `Run lagebild.tenant.add --site ${site} first, then re-run lagebild.tenant.rotate-secret`,
+            kind: "required",
+          },
+        ],
       };
     }
     return {
@@ -399,7 +461,8 @@ export async function runLagebildTenantRotateSecret(
         newRef,
         message: `Secret ref for ${kind} updated to ${newRef} for site ${site}`,
       },
-      summary: `lagebild.tenant.rotate-secret: ${kind} → ${newRef} for ${site}`,
+      summary: `[lagebild.tenant.rotate-secret] ${kind} → ${newRef} for ${site}`,
+      exitCode: 0,
     };
   } catch (err) {
     return {
@@ -410,8 +473,14 @@ export async function runLagebildTenantRotateSecret(
         kind,
         message: (err as Error).message,
       },
-      summary: `lagebild.tenant.rotate-secret failed: ${(err as Error).message}`,
+      summary: `[lagebild.tenant.rotate-secret] failed: ${(err as Error).message}`,
       exitCode: 1,
+      nextSteps: [
+        {
+          action: "Check the error message and re-run lagebild.tenant.rotate-secret",
+          kind: "required",
+        },
+      ],
     };
   }
 }
@@ -467,13 +536,20 @@ export async function runLagebildValidate(
   if (violations.length > 0) {
     return {
       data: { command: "lagebild.validate", status: "error", violations },
-      summary: `lagebild.validate: ${violations.length} violation(s): ${violations.join("; ")}`,
+      summary: `[lagebild.validate] ${violations.length} violation(s): ${violations.join("; ")}`,
       exitCode: 1,
+      nextSteps: [
+        {
+          action: "Fix the violations listed above, then re-run lagebild.validate",
+          kind: "required",
+        },
+      ],
     };
   }
 
   return {
     data: { command: "lagebild.validate", status: "ok", violations: [] },
-    summary: "lagebild.validate: OK (no per-site Workers, .env.example clean)",
+    summary: "[lagebild.validate] OK (no per-site Workers, .env.example clean)",
+    exitCode: 0,
   };
 }
