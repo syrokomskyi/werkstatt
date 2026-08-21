@@ -106,5 +106,11 @@ export async function runDeployArtifactVerify(
   return {
     data: { verified: true, hash: treeHash, expectedHash: manifest.hash, signatureVerified },
     summary: `[deploy.artifact.verify] ${hash} verified (hash: ok, sig: ${signatureVerified})`,
+    nextSteps: [
+      {
+        action: `Deploy the artifact: pnpm exec werkstatt run leitstand.dev-deploy --release <release-id>`,
+        kind: "optional",
+      },
+    ],
   };
 }

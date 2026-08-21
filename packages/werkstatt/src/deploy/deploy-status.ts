@@ -71,5 +71,11 @@ export async function runDeployStatus(
   return {
     data: status,
     summary: `[deploy.status] current: ${currentHash?.slice(0, 16) ?? "none"}..., previous: ${previousHash?.slice(0, 16) ?? "none"}...`,
+    nextSteps: [
+      {
+        action: `Check leitstand status: pnpm exec werkstatt run leitstand.status --site <system-id>`,
+        kind: "optional",
+      },
+    ],
   };
 }

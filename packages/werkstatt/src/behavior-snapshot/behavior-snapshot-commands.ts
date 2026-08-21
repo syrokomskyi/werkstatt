@@ -188,6 +188,12 @@ export async function runBehaviorSnapshotCapture(
       wrapper,
     },
     summary: `[behavior.snapshot.capture] ${systemId} (${buildKind}): ${snapshot.routeCount} routes`,
+    nextSteps: [
+      {
+        action: `Prepare a release: pnpm exec werkstatt run release.prepare --mission <mission-id>`,
+        kind: "optional",
+      },
+    ],
   };
 }
 
@@ -312,5 +318,14 @@ export async function runBehaviorSnapshotDiff(
     data: { verdict, baselineHash, candidateHash, differences },
     exitCode: verdict === "pass" ? 0 : 1,
     summary: `[behavior.snapshot.diff] ${verdict} — ${differences.length} structural differences`,
+    nextSteps:
+      verdict === "fail"
+        ? [
+            {
+              action: `Review the ${differences.length} structural difference(s) above and decide whether to accept or fix them, then re-run: pnpm exec werkstatt run behavior.snapshot.diff`,
+              kind: "required",
+            },
+          ]
+        : undefined,
   };
 }

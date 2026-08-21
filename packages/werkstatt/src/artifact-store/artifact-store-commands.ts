@@ -254,6 +254,12 @@ export async function runArtifactStorePut(
         createdAt: result.createdAt,
       },
       summary: `[artifact.store.put] ${releaseId} artifact stored (${result.distArtifactHash.slice(0, 16)}...)`,
+      nextSteps: [
+        {
+          action: `Validate the artifact: pnpm exec werkstatt run artifact.store.validate --release ${releaseId}`,
+          kind: "optional",
+        },
+      ],
     };
   } finally {
     await releaseLock(workspaceRoot, `release:${releaseId}`);

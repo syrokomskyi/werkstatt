@@ -96,5 +96,11 @@ export async function runDeployAtomicSwap(
       swapTimeMs,
     },
     summary: `[deploy.atomic.swap] swapped to ${hash.slice(0, 16)}... in ${swapTimeMs}ms`,
+    nextSteps: [
+      {
+        action: `Verify health: pnpm exec werkstatt run leitstand.health --site <system-id> --channel main`,
+        kind: "optional",
+      },
+    ],
   };
 }
