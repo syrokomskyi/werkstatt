@@ -41,6 +41,10 @@
       "types": "./os/werkstatt-shared-validate.module.ts",
       "default": "./os/werkstatt-shared-validate.module.ts"
     },
+    "./os/werkstatt-commands-validate-module": {
+      "types": "./os/werkstatt-commands-validate.module.ts",
+      "default": "./os/werkstatt-commands-validate.module.ts"
+    },
     "./package.json": "./package.json",
     "./kernel": {
       "types": "./src/kernel/index.ts",
@@ -339,12 +343,7 @@
       "default": "./src/certification/index.ts"
     }
   },
-  "files": [
-    "src",
-    "bin",
-    "os",
-    "dist"
-  ],
+  "files": ["src", "bin", "os", "dist"],
   "scripts": {
     "lint": "pnpm exec eslint \"src/**/*.ts\" \"os/**/*.ts\"",
     "typecheck": "pnpm exec tsc -p tsconfig.json --noEmit",
@@ -425,6 +424,10 @@
       "./os/werkstatt-shared-validate-module": {
         "types": "./dist/os/werkstatt-shared-validate.module.d.ts",
         "default": "./dist/os/werkstatt-shared-validate.module.js"
+      },
+      "./os/werkstatt-commands-validate-module": {
+        "types": "./dist/os/werkstatt-commands-validate.module.d.ts",
+        "default": "./dist/os/werkstatt-commands-validate.module.js"
       },
       "./package.json": "./package.json",
       "./kernel": {
