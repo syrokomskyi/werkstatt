@@ -75,7 +75,7 @@ export interface ShellConfig {
  * All blocks in ResolvedPage.blocks passed visibility — invisible blocks are dropped.
  */
 export interface ResolvedBlock {
-  /** Stable kebab-case block id from the content entry (null if not declared). */
+  /** Stable kebab-case block id from the content entry. Mandatory for content blocks (RFC-0914); null only for shell blocks injected by the pipeline. */
   readonly id: string | null;
   /** The PlanetName or MoonName identifying this block's archetype. */
   readonly planetName: string;

@@ -27,7 +27,7 @@ export async function hasLocalizedPage(pageId: PageId, lang: LanguageCode): Prom
  * RFC-0914: Resolve a section's HTML `id` from SectionProps.
  *
  * Reads `blockId` (the stable block.id from content entry) directly.
- * Falls back to `defaultAnchorId` if blockId is not set (e.g. legacy shell blocks).
+ * Falls back to `defaultAnchorId` only for shell blocks (which have no content-entry id).
  *
  * @example
  * // In a section component:
