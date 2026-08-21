@@ -1,7 +1,7 @@
 ---
 id: RFC-0905
 title: "Redirect effectiveness in Worker-first deployments"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
