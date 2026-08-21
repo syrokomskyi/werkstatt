@@ -43,7 +43,7 @@ describe("parseUrl trailing-slash normalization (RFC-0576)", () => {
 });
 
 // extractBlockAnchorIds is not exported — we test it by replicating the logic.
-// The function scans page frontmatter blocks[] and collects props.anchorId values.
+// RFC-0914: The function scans page frontmatter blocks[] and collects block.id values.
 // These are the section-level anchor targets that SectionShell renders as HTML id attributes.
 
 describe("extractBlockAnchorIds logic", () => {
@@ -55,32 +55,30 @@ describe("extractBlockAnchorIds logic", () => {
     for (const block of blocks) {
       if (!block || typeof block !== "object") continue;
       const b = block as Record<string, unknown>;
-      if (typeof b.props === "object" && b.props !== null) {
-        const props = b.props as Record<string, unknown>;
-        if (typeof props.anchorId === "string") {
-          ids.push(props.anchorId);
-        }
+      // RFC-0914: block.id is the stable HTML id (replaces props.anchorId)
+      if (typeof b.id === "string") {
+        ids.push(b.id);
       }
     }
     return ids;
   }
 
-  it("collects anchorId from block props", () => {
+  it("collects id from blocks", () => {
     const frontmatter = {
       blocks: [
         { id: "hero", type: "hero-decision-card", props: {} },
-        { id: "form", type: "send-message", props: { anchorId: "recommendation-form" } },
-        { id: "faq", type: "faq-list", props: { anchorId: "faq" } },
+        { id: "recommendation-form", type: "send-message", props: {} },
+        { id: "faq", type: "faq-list", props: {} },
       ],
     };
-    expect(extractBlockAnchorIds(frontmatter)).toEqual(["recommendation-form", "faq"]);
+    expect(extractBlockAnchorIds(frontmatter)).toEqual(["hero", "recommendation-form", "faq"]);
   });
 
-  it("returns empty array when no blocks have anchorId", () => {
+  it("returns empty array when no blocks have id", () => {
     const frontmatter = {
       blocks: [
-        { id: "hero", type: "hero-decision-card", props: {} },
-        { id: "how-it-works", type: "markdown", props: { heading: "How it works" } },
+        { type: "hero-decision-card", props: {} },
+        { type: "markdown", props: { heading: "How it works" } },
       ],
     };
     expect(extractBlockAnchorIds(frontmatter)).toEqual([]);
@@ -90,12 +88,9 @@ describe("extractBlockAnchorIds logic", () => {
     expect(extractBlockAnchorIds({})).toEqual([]);
   });
 
-  it("handles blocks without props", () => {
+  it("handles blocks without id", () => {
     const frontmatter = {
-      blocks: [
-        { id: "hero", type: "hero" },
-        { id: "form", props: { anchorId: "form" } },
-      ],
+      blocks: [{ type: "hero" }, { id: "form", props: {} }],
     };
     expect(extractBlockAnchorIds(frontmatter)).toEqual(["form"]);
   });
