@@ -198,7 +198,7 @@ export async function runWorkflowList(
   return {
     data: { command: "workflow.list", workflows: entries },
     exitCode: 0,
-    summary: `workflow.list: ${entries.length} workflow file(s) found`,
+    summary: `[workflow.list] ${entries.length} workflow file(s) found`,
   };
 }
 
@@ -213,7 +213,7 @@ export async function runWorkflowAmendList(
   return {
     data: { command: "workflow-amend.list", workflows: entries },
     exitCode: 0,
-    summary: `workflow-amend.list: ${entries.length} amend workflow file(s) found`,
+    summary: `[workflow-amend.list] ${entries.length} amend workflow file(s) found`,
   };
 }
 
@@ -296,7 +296,16 @@ export async function runWorkflowLint(
     exitCode: violations.length > 0 ? 1 : 0,
     summary:
       violations.length > 0
-        ? `workflow.lint: ${violations.length} violation(s)`
-        : `workflow.lint: ${workflows.length} workflow file(s) valid`,
+        ? `[workflow.lint] ${violations.length} violation(s)`
+        : `[workflow.lint] ${workflows.length} workflow file(s) valid`,
+    nextSteps:
+      violations.length > 0
+        ? [
+            {
+              action: "Fix the workflow lint violations listed above, then re-run workflow.lint",
+              kind: "required",
+            },
+          ]
+        : undefined,
   };
 }

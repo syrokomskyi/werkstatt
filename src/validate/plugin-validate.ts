@@ -50,6 +50,7 @@ export interface PluginValidateResult {
   data: PluginValidateData;
   exitCode: number;
   summary?: string;
+  nextSteps?: import("../kernel/types.ts").KernelNextStep[];
 }
 
 interface MinimalLogger {
@@ -225,7 +226,16 @@ function buildResult(
       violations,
     },
     exitCode: hasErrors ? 1 : 0,
-    summary: hasErrors ? undefined : `[werkstatt.plugin.validate] ${status}`,
+    summary: `[werkstatt.plugin.validate] ${status}`,
+    nextSteps: hasErrors
+      ? [
+          {
+            action:
+              "Fix the plugin validation errors listed above, then re-run werkstatt.plugin.validate",
+            kind: "required",
+          },
+        ]
+      : undefined,
   };
 }
 
