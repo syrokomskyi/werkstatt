@@ -274,5 +274,11 @@ export async function runSternsystemSync(
     data,
     exitCode: 0,
     summary: `[sternsystem.sync] ${id} mirrored (${direction}, branch: ${syncAll ? "*" : branchName})`,
+    nextSteps: [
+      {
+        action: `Open a mission: pnpm exec werkstatt run mission.open --system ${id} --brief "<brief>"`,
+        kind: "optional",
+      },
+    ],
   };
 }

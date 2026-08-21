@@ -277,5 +277,11 @@ export async function runHandoffPack(
   return {
     data: { bundleDir, site: siteName, fileCount: entries.length },
     summary: `[handoff.pack] ${siteName}: ${entries.length} authored files → ${bundleDir}`,
+    nextSteps: [
+      {
+        action: `Validate the bundle: pnpm exec werkstatt run handoff.validate --bundle ${bundleDir}`,
+        kind: "optional",
+      },
+    ],
   };
 }

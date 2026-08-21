@@ -851,6 +851,19 @@ export async function runLeitstandDevDeploy(
       ? `[leitstand.dev-deploy] failed at phase: ${deployResult.failingPhase}`
       : `[leitstand.dev-deploy] deployed to dev: ${deployResult.deploymentUrl}`,
     exitCode: deployResult.failingPhase ? 1 : 0,
+    nextSteps: deployResult.failingPhase
+      ? [
+          {
+            action: `Fix the failing phase (${deployResult.failingPhase}), then re-run: pnpm exec werkstatt run leitstand.dev-deploy --release ${releaseId}`,
+            kind: "required",
+          },
+        ]
+      : [
+          {
+            action: `Propagate to alt: pnpm exec werkstatt run leitstand.propagate --release ${releaseId}`,
+            kind: "optional",
+          },
+        ],
   } as unknown as KernelCommandResult<DevDeployResult>;
 }
 
@@ -1012,6 +1025,23 @@ export async function runLeitstandPropagate(
       ? `[leitstand.propagate] failed at phase: ${deployResult.failingPhase}${deployResult.errorMessage ? ` — ${deployResult.errorMessage}` : ""}`
       : `[leitstand.propagate] deployed to alt: ${deployResult.deploymentUrl}`,
     exitCode: deployResult.failingPhase ? 1 : 0,
+    nextSteps: deployResult.failingPhase
+      ? [
+          {
+            action: `Fix the failing phase (${deployResult.failingPhase}), then re-run: pnpm exec werkstatt run leitstand.propagate --release ${releaseId}`,
+            kind: "required",
+          },
+        ]
+      : [
+          {
+            action: `Certify the alt gate: pnpm exec werkstatt run leitstand.certify --release ${releaseId} --gate alt`,
+            kind: "optional",
+          },
+          {
+            action: `Promote to main: pnpm exec werkstatt run leitstand.promote --release ${releaseId} --main-verification-decision <path>`,
+            kind: "optional",
+          },
+        ],
   } as unknown as KernelCommandResult<LeitstandPropagateData>;
 }
 
@@ -1194,6 +1224,23 @@ export async function runLeitstandPromote(
       ? `[leitstand.promote] failed at phase: ${deployResult.failingPhase}`
       : `[leitstand.promote] promoted to main: ${deployResult.deploymentUrl}`,
     exitCode: deployResult.failingPhase ? 1 : 0,
+    nextSteps: deployResult.failingPhase
+      ? [
+          {
+            action: `Fix the failing phase (${deployResult.failingPhase}), then re-run: pnpm exec werkstatt run leitstand.promote --release ${releaseId} --main-verification-decision <path>`,
+            kind: "required",
+          },
+        ]
+      : [
+          {
+            action: `Verify health: pnpm exec werkstatt run leitstand.health --site ${systemId} --channel main`,
+            kind: "optional",
+          },
+          {
+            action: `Close the mission: pnpm exec werkstatt run mission.close --mission <mission-id>`,
+            kind: "optional",
+          },
+        ],
   } as unknown as KernelCommandResult<LeitstandPromoteData>;
 }
 
@@ -1289,6 +1336,12 @@ export async function runLeitstandStatus(
     data: { systemId, channels },
     summary: `[leitstand.status] ${systemId}: dev=${channels.dev?.state ?? "none"} alt=${channels.alt?.state ?? "none"} main=${channels.main?.state ?? "none"}`,
     exitCode: 0,
+    nextSteps: [
+      {
+        action: `Check pipeline state: pnpm exec werkstatt run leitstand.pipeline.check --site ${systemId}`,
+        kind: "optional",
+      },
+    ],
   };
 }
 
@@ -1440,12 +1493,24 @@ async function runSiteRollback(
         data,
         summary: `[leitstand.rollback] ${systemId}: wrangler rollback failed — ${rollbackResult.stderr.slice(-200)}`,
         exitCode: 1,
+        nextSteps: [
+          {
+            action: `Check wrangler logs and re-run: pnpm exec werkstatt run leitstand.rollback --site ${systemId}`,
+            kind: "required",
+          },
+        ],
       } as unknown as KernelCommandResult<LeitstandRollbackData>;
     }
 
     return {
       data,
       summary: `[leitstand.rollback] ${systemId}: rolled back to previous deployment`,
+      nextSteps: [
+        {
+          action: `Verify health: pnpm exec werkstatt run leitstand.health --site ${systemId} --channel ${channel}`,
+          kind: "optional",
+        },
+      ],
     } as unknown as KernelCommandResult<LeitstandRollbackData>;
   } finally {
     // Clean up temp directory
@@ -1515,6 +1580,12 @@ async function runServiceRollback(
         },
         summary: `[leitstand.rollback] ${serviceId}: wrangler rollback failed — ${wranglerResult.stderr.slice(-200)}`,
         exitCode: 1,
+        nextSteps: [
+          {
+            action: `Check wrangler logs and re-run: pnpm exec werkstatt run leitstand.rollback --service ${serviceId}`,
+            kind: "required",
+          },
+        ],
       } as unknown as KernelCommandResult<LeitstandRollbackData>;
     }
 
@@ -1537,6 +1608,12 @@ async function runServiceRollback(
         operationId,
       },
       summary: `[leitstand.rollback] ${serviceId}: rolled back to previous deployment`,
+      nextSteps: [
+        {
+          action: `Verify service health: pnpm exec werkstatt run leitstand.health --service ${serviceId}`,
+          kind: "optional",
+        },
+      ],
     } as unknown as KernelCommandResult<LeitstandRollbackData>;
   } finally {
     await releaseServiceLock(workspaceRoot, serviceId);
@@ -1719,5 +1796,11 @@ export async function runLeitstandPipelineCheck(
     },
     summary: `[leitstand.pipeline.check] release=${releaseId}: state=${releaseState} next=${determineNextStep(releaseState)}`,
     exitCode: 0,
+    nextSteps: [
+      {
+        action: determineNextStep(releaseState),
+        kind: "optional",
+      },
+    ],
   };
 }

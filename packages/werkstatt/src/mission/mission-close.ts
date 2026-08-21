@@ -912,6 +912,16 @@ export async function runMissionClose(
         bordbuchValidation: { violations: [], checked: true },
       },
       summary: `[mission.close] closed mission ${missionId}`,
+      nextSteps: [
+        {
+          action: `Prepare a release: pnpm exec werkstatt run release.prepare --mission ${missionId}`,
+          kind: "optional",
+        },
+        {
+          action: `Archive the mission: pnpm exec forge run docs.archive`,
+          kind: "optional",
+        },
+      ],
     };
   } finally {
     await releaseLock(workspaceRoot, `mission:${missionId}`);

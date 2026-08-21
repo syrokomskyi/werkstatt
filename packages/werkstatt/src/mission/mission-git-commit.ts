@@ -510,6 +510,12 @@ export async function runMissionGitCommit(
         preCommitValidation,
       },
       summary: `[mission.git.commit] ${missionId} pre-commit validation failed — fix issues before committing`,
+      nextSteps: [
+        {
+          action: `Fix the validation failures above, then re-run: pnpm exec werkstatt run mission.git.commit --mission ${missionId} --message "<msg>"`,
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -557,5 +563,11 @@ export async function runMissionGitCommit(
   return {
     data,
     summary: `[mission.git.commit] ${missionId} committed: ${commitSha.slice(0, 12)}`,
+    nextSteps: [
+      {
+        action: `Validate the mission: pnpm exec werkstatt run mission.validate --mission ${missionId}`,
+        kind: "optional",
+      },
+    ],
   };
 }

@@ -670,6 +670,27 @@ export async function runLeitstandCertify(
     },
     summary: `[leitstand.certify] gate=${gate} status=${evaluationResult.status} decision=${decisionId} output=${outputPath}`,
     exitCode: 0,
+    nextSteps:
+      evaluationResult.status === "pass"
+        ? gate === "alt"
+          ? [
+              {
+                action: `Promote to main: pnpm exec werkstatt run leitstand.promote --release ${releaseId} --main-verification-decision ${outputPath}`,
+                kind: "optional",
+              },
+            ]
+          : [
+              {
+                action: `Deployment pipeline complete. Close the mission: pnpm exec werkstatt run mission.close --mission <mission-id>`,
+                kind: "optional",
+              },
+            ]
+        : [
+            {
+              action: `Review the evaluation failures in ${outputPath}, fix the issues, then re-run: pnpm exec werkstatt run leitstand.certify --release ${releaseId} --gate ${gate}`,
+              kind: "required",
+            },
+          ],
   } as unknown as KernelCommandResult<CertifyResult>;
 }
 

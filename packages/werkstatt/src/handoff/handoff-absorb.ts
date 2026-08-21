@@ -220,6 +220,12 @@ export async function runHandoffAbsorb(
     summary: `[handoff.absorb] absorbed apps/${targetApp} — overall tier ${report.overallTier}${
       validationClean === false ? " (golden-pack drift — see report)" : ""
     }`,
+    nextSteps: [
+      {
+        action: `Validate the site: pnpm exec werkstatt run mission.validate --mission <mission-id>`,
+        kind: "optional",
+      },
+    ],
   };
 }
 

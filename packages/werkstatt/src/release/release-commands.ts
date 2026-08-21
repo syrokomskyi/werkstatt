@@ -629,6 +629,12 @@ export async function runReleasePrepare(
           buildReused,
         },
         summary: `[release.prepare] ${releaseId} prepared (snapshot diff: ${snapshotDiffVerdict}, C-surface: ${cSurfaceVerdict})`,
+        nextSteps: [
+          {
+            action: `Mark release as ready: pnpm exec werkstatt run release.ready --release ${releaseId}`,
+            kind: "required",
+          },
+        ],
       };
     } finally {
       await releaseLock(workspaceRoot, `release:${releaseId}`);
@@ -778,6 +784,12 @@ export async function runReleaseReady(
         distVerified: true,
       },
       summary: `[release.ready] ${releaseId} marked ready`,
+      nextSteps: [
+        {
+          action: `Deploy to dev: pnpm exec werkstatt run leitstand.dev-deploy --release ${releaseId}`,
+          kind: "required",
+        },
+      ],
     };
   } finally {
     await releaseLock(workspaceRoot, `release:${releaseId}`);
@@ -846,6 +858,22 @@ export async function runReleaseValidate(
       artifactPresent,
     },
     summary: `[release.validate] ${releaseId} valid (state: ${manifest.state})`,
+    nextSteps:
+      manifest.state === "prepared"
+        ? [
+            {
+              action: `Mark release as ready: pnpm exec werkstatt run release.ready --release ${releaseId}`,
+              kind: "optional",
+            },
+          ]
+        : manifest.state === "ready"
+          ? [
+              {
+                action: `Deploy to dev: pnpm exec werkstatt run leitstand.dev-deploy --release ${releaseId}`,
+                kind: "optional",
+              },
+            ]
+          : undefined,
   };
 }
 
@@ -1012,6 +1040,14 @@ export async function runReleaseStateValidate(
       summary,
     },
     summary,
+    nextSteps: hasError
+      ? [
+          {
+            action: `Fix the failing checks above, then re-run: pnpm exec werkstatt run release.state.validate --release ${firstTarget?.releaseId ?? "<release-id>"}`,
+            kind: "required",
+          },
+        ]
+      : undefined,
   };
 }
 
@@ -1323,5 +1359,13 @@ export async function runDistDeterminismValidate(
     summary: hashesMatch
       ? `[dist.determinism.validate] all ${stableResult.files.length} files are deterministic`
       : `[dist.determinism.validate] ${nonDeterministicFiles.length}/${stableResult.files.length} files are non-deterministic`,
+    nextSteps: hashesMatch
+      ? undefined
+      : [
+          {
+            action: `Review the ${nonDeterministicFiles.length} non-deterministic files listed above and add normalizers or exclude them from the build, then re-run: pnpm exec werkstatt run dist.determinism.validate --release ${releaseId ?? `<mission>`}`,
+            kind: "required",
+          },
+        ],
   };
 }

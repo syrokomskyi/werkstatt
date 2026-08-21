@@ -109,6 +109,12 @@ export async function runValidatePostbuild(
       },
       exitCode: 1,
       summary: "No dist/ found — run mission.validate first to build the site.",
+      nextSteps: [
+        {
+          action: "Run: pnpm exec werkstatt run mission.validate --mission <mission-id>",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -143,6 +149,14 @@ export async function runValidatePostbuild(
       summary: report.ok
         ? "All post-build validators passed."
         : `Post-build validation failed: ${report.timing.failedStep ?? "unknown step"}`,
+      nextSteps: report.ok
+        ? undefined
+        : [
+            {
+              action: `Fix the failing post-build validator (${report.timing.failedStep ?? "unknown"}), then re-run: pnpm exec werkstatt run validate.postbuild --site ${siteName}`,
+              kind: "required",
+            },
+          ],
     };
   }
 
@@ -213,5 +227,13 @@ export async function runValidatePostbuild(
     summary: allOk
       ? "All post-build validators passed (slow steps skipped)."
       : "Post-build validation failed.",
+    nextSteps: allOk
+      ? undefined
+      : [
+          {
+            action: `Fix the failing post-build validators above, then re-run: pnpm exec werkstatt run validate.postbuild --site ${siteName}`,
+            kind: "required",
+          },
+        ],
   };
 }

@@ -16,16 +16,35 @@ ruleId = command; diagnosticsResult takes rich Diagnostic[] with registered ids.
 </CHANGE_SUMMARY>
 */
 
-import type { CheckResult, Diagnostic, KernelCommandResult } from "@warpgogol/werkstatt/kernel";
+import type {
+  CheckResult,
+  Diagnostic,
+  KernelCommandResult,
+  KernelNextStep,
+} from "@warpgogol/werkstatt/kernel";
+
+function defaultFailNextSteps(command: string): KernelNextStep[] {
+  return [
+    {
+      action: `Fix the error diagnostics reported by ${command} above, then re-run the pipeline`,
+      kind: "required",
+    },
+  ];
+}
 
 /**
  * RFC-0203: canonical result builder. Migrated checks emit `Diagnostic[]` with
  * registered rule ids instead of bare strings. Exit code is 1 when any
  * diagnostic is an error; warnings and info do not fail the pipeline.
+ *
+ * When `nextSteps` are not provided and the result has errors, a default
+ * agent-actionable nextStep is emitted: "Fix the error diagnostics … then
+ * re-run the pipeline".
  */
 export function diagnosticsResult(
   command: string,
   diagnostics: Diagnostic[],
+  nextSteps?: KernelNextStep[],
 ): KernelCommandResult<CheckResult> {
   const summary = {
     error: diagnostics.filter((d) => d.severity === "error").length,
@@ -34,10 +53,13 @@ export function diagnosticsResult(
   };
   const status: CheckResult["status"] =
     summary.error > 0 ? "fail" : summary.warning > 0 ? "warn" : "pass";
+  const resolvedNextSteps =
+    nextSteps ?? (summary.error > 0 ? defaultFailNextSteps(command) : undefined);
   return {
     data: { command, status, diagnostics, summary },
     exitCode: summary.error > 0 ? 1 : 0,
     summary: `${command}: ${summary.error} error(s), ${summary.warning} warning(s)`,
+    nextSteps: resolvedNextSteps,
   };
 }
 
@@ -58,11 +80,16 @@ function emptySummary(): CheckResult["summary"] {
  * Canonical success result. RFC-0203: emits an empty `CheckResult` (no
  * diagnostics) rather than the legacy `{ command, status, violations }` shape.
  */
-export function passResult(command: string, summary?: string): KernelCommandResult<CheckResult> {
+export function passResult(
+  command: string,
+  summary?: string,
+  nextSteps?: KernelNextStep[],
+): KernelCommandResult<CheckResult> {
   return {
     data: { command, status: "pass", diagnostics: [], summary: emptySummary() },
     exitCode: 0,
     summary: summary ?? `${command}: OK`,
+    nextSteps,
   };
 }
 
@@ -70,10 +97,14 @@ export function passResult(command: string, summary?: string): KernelCommandResu
  * Canonical failure result — always exits 1 (preserving the historical
  * failResult contract). RFC-0203: violation strings become error Diagnostics
  * keyed by the command name.
+ *
+ * When `nextSteps` are not provided, a default agent-actionable nextStep is
+ * emitted: "Fix the error diagnostics … then re-run the pipeline".
  */
 export function failResult(
   command: string,
   violations: string[],
+  nextSteps?: KernelNextStep[],
 ): KernelCommandResult<CheckResult> {
   const diagnostics = violationsToDiagnostics(command, violations);
   return {
@@ -85,6 +116,7 @@ export function failResult(
     },
     exitCode: 1,
     summary: `${command}: ${violations.length} violation(s)`,
+    nextSteps: nextSteps ?? defaultFailNextSteps(command),
   };
 }
 
@@ -97,6 +129,7 @@ export function failResult(
 export function resultFromViolations(
   command: string,
   violations: string[],
+  nextSteps?: KernelNextStep[],
 ): KernelCommandResult<CheckResult> {
-  return violations.length > 0 ? failResult(command, violations) : passResult(command);
+  return violations.length > 0 ? failResult(command, violations, nextSteps) : passResult(command);
 }

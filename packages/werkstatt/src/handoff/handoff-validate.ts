@@ -80,6 +80,12 @@ export async function runHandoffValidate(
       data,
       exitCode: 1,
       summary: `[handoff.validate] ${problems.length} integrity problem(s)`,
+      nextSteps: [
+        {
+          action: `Fix the ${problems.length} integrity problem(s) above, then re-run: pnpm exec werkstatt run handoff.validate --bundle <bundle-dir>`,
+          kind: "required",
+        },
+      ],
     };
   }
 

@@ -75,5 +75,14 @@ export async function runMissionList(
   return {
     data: { missions, count: missions.length },
     summary: `[mission.list] ${missions.length} mission${missions.length === 1 ? "" : "s"} found`,
+    nextSteps:
+      missions.length === 0
+        ? [
+            {
+              action: `Open a mission: pnpm exec werkstatt run mission.open --system <system-id> --brief "<brief>"`,
+              kind: "optional",
+            },
+          ]
+        : undefined,
   };
 }

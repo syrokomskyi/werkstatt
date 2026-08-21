@@ -161,6 +161,15 @@ export async function runEvidenceFetch(
       data: { missionId, runs },
       exitCode: 0,
       summary: `[evidence.fetch] ${missionId}: ${runs.length} run${runs.length === 1 ? "" : "s"} available`,
+      nextSteps:
+        runs.length > 0
+          ? [
+              {
+                action: `Download a run: pnpm exec werkstatt run evidence.fetch --mission ${missionId} --run <timestamp>`,
+                kind: "optional",
+              },
+            ]
+          : undefined,
     };
   }
 

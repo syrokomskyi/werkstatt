@@ -913,6 +913,12 @@ export async function runMissionMaterialize(
           workspaceGlobCheck: { stalePackages: [], ok: true },
         },
         summary: `[mission.materialize] ${missionId} report-only: ${verdict}`,
+        nextSteps: [
+          {
+            action: `Materialize for real: pnpm exec werkstatt run mission.materialize --mission ${missionId} --skip-preflight=false`,
+            kind: "required",
+          },
+        ],
       };
     }
 
@@ -1542,6 +1548,12 @@ export async function runMissionMaterialize(
     return {
       data: report,
       summary: `[mission.materialize] ${missionId} materialized (${verdict}, green)`,
+      nextSteps: [
+        {
+          action: `Edit content in missions/${missionId}/workpiece/src/content/, then run: pnpm exec werkstatt run mission.validate --mission ${missionId}`,
+          kind: "required",
+        },
+      ],
     };
   } finally {
     await releaseLock(workspaceRoot, `mission:${missionId}`);
