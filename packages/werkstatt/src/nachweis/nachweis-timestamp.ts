@@ -124,6 +124,12 @@ export async function runNachweisTimestamp(
       },
       exitCode: 0,
       summary: `[nachweis.timestamp] ${systemId}: already timestamped '${slug}' (bordbuch: ${existingTimestamped.id})`,
+      nextSteps: [
+        {
+          action: `Approve the nachweis: pnpm exec werkstatt run nachweis.approve --site ${systemId} --slug ${slug}`,
+          kind: "optional",
+        },
+      ],
     };
   }
 
@@ -205,5 +211,11 @@ export async function runNachweisTimestamp(
     },
     exitCode: 0,
     summary: `[nachweis.timestamp] ${systemId}: timestamped '${slug}' via ${adapter.name} (bordbuch: ${bordbuchEventId})`,
+    nextSteps: [
+      {
+        action: `Approve the nachweis: pnpm exec werkstatt run nachweis.approve --site ${systemId} --slug ${slug}`,
+        kind: "optional",
+      },
+    ],
   };
 }

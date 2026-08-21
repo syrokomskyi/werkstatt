@@ -144,9 +144,7 @@ export async function runNachweisScreenshotUpload(
   const updatedContent = stringifyMarkdownFrontmatter(evidenceContent, evidenceData);
   await fs.writeFile(evidenceFile, updatedContent, "utf8");
 
-  logger.info(
-    `[nachweis.screenshot.upload] uploaded screenshot for '${slug}' to ${r2Key}`,
-  );
+  logger.info(`[nachweis.screenshot.upload] uploaded screenshot for '${slug}' to ${r2Key}`);
 
   const operationId = generateOperationId();
   await acquireLock(
@@ -200,5 +198,11 @@ export async function runNachweisScreenshotUpload(
     },
     exitCode: 0,
     summary: `[nachweis.screenshot.upload] ${systemId}: screenshot for '${slug}' uploaded (bordbuch: ${bordbuchEventId})`,
+    nextSteps: [
+      {
+        action: `Process the screenshot: pnpm exec werkstatt run nachweis.screenshot.process --site ${systemId} --slug ${slug}`,
+        kind: "optional",
+      },
+    ],
   };
 }

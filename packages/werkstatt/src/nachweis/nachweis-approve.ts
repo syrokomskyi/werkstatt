@@ -113,6 +113,12 @@ export async function runNachweisApprove(
       },
       exitCode: 0,
       summary: `[nachweis.approve] ${systemId}: DRY RUN — would approve '${slug}' (verification: ${verificationLevel}, legal: ${legalContentCheckRaw})`,
+      nextSteps: [
+        {
+          action: `Approve for real: pnpm exec werkstatt run nachweis.approve --site ${systemId} --slug ${slug}`,
+          kind: "optional",
+        },
+      ],
     };
   }
 
@@ -139,6 +145,16 @@ export async function runNachweisApprove(
         },
         exitCode: 1,
         summary: `[nachweis.approve] N3_GATE_FAILED: missing ${missing.join(", ")} Bordbuch entries for '${slug}'. Run nachweis.sign and nachweis.timestamp first.`,
+        nextSteps: [
+          {
+            action: `Sign the nachweis: pnpm exec werkstatt run nachweis.sign --site ${systemId} --slug ${slug}`,
+            kind: "required",
+          },
+          {
+            action: `Timestamp the nachweis: pnpm exec werkstatt run nachweis.timestamp --site ${systemId} --slug ${slug}`,
+            kind: "required",
+          },
+        ],
       };
     }
   }
@@ -188,5 +204,11 @@ export async function runNachweisApprove(
     },
     exitCode: 0,
     summary: `[nachweis.approve] ${systemId}: approved '${slug}' (verification: ${verificationLevel}, legal: ${legalContentCheckRaw}, bordbuch: ${bordbuchEventId})`,
+    nextSteps: [
+      {
+        action: `Publish the nachweis: pnpm exec werkstatt run nachweis.publish --site ${systemId} --slug ${slug}`,
+        kind: "optional",
+      },
+    ],
   };
 }

@@ -326,5 +326,11 @@ export async function runNachweisScreenshotProcess(
     },
     exitCode: 0,
     summary: `[nachweis.screenshot.process] ${systemId}: display variant for '${slug}' processed (bordbuch: ${bordbuchEventId})`,
+    nextSteps: [
+      {
+        action: `Upload the public derivative: pnpm exec werkstatt run nachweis.public-derivative --site ${systemId} --slug ${slug}`,
+        kind: "optional",
+      },
+    ],
   };
 }

@@ -106,6 +106,12 @@ export async function runNachweisIngest(
       },
       exitCode: 0,
       summary: `[nachweis.ingest] ${systemId}: dry-run — record ${recordId} would be ingested (sha256: ${sourceSha256.slice(0, 20)}...)`,
+      nextSteps: [
+        {
+          action: `Ingest for real: pnpm exec werkstatt run nachweis.ingest --site ${systemId} --slug ${slug}`,
+          kind: "optional",
+        },
+      ],
     };
   }
 
@@ -222,5 +228,11 @@ export async function runNachweisIngest(
     },
     exitCode: 0,
     summary: `[nachweis.ingest] ${systemId}: ingested ${recordId} (sha256: ${sourceSha256.slice(0, 20)}..., bordbuch: ${bordbuchEventId})`,
+    nextSteps: [
+      {
+        action: `Sign the nachweis: pnpm exec werkstatt run nachweis.sign --site ${systemId} --slug ${slug}`,
+        kind: "optional",
+      },
+    ],
   };
 }

@@ -145,6 +145,12 @@ export async function runNachweisSign(
       },
       exitCode: 0,
       summary: `[nachweis.sign] ${systemId}: already signed '${slug}' (bordbuch: ${existingSigned.id})`,
+      nextSteps: [
+        {
+          action: `Timestamp the nachweis: pnpm exec werkstatt run nachweis.timestamp --site ${systemId} --slug ${slug}`,
+          kind: "optional",
+        },
+      ],
     };
   }
 
@@ -160,6 +166,12 @@ export async function runNachweisSign(
       },
       exitCode: 0,
       summary: `[nachweis.sign] ${systemId}: DRY RUN — would sign '${slug}'`,
+      nextSteps: [
+        {
+          action: `Sign for real: pnpm exec werkstatt run nachweis.sign --site ${systemId} --slug ${slug}`,
+          kind: "optional",
+        },
+      ],
     };
   }
 
@@ -203,5 +215,11 @@ export async function runNachweisSign(
     },
     exitCode: 0,
     summary: `[nachweis.sign] ${systemId}: signed '${slug}' (bordbuch: ${bordbuchEventId})`,
+    nextSteps: [
+      {
+        action: `Timestamp the nachweis: pnpm exec werkstatt run nachweis.timestamp --site ${systemId} --slug ${slug}`,
+        kind: "optional",
+      },
+    ],
   };
 }

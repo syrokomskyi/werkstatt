@@ -272,5 +272,11 @@ export async function runNachweisWithdraw(
     },
     exitCode: 0,
     summary: `[nachweis.withdraw] ${systemId}: withdrawn '${slug}' (bordbuch: ${bordbuchEventIds.length} entries)`,
+    nextSteps: [
+      {
+        action: `Validate the nachweis: pnpm exec werkstatt run nachweis.validate --site ${systemId}`,
+        kind: "optional",
+      },
+    ],
   };
 }

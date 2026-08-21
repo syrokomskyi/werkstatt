@@ -487,5 +487,13 @@ export async function runNachweisValidate(
     },
     exitCode: hasViolations ? 1 : 0,
     summary: `[nachweis.validate] ${systemId}: ${slugs.size} records, ${violations.length} violations, ${publishedCount} published`,
+    nextSteps: hasViolations
+      ? [
+          {
+            action: `Fix the ${violations.length} violation(s) above, then re-run: pnpm exec werkstatt run nachweis.validate --site ${systemId}`,
+            kind: "required",
+          },
+        ]
+      : undefined,
   };
 }
