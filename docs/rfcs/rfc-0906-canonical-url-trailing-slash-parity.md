@@ -8,8 +8,9 @@ owners:
   - architecture
 reviewers:
   - human:andrii-syrokomskyi
-createdAt: 2026-08-22
+createdAt: 2026-08-21
 updatedAt: 2026-08-22
+enhancedAt: 2026-08-22
 implementedAt:
 closedAt:
 supersedes: []
@@ -22,6 +23,7 @@ related:
   - RFC-0317
   - RFC-0898
   - RFC-0160
+  - RFC-0163
   - RFC-0904
 satisfies:
   - DNA-85
@@ -48,6 +50,7 @@ nonGoals:
   - "Do not validate canonical domain origin — that is owned by seo.domain.validate (RFC-0898)"
   - "Do not validate hreflang href origins — that is owned by seo.domain.validate (RFC-0898)"
   - "Do not validate cross-language link consistency — that is owned by seo.cross-lang-links.validate (RFC-0898)"
+  - "Do not validate JSON-LD WebPage.url trailing-slash parity — that is owned by jsonld.url.validate (RFC-0163), which checks WebPage.url pathname against the canonical href. After the runtime fix, the canonical href matches canonicalPageUrl, so WebPage.url inherits trailing-slash correctness transitively. seo.domain.validate (RFC-0898) checks JSON-LD url origins. No separate CANON-HTML rule for JSON-LD url is needed."
 ---
 
 # RFC-0906: Canonical URL trailing-slash parity between HTML and sitemap
@@ -193,6 +196,11 @@ interface CanonicalHtmlParityResult {
 //   expected canonical set built from system.md.
 //   This is a subset of CANON-HTML-01 but integrated into canonical.url.validate
 //   because the expected canonical set is already built in that command.
+//   Severity rationale: CANON-04 checks set membership (is the URL in the
+//   expected set?), which is a weaker check than CANON-HTML-01 (exact per-page
+//   equality against canonicalPageUrl output). A set membership failure may
+//   be a false alarm for edge-case routes not yet in the manifest, while an
+//   exact equality failure is always a real mismatch. Hence warning vs error.
 //
 // Implementation: after the existing CANON-01..03 checks, walk dist/client/**/*.html,
 // extract <link rel="canonical"> hrefs, and check each against expectedUrls.
