@@ -14,6 +14,7 @@
   <item>RFC-0842: add leitstand.pipeline.check command for release pipeline state inspection.</item>
   <item>RFC-0866: add leitstand.certify command; add --gate-decision, --candidate-id, --artifact-hash flags to dev-deploy, propagate, promote.</item>
   <item>Fix description flags for dev-deploy, propagate, promote to include --site (KERNEL-FLAG-06).</item>
+  <item>RFC-0899: add leitstand.access.protect, unprotect, status commands for dev/alt subdomain PIN access protection.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -388,6 +389,84 @@ export function createLeitstandModule(): KernelModule {
         writes: ["services/registry.yaml"],
         reads: ["services/registry.yaml", "services/{service}/**"],
         execute: runLeitstandServicePromote,
+      });
+
+      const { runLeitstandAccessProtect, runLeitstandAccessUnprotect, runLeitstandAccessStatus } =
+        await import("./access-commands.ts");
+      registry.registerCommand({
+        name: "leitstand.access.protect",
+        description:
+          "RFC-0899: Set ACCESS_PIN secret on dev and alt channel Workers for Basic Auth access protection. Flags: --site, [--pin].",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        flags: {
+          site: {
+            kind: "string",
+            required: true,
+            description: "Sternsystem id.",
+          },
+          system: {
+            kind: "string",
+            description: "Alias for --site.",
+          },
+          pin: {
+            kind: "string",
+            description: "4-digit PIN. Auto-generated if omitted.",
+          },
+        },
+        writes: ["systems-cache/{system}/system-state.yaml"],
+        reads: [
+          "systems-cache/{system}/system-config.yaml",
+          "systems-cache/{system}/system-state.yaml",
+        ],
+        execute: runLeitstandAccessProtect,
+      });
+      registry.registerCommand({
+        name: "leitstand.access.unprotect",
+        description:
+          "RFC-0899: Remove ACCESS_PIN secret from dev and alt channel Workers. Flags: --site.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        flags: {
+          site: {
+            kind: "string",
+            required: true,
+            description: "Sternsystem id.",
+          },
+          system: {
+            kind: "string",
+            description: "Alias for --site.",
+          },
+        },
+        writes: ["systems-cache/{system}/system-state.yaml"],
+        reads: [
+          "systems-cache/{system}/system-config.yaml",
+          "systems-cache/{system}/system-state.yaml",
+        ],
+        execute: runLeitstandAccessUnprotect,
+      });
+      registry.registerCommand({
+        name: "leitstand.access.status",
+        description:
+          "RFC-0899: Report access protection status (PIN set or not) for a Sternsystem. Flags: --site.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: false,
+        flags: {
+          site: {
+            kind: "string",
+            required: true,
+            description: "Sternsystem id.",
+          },
+          system: {
+            kind: "string",
+            description: "Alias for --site.",
+          },
+        },
+        reads: ["systems-cache/{system}/system-state.yaml"],
+        execute: runLeitstandAccessStatus,
       });
     },
   };
