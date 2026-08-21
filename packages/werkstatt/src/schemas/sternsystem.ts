@@ -140,6 +140,12 @@ export const systemStateSchema = z.object({
       main: lastPropagatedChannelSchema.optional(),
     })
     .default({}),
+  // RFC-0899: 4-digit PIN for dev/alt subdomain access protection. Null when not set.
+  accessPin: z
+    .string()
+    .regex(/^\d{4}$/, "accessPin must be a 4-digit numeric string")
+    .nullable()
+    .default(null),
 });
 
 export const servicesRegistrySchema = z.object({
