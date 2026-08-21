@@ -534,5 +534,9 @@
       <change-type>RFC-0893 Icon reference validation for VendorIconConfig in content</change-type>
       <expectation>Run `pnpm --filter @warpgogol/werkstatt-site build:check` and `pnpm --filter @warpgogol/werkstatt-site exec vitest run src/checks/tests/icon-references.test.ts`; verify `icon.references.validate` command is registered via `pnpm exec werkstatt run icon.references.validate --site <id> --json`; verify ICON-REF-01 is emitted for missing icons, ICON-REF-02 for empty icons/gen/ directory, ICON-REF-03 for malformed configs; verify the command runs in `SITES_CHECK_AUTHOR_PIPELINE` via `pnpm exec werkstatt run sites-check.author --site <id>`.</expectation>
     </entry>
+    <entry id="vm-39">
+      <change-type>RFC-0898 Canonical URL hardening and cross-language link validator</change-type>
+      <expectation>Run `pnpm --filter @warpgogol/werkstatt-site build:check` and `pnpm --filter @warpgogol/werkstatt-site exec vitest run src/checks/tests/seo-domain.test.ts src/checks/tests/seo-cross-lang-links.test.ts`; verify `seo.domain.validate` and `seo.cross-lang-links.validate` are registered via `pnpm exec werkstatt run seo.domain.validate --site <id> --json` and `pnpm exec werkstatt run seo.cross-lang-links.validate --site <id> --json`; verify SEO-DOMAIN-01..05 and SEO-XLANG-01 rules; verify both validators run in `SITES_CHECK_POSTBUILD_PIPELINE` after `canonical.url.validate`; verify page templates pass `canonicalUrl={data.semanticPage?.url}` to BaseLayout without `Astro.url.origin` fallback.</expectation>
+    </entry>
   </change-validation-matrix>
 </verification-plan>
