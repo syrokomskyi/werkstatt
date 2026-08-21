@@ -17,6 +17,7 @@ managed by this command.
 <CHANGE_SUMMARY>
   <item>RFC-0896: initial customdomain.register command handler.</item>
   <item>Fix: filter by type=A when searching existing records so MX/TXT records for the same domain name do not block A record creation.</item>
+  <item>Fix: handle Cloudflare error 81062 (DNS record managed by Workers already exists) as idempotent success — listDnsRecords does not return Workers-managed records.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -106,16 +107,34 @@ export async function runCustomdomainRegister(
       );
     }
   } else {
-    const created = await createDnsRecord(zoneId, apiToken, expectedDnsRecord);
-    dnsCreated = true;
-    dnsResult = {
-      id: created.id,
-      type: "A",
-      name: created.name,
-      content: created.content,
-      proxied: true,
-      created: true,
-    };
+    try {
+      const created = await createDnsRecord(zoneId, apiToken, expectedDnsRecord);
+      dnsCreated = true;
+      dnsResult = {
+        id: created.id,
+        type: "A",
+        name: created.name,
+        content: created.content,
+        proxied: true,
+        created: true,
+      };
+    } catch (err) {
+      // Cloudflare error 81062: "A DNS record managed by Workers already exists on that host."
+      // listDnsRecords does not return Workers-managed records — treat as idempotent success.
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes("81062")) {
+        dnsResult = {
+          id: "workers-managed",
+          type: "A",
+          name: apexDomain,
+          content: expectedDnsRecord.content,
+          proxied: true,
+          created: false,
+        };
+      } else {
+        throw err;
+      }
+    }
   }
 
   const existingRoutes = await listWorkersRoutes(zoneId, apiToken);
