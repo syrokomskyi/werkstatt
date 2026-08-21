@@ -10,8 +10,8 @@ policy:
   siteIdSource: provisioning
   noSecrets: true
 sites:
-  - appId: warpgogol-com
-    clientSemanticId: warpgogol-com
+  - appId: warpgogol
+    clientSemanticId: warpgogol
     siteId: "1"
     matomoCloudHost: warpgogol.matomo.cloud
     status: active
