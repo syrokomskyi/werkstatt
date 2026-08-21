@@ -28,3 +28,32 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from `w
 - Package is published as `@warpgogol/werkstatt-shared` with `access: public`.
 - `prepublishOnly` runs typecheck before publish.
 - Publication is operator-triggered via repo-extract (RFC-0773). See `extract.config.yaml` and `docs/authoring/publication-runbook.md`.
+
+## Canonical utilities
+
+### Slug generation (RFC-0915, DNA-88)
+
+Location: `packages/werkstatt-shared/src/share/slug/` — exported via `@warpgogol/werkstatt-shared/share/slug`.
+
+| Export | Purpose |
+| --- | --- |
+| `slugUrl(text, lang?)` | Locale-aware URL slug (German umlauts, Ukrainian transliteration, default) |
+| `slugId(text)` | Semantic block ID slug (replaces custom NFKD slugify) |
+| `HeadingSlugger` | Stateful heading anchor deduplication (wraps github-slugger) |
+
+Rules:
+
+- Agents MUST import slug utilities from `@warpgogol/werkstatt-shared/share/slug` and MUST NOT reimplement slugify logic.
+- The external packages `@sindresorhus/slugify`, `cyrillic-to-translit-js`, and `github-slugger` are dependencies of this package only — no other package may declare them as direct dependencies.
+- Enforcement: `utility.provenance.validate` (RFC-0916) scans for reimplementations outside the canonical path.
+
+### Utility registry (RFC-0916)
+
+Location: `packages/werkstatt-shared/src/share/utility-registry.yaml`
+
+To add a new canonical utility:
+
+1. Implement the utility in `packages/werkstatt-shared/src/share/<name>/`
+2. Add a subpath export to `packages/werkstatt-shared/package.json`
+3. Add an entry to `utility-registry.yaml` with `id`, `canonicalPath`, `forbiddenImports`, `functionNames`, `patterns`, and `allowlist`
+4. Document the utility in this AGENTS.md section
