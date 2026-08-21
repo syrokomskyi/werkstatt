@@ -1,7 +1,7 @@
 ---
 id: RFC-0901
 title: "Cross-locale structural parity validation for translated content"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
