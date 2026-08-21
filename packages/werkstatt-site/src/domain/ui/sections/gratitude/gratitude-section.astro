@@ -66,18 +66,22 @@ if (testimonials.length === 0) {
   return;
 }
 
-const evidenceSourceEntries = await getCollection(
-  "business-profile",
-  (entry: CollectionEntry<"business-profile">) =>
-    entry.id.startsWith(`${lang}/`) &&
-    (entry.data as { type?: string }).type === "evidence-source",
-);
+const hasEvidenceRefs = testimonials.some((t) => t.evidenceRef);
 
 const evidenceSlugById = new Map<string, string>();
-for (const entry of evidenceSourceEntries) {
-  const data = entry.data as { id?: string; slug?: string };
-  if (data.id && data.slug) {
-    evidenceSlugById.set(data.id, data.slug);
+if (hasEvidenceRefs) {
+  const evidenceSourceEntries = await getCollection(
+    "business-profile",
+    (entry: CollectionEntry<"business-profile">) =>
+      entry.id.startsWith(`${lang}/`) &&
+      (entry.data as { type?: string }).type === "evidence-source",
+  );
+
+  for (const entry of evidenceSourceEntries) {
+    const data = entry.data as { id?: string; slug?: string };
+    if (data.id && data.slug) {
+      evidenceSlugById.set(data.id, data.slug);
+    }
   }
 }
 
@@ -120,9 +124,7 @@ function resolveEvidenceLink(evidenceRef?: string): string | null {
             <span class="gratitude-card__quote-mark" aria-hidden="true">
               &ldquo;
             </span>
-            <blockquote class="gratitude-card__quote">
-              {testimonial.quote}
-            </blockquote>
+            <blockquote class="gratitude-card__quote">{testimonial.quote}</blockquote>
             <footer class="gratitude-card__author">
               <span class="gratitude-card__author-name">{testimonial.authorName}</span>
               {testimonial.authorRole && (
