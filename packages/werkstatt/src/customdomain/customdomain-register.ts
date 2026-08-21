@@ -3,16 +3,20 @@
 <purpose>
 RFC-0896: customdomain.register command handler — registers a proxied A record
 and Workers route for a site's apex domain via the Cloudflare API. Idempotent:
-skips existing correct records, errors on mismatched records.
+skips existing correct records, errors on mismatched A records. Coexists with
+non-A records (MX, TXT, etc.) for the same domain name — only A records are
+managed by this command.
 </purpose>
 <non-goals>
-  <item>Do not auto-update mismatched DNS records or Workers routes — operator must fix manually.</item>
+  <item>Do not auto-update mismatched A DNS records or Workers routes — operator must fix manually.</item>
+  <item>Do not modify or delete non-A records (MX, TXT, etc.) — those are managed by dns.record.upsert.</item>
   <item>Do not handle DNS propagation waiting — that is out of scope.</item>
   <item>Do not handle www subdomain — that is redirect.register's responsibility.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0896: initial customdomain.register command handler.</item>
+  <item>Fix: filter by type=A when searching existing records so MX/TXT records for the same domain name do not block A record creation.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -76,13 +80,15 @@ export async function runCustomdomainRegister(
   const expectedRoutePattern = buildApexRoutePattern(apexDomain);
 
   const existingDnsRecords = await listDnsRecords(zoneId, apiToken, apexDomain);
-  const matchingDns = existingDnsRecords.find((r) => r.name === apexDomain);
+  // Only look for A records — MX, TXT, and other record types for the same
+  // domain name can coexist with the proxied A record and are not managed here.
+  const matchingDns = existingDnsRecords.find((r) => r.name === apexDomain && r.type === "A");
 
   let dnsResult: CustomDomainRegisterResult["dnsRecord"];
   let dnsCreated = false;
 
   if (matchingDns) {
-    if (matchingDns.type === "A" && matchingDns.proxied === true) {
+    if (matchingDns.proxied === true) {
       dnsResult = {
         id: matchingDns.id,
         type: "A",
@@ -93,10 +99,10 @@ export async function runCustomdomainRegister(
       };
     } else {
       throw new Error(
-        `[customdomain.register] DNS record for '${apexDomain}' exists but has wrong values. ` +
-          `Current: type=${matchingDns.type}, content=${matchingDns.content}, proxied=${matchingDns.proxied}. ` +
-          `Expected: type=A, proxied=true (content is a proxied placeholder). ` +
-          `Delete or fix the record manually before re-running.`,
+        `[customdomain.register] A record for '${apexDomain}' exists but is not proxied. ` +
+          `Current: proxied=${matchingDns.proxied}. ` +
+          `Expected: proxied=true. ` +
+          `Enable Cloudflare proxy on the A record manually before re-running.`,
       );
     }
   } else {

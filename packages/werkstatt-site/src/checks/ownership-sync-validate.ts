@@ -139,7 +139,10 @@ export async function runOwnershipSyncValidate(
       severity: "error",
       file: relToSite,
       message: OWN_01_MESSAGE,
-      fixHint: `Add this file to GENERATOR_OWNERSHIP_MAP or remove it: git rm ${relToSite}`,
+      fixHint:
+        `Add this file to GENERATOR_OWNERSHIP_MAP, remove it (git rm ${relToSite}), ` +
+        `or if it is an authored static asset, add the directory to STATIC_ASSET_EXEMPT_DIRS ` +
+        `in generated-stale-validate.ts (current exempt dirs: ${STATIC_ASSET_EXEMPT_DIRS.join(", ")}).`,
     });
   }
 

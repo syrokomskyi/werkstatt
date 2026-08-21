@@ -43,6 +43,7 @@ import { runDiagnosticShapeLint } from "../diagnostic-shape-lint.ts";
 import { runWarningDiagnosticsLint } from "../warning-diagnostics-lint.ts";
 import { runKernelFlagsLint } from "../kernel-flags-lint.ts";
 import { runKernelIoLint } from "../kernel-io-lint.ts";
+import { runCloudflareWorkersImportLint } from "../cloudflare-workers-import-lint.ts";
 import { runCheckFixtureLint } from "../check-fixture-lint.ts";
 import { runCommandArgsValidate } from "../command-args-validate.ts";
 import { runPipelineLogHygieneValidate } from "../pipeline/pipeline-log-hygiene.ts";
@@ -194,6 +195,23 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     reads: ["packages/os/site-kernel-checks/src/**/*.ts", "packages/os/site-kernel/src/**/*.ts"],
     execute: runKernelIoLint,
   },
+  {
+    name: "cloudflare.workers.import.lint",
+    description:
+      'Static lint (CF-IMPORT-01): forbids static import from "cloudflare:workers" in packages source files. ' +
+      "The cloudflare:workers module is only available in the Cloudflare Workers runtime — a static import " +
+      "causes ERR_UNSUPPORTED_ESM_URL_SCHEME during Astro SSR build. Use dynamic import() in a try/catch instead.",
+    scope: "workspace",
+    supportsAllSites: true,
+    cacheable: false,
+    flags: {},
+    reads: [
+      "packages/werkstatt-site/src/**/*.ts",
+      "packages/werkstatt-site/src/**/*.astro",
+      "packages/werkstatt-shared/src/**/*.ts",
+    ],
+    execute: runCloudflareWorkersImportLint,
+  },
   /* RFC-0610 */
   {
     name: "command.args.validate",
@@ -328,7 +346,10 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
       },
     },
     supportsAllSites: true,
-    reads: ["<app>/src/pages/**/*.astro", "packages/werkstatt-site/src/domain/ui/sections/navigation-section/**/*.astro"],
+    reads: [
+      "<app>/src/pages/**/*.astro",
+      "packages/werkstatt-site/src/domain/ui/sections/navigation-section/**/*.astro",
+    ],
     modulePaths: ["structure-hierarchy.ts"],
     execute: runStructureHierarchyValidate,
   },

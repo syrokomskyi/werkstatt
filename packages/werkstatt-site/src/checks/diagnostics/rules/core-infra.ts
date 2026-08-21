@@ -172,6 +172,13 @@ export const CORE_INFRA_RULES: Record<string, RuleDescriptor> = {
     "kernel.io.lint",
   ),
 
+  // cloudflare.workers.import.lint — prevents ERR_UNSUPPORTED_ESM_URL_SCHEME during Astro build.
+  "CF-IMPORT-01": rule(
+    "CF-IMPORT-01",
+    "Static import from cloudflare:workers — use dynamic import() in a try/catch instead",
+    "cloudflare.workers.import.lint",
+  ),
+
   // RFC-0303: shared fs/text helper dedup + oversized-file guard rails.
   "WALK-01": rule(
     "WALK-01",
