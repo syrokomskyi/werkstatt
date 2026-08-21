@@ -1,7 +1,7 @@
 ---
 id: RFC-0906
 title: "Canonical URL trailing-slash parity between HTML and sitemap"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -9,9 +9,9 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-21
-updatedAt: 2026-08-22
+updatedAt: 2026-08-21
 enhancedAt: 2026-08-22
-implementedAt:
+implementedAt: 2026-08-21
 closedAt:
 supersedes: []
 supersededBy:
