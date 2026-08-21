@@ -74,7 +74,13 @@ export async function runGitMeshVerify(
         diagnostics: ["gitmesh.verify: no werkstatt.gitmesh.json found — run gitmesh.sync first"],
       },
       exitCode: 1,
-      summary: "gitmesh.verify: no werkstatt.gitmesh.json found — run gitmesh.sync first",
+      summary: "[gitmesh.verify] no werkstatt.gitmesh.json found — run gitmesh.sync first",
+      nextSteps: [
+        {
+          action: "Run gitmesh.sync first to configure gitmesh, then re-run gitmesh.verify",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -95,7 +101,13 @@ export async function runGitMeshVerify(
         ],
       },
       exitCode: 1,
-      summary: `gitmesh.verify: no ${IDENTITY_FILENAME} found — cannot verify signatures without operator public key`,
+      summary: `[gitmesh.verify] no ${IDENTITY_FILENAME} found — cannot verify signatures without operator public key`,
+      nextSteps: [
+        {
+          action: "Run identity.bootstrap first (RFC-0558), then re-run gitmesh.verify",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -110,7 +122,13 @@ export async function runGitMeshVerify(
         diagnostics: [`gitmesh.verify: ${IDENTITY_FILENAME} contains no public keys`],
       },
       exitCode: 1,
-      summary: `gitmesh.verify: ${IDENTITY_FILENAME} contains no public keys`,
+      summary: `[gitmesh.verify] ${IDENTITY_FILENAME} contains no public keys`,
+      nextSteps: [
+        {
+          action: `Add public keys to ${IDENTITY_FILENAME}, then re-run gitmesh.verify`,
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -126,7 +144,13 @@ export async function runGitMeshVerify(
         diagnostics: ["gitmesh.verify: cannot resolve HEAD — not a git repository?"],
       },
       exitCode: 1,
-      summary: "gitmesh.verify: cannot resolve HEAD — not a git repository?",
+      summary: "[gitmesh.verify] cannot resolve HEAD — not a git repository?",
+      nextSteps: [
+        {
+          action: "Ensure the workspace is a git repository, then re-run gitmesh.verify",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -189,9 +213,17 @@ export async function runGitMeshVerify(
     },
     exitCode: verified ? 0 : 1,
     summary:
-      `gitmesh.verify: ${totalCommits} commit(s) checked, ${signedCommits} signed, ${unsignedCommits} unsigned, ${invalidSignatures} invalid` +
+      `[gitmesh.verify] ${totalCommits} commit(s) checked, ${signedCommits} signed, ${unsignedCommits} unsigned, ${invalidSignatures} invalid` +
       (lastVerifiedSha
         ? ` (incremental from ${lastVerifiedSha.slice(0, 8)})`
         : " (full verification)"),
+    nextSteps: verified
+      ? undefined
+      : [
+          {
+            action: "Review the unsigned/invalid commits listed above, then re-run gitmesh.verify",
+            kind: "required",
+          },
+        ],
   };
 }

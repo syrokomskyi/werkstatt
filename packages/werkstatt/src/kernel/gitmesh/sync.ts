@@ -99,7 +99,13 @@ export async function runGitMeshSync(
           diagnostics: ["gitmesh.sync: no remotes configured in werkstatt.gitmesh.json"],
         },
         exitCode: 1,
-        summary: "gitmesh.sync: no remotes configured",
+        summary: "[gitmesh.sync] no remotes configured",
+        nextSteps: [
+          {
+            action: "Configure remotes in werkstatt.gitmesh.json and re-run gitmesh.sync",
+            kind: "required",
+          },
+        ],
       };
     }
 
@@ -119,7 +125,10 @@ export async function runGitMeshSync(
           ],
         },
         exitCode: 1,
-        summary: "gitmesh.sync: clone corruption detected (git fsck failed)",
+        summary: "[gitmesh.sync] clone corruption detected (git fsck failed)",
+        nextSteps: [
+          { action: "Re-clone from a trusted remote, then re-run gitmesh.sync", kind: "required" },
+        ],
       };
     }
 
@@ -137,7 +146,10 @@ export async function runGitMeshSync(
           diagnostics: ["gitmesh.sync: uncommitted local changes — commit or stash before sync"],
         },
         exitCode: 1,
-        summary: "gitmesh.sync: uncommitted local changes — commit or stash before sync",
+        summary: "[gitmesh.sync] uncommitted local changes — commit or stash before sync",
+        nextSteps: [
+          { action: "Commit or stash local changes, then re-run gitmesh.sync", kind: "required" },
+        ],
       };
     }
 
@@ -170,7 +182,13 @@ export async function runGitMeshSync(
           diagnostics: warnings.map((w) => `gitmesh.sync: ${w}`),
         },
         exitCode: 1,
-        summary: `gitmesh.sync: all remotes unreachable (${warnings.join(", ")})`,
+        summary: `[gitmesh.sync] all remotes unreachable (${warnings.join(", ")})`,
+        nextSteps: [
+          {
+            action: "Check network connectivity and remote availability, then re-run gitmesh.sync",
+            kind: "required",
+          },
+        ],
       };
     }
 
@@ -197,7 +215,13 @@ export async function runGitMeshSync(
           ],
         },
         exitCode: 1,
-        summary: `gitmesh.sync: non-fast-forward detected (force-push on ${latest.remote}?) — manual reset required`,
+        summary: `[gitmesh.sync] non-fast-forward detected (force-push on ${latest.remote}?) — manual reset required`,
+        nextSteps: [
+          {
+            action: `Manual reset required — force-push detected on ${latest.remote}. Reset HEAD and re-run gitmesh.sync`,
+            kind: "required",
+          },
+        ],
       };
     }
 
@@ -238,7 +262,14 @@ export async function runGitMeshSync(
             ],
           },
           exitCode: 1,
-          summary: `gitmesh.sync: signature verification failed (${signaturesFailed} invalid) — HEAD not advanced`,
+          summary: `[gitmesh.sync] signature verification failed (${signaturesFailed} invalid) — HEAD not advanced`,
+          nextSteps: [
+            {
+              action:
+                "Review the invalid signatures, remove untrusted commits, then re-run gitmesh.sync",
+              kind: "required",
+            },
+          ],
         };
       }
     }
@@ -261,7 +292,7 @@ export async function runGitMeshSync(
       },
       exitCode: 0,
       summary:
-        `gitmesh.sync: received ${commitsToReceive.length} commit(s) from ${latest.remote}` +
+        `[gitmesh.sync] received ${commitsToReceive.length} commit(s) from ${latest.remote}` +
         (warnings.length > 0 ? `, warnings: ${warnings.join(", ")}` : ""),
     };
   } finally {
