@@ -63,7 +63,7 @@ export function ok(command: string): KernelCommandResult<CheckResult> {
   return {
     exitCode: 0,
     data: { command, status: "ok", violations: [] },
-    summary: `OK - ${command}`,
+    summary: `[${command}] OK`,
   };
 }
 
@@ -71,7 +71,13 @@ export function fail(command: string, violations: Violation[]): KernelCommandRes
   return {
     exitCode: 1,
     data: { command, status: "fail", violations },
-    summary: `FAIL - ${command} (${violations.length} violation${violations.length === 1 ? "" : "s"})`,
+    summary: `[${command}] FAIL (${violations.length} violation${violations.length === 1 ? "" : "s"})`,
+    nextSteps: [
+      {
+        action: `Fix the ${violations.length} violation(s) for ${command}, then re-run`,
+        kind: "required",
+      },
+    ],
   };
 }
 

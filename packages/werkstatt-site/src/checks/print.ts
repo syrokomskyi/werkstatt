@@ -48,7 +48,10 @@ export async function runPrintContractValidate(
   if (!app) {
     return {
       exitCode: 1,
-      summary: "This command must be run inside an app context.",
+      summary: "[print.contract.validate] This command must be run inside an app context.",
+      nextSteps: [
+        { action: "Run this command from within a site mission context", kind: "required" },
+      ],
     };
   }
 
@@ -63,7 +66,14 @@ export async function runPrintContractValidate(
   } catch {
     return {
       exitCode: 1,
-      summary: "Failed to load system manifest.",
+      summary: "[print.contract.validate] Failed to load system manifest.",
+      nextSteps: [
+        {
+          action:
+            "Ensure src/content/system.md exists and is valid, then re-run print.contract.validate",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -207,8 +217,15 @@ export async function runPrintContractValidate(
   if (errors.length > 0) {
     return {
       exitCode: 1,
-      summary: `${errors.length} contract violation${errors.length === 1 ? "" : "s"} found.`,
+      summary: `[print.contract.validate] ${errors.length} contract violation${errors.length === 1 ? "" : "s"} found.`,
       data: { violations },
+      nextSteps: [
+        {
+          action:
+            "Fix the print contract violations listed above, then re-run print.contract.validate",
+          kind: "required",
+        },
+      ],
     };
   }
 
@@ -216,8 +233,8 @@ export async function runPrintContractValidate(
     exitCode: 0,
     summary:
       warnings.length > 0
-        ? `No errors. ${warnings.length} warning${warnings.length === 1 ? "" : "s"}.`
-        : "No print contract violations found.",
+        ? `[print.contract.validate] No errors. ${warnings.length} warning${warnings.length === 1 ? "" : "s"}.`
+        : "[print.contract.validate] No print contract violations found.",
     data: violations.length > 0 ? { violations } : undefined,
   };
 }
@@ -234,7 +251,10 @@ export async function runPrintLayoutValidate(
   if (!app) {
     return {
       exitCode: 1,
-      summary: "This command must be run inside an app context.",
+      summary: "[print.layout.validate] This command must be run inside an app context.",
+      nextSteps: [
+        { action: "Run this command from within a site mission context", kind: "required" },
+      ],
     };
   }
 
@@ -290,14 +310,20 @@ export async function runPrintLayoutValidate(
   if (errors.length > 0) {
     return {
       exitCode: 1,
-      summary: `${errors.length} print layout violation${errors.length === 1 ? "" : "s"} found.`,
+      summary: `[print.layout.validate] ${errors.length} print layout violation${errors.length === 1 ? "" : "s"} found.`,
       data: { violations },
+      nextSteps: [
+        {
+          action: "Fix the print layout violations listed above, then re-run print.layout.validate",
+          kind: "required",
+        },
+      ],
     };
   }
 
   return {
     exitCode: 0,
-    summary: "No print layout violations found.",
+    summary: "[print.layout.validate] No print layout violations found.",
   };
 }
 
