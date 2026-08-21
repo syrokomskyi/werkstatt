@@ -8,8 +8,9 @@ owners:
   - architecture
 reviewers:
   - human:andrii-syrokomskyi
-createdAt: 2026-08-22
+createdAt: 2026-08-21
 updatedAt: 2026-08-22
+enhancedAt: 2026-08-22
 implementedAt:
 closedAt:
 supersedes: []
@@ -33,7 +34,6 @@ commands:
 appsImpacted: []
 packagesImpacted:
   - "@warpgogol/werkstatt-site"
-  - "@warpgogol/werkstatt-shared"
 liveSpec: true
 successSignals:
   - "sitemap.placeholder.validate detects unresolved [slug], [version], or other bracket placeholders in sitemap XML files"
@@ -83,13 +83,13 @@ The kernel gains two new post-build validators:
    - Indexable pages missing from the sitemap (SITEMAP-COV-01).
    - Sitemap URLs that do not correspond to any indexable page (SITEMAP-COV-02, warning — may be intentionally included non-indexable pages).
 
-Both validators are integrated into `SITES_CHECK_POSTBUILD_PIPELINE` after `canonical.url.validate`.
+Both validators are integrated into `SITES_CHECK_POSTBUILD_PIPELINE` after `dist.sitemap.images.validate`, grouping all sitemap-related validators together.
 
 ## Architectural fit
 
 **Architecture DNA:**
 
-- **DNA-58** (Generated-file content determinism) — extends to sitemap integrity: the sitemap MUST contain exactly the indexable pages declared in `system.md`, with fully expanded URLs (no placeholders). Unresolved placeholders and coverage gaps are determinism violations.
+- **DNA-58** (Generated-file content determinism) — complements sitemap integrity: the sitemap MUST contain exactly the indexable pages declared in `system.md`, with fully expanded URLs (no placeholders). Unresolved placeholders and coverage gaps are determinism violations. This RFC does not establish a new DNA invariant; it enforces existing DNA-58 principles for sitemap files specifically.
 
 **Existing RFCs:**
 
@@ -138,6 +138,9 @@ interface SitemapPlaceholderResult {
 
 // Logic:
 // 1. Glob dist/client/sitemap*.xml (includes sitemap.xml index and sub-sitemaps)
+//    Note: most postbuild validators read from dist/client/ (e.g. seo.technical.validate,
+//    robots.page.validate). canonical.url.validate reads from public/ — this is the
+//    exception, not the convention. These validators follow the majority dist/client/ convention.
 // 2. For each sitemap file:
 //    a. Parse XML, extract all <loc> URLs
 //    b. For each URL, check for bracket placeholder pattern: /\[[a-zA-Z0-9_-]+\]/
@@ -158,7 +161,9 @@ interface SitemapCoverageResult {
 // Rules:
 // SITEMAP-COV-01 (indexable page missing from sitemap) — severity: error
 //   A page declared in system.md with indexable: true (and not excluded via
-//   output.sitemap: false) is not found in any sitemap XML file.
+//   output.sitemap: false or output.sitemap: { include: false }) is not found
+//   in any sitemap XML file. Both boolean and object forms of output.sitemap
+//   exclusion are handled (see isSitemapExcluded in routes/registry.ts).
 // SITEMAP-COV-02 (sitemap URL not in expected indexable set) — severity: warning
 //   A URL in a sitemap XML file does not correspond to any indexable page
 //   declared in system.md. May be intentionally included (e.g., special pages).
@@ -166,6 +171,7 @@ interface SitemapCoverageResult {
 // Logic:
 // 1. Load system.md manifest, build expected indexable URL set:
 //    For each page with routes and not excluded via output.sitemap:
+//      (exclusion check: output.sitemap === false OR output.sitemap.include === false)
 //      For each lang in routes:
 //        expectedUrls.add(canonicalPageUrl({ lang, route: slug, kind: "html" }, canonicalOpts))
 // 2. Parse all sitemap*.xml files, collect all sitemap URLs into a Set
@@ -269,15 +275,21 @@ Both commands use `diagnosticsResult` from `@warpgogol/werkstatt-shared/checks/r
 
 **New apps:** Automatically compliant — the validators run in `SITES_CHECK_POSTBUILD_PIPELINE`.
 
-**Pipeline integration:** Both commands are added to `SITES_CHECK_POSTBUILD_PIPELINE` after `canonical.url.validate` and before `robots.page.validate`:
+**Pipeline integration:** Both commands are added to `SITES_CHECK_POSTBUILD_PIPELINE` after `dist.sitemap.images.validate`, grouping all sitemap-related validators together:
 
 ```
+robots.page.validate
+feed.validate
 canonical.url.validate
-canonical.html-parity.validate    (RFC-0906)
+seo.domain.validate
+seo.cross-lang-links.validate
+dist.sitemap.images.validate
 sitemap.placeholder.validate      ← NEW
 sitemap.coverage.validate         ← NEW
-robots.page.validate
+passport.verify
 ```
+
+Note: `robots.page.validate` runs before `canonical.url.validate` in the actual pipeline (line 44 vs 48 in `sites-check-postbuild.ts`). The earlier draft of this RFC proposed inserting before `robots.page.validate`, which was based on an incorrect understanding of the pipeline order.
 
 ## Alternatives considered
 
@@ -302,7 +314,7 @@ robots.page.validate
 - [ ] `sitemap.placeholder.validate` emits SITEMAP-PH-01 for URLs containing `[slug]`, `[version]`, or any bracket placeholder
 - [ ] `sitemap.coverage.validate` emits SITEMAP-COV-01 for indexable pages missing from the sitemap
 - [ ] `sitemap.coverage.validate` emits SITEMAP-COV-02 (warning) for sitemap URLs not in the expected indexable set
-- [ ] Both commands added to `SITES_CHECK_POSTBUILD_PIPELINE` after `canonical.url.validate` and before `robots.page.validate`
+- [ ] Both commands added to `SITES_CHECK_POSTBUILD_PIPELINE` after `dist.sitemap.images.validate`
 - [ ] `--json` output format matches the documented shape for both commands
 - [ ] `packages/werkstatt-site/AGENTS.md` documents both new commands
 - [ ] Unit tests pass: `pnpm --filter @warpgogol/werkstatt-site test`
@@ -313,6 +325,6 @@ robots.page.validate
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST reuse `canonicalPageUrl` from `@warpgogol/werkstatt-site/share/astro/canonical-url` for expected URL computation in `sitemap.coverage.validate`.
-- Agents MUST reuse `extractSitemapUrls` from `canonical-url.ts` (or extract it to a shared helper) for parsing sitemap XML.
-- Agents MUST use `diagnosticsResult` from `../result-helpers.ts` for output, consistent with existing validators.
+- Agents MUST reuse `extractSitemapUrls` from `canonical-url.ts` for parsing sitemap XML. This function is currently private — export it from `canonical-url.ts` or extract it to a shared helper in `@warpgogol/werkstatt-shared/checks` before reuse.
+- Agents MUST use `diagnosticsResult` from `@warpgogol/werkstatt-shared/checks/result-helpers` for output, consistent with existing validators. The re-export shim at `../result-helpers.ts` in `werkstatt-site` also works but the canonical source is `werkstatt-shared`.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
