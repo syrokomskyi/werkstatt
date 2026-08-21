@@ -33,14 +33,7 @@ export interface CommandsValidateResult {
 
 const COMMAND_NAME = "werkstatt.commands.validate";
 
-const EXCLUDE_DIRS = new Set([
-  "node_modules",
-  "tests",
-  "tests-handoff",
-  "dist",
-  "templates",
-  "os",
-]);
+const EXCLUDE_DIRS = new Set(["node_modules", "tests", "tests-handoff", "dist", "templates", "os"]);
 const EXCLUDE_SUFFIXES = [".test.ts", ".spec.ts"];
 
 const HELPER_FUNCTIONS = new Set([
@@ -78,14 +71,13 @@ function isHandlerFile(content: string): boolean {
 }
 
 interface ReturnViolation {
-  line: number;
   exitCodePresent: boolean;
   exitCodeValue: string | null;
+  exitCodeIsLiteral: boolean;
   summaryPresent: boolean;
   summaryValue: string | null;
   nextStepsPresent: boolean;
   isHelperReturn: boolean;
-  helperName: string | null;
 }
 
 function findReturnStatements(content: string): { startIdx: number; line: number }[] {
@@ -139,14 +131,13 @@ function analyzeReturnObject(
   );
   if (helperMatch) {
     return {
-      line: 0,
       exitCodePresent: true,
       exitCodeValue: null,
+      exitCodeIsLiteral: false,
       summaryPresent: true,
       summaryValue: null,
       nextStepsPresent: true,
       isHelperReturn: true,
-      helperName: helperMatch[1] ?? null,
     };
   }
 
@@ -154,15 +145,17 @@ function analyzeReturnObject(
   const summaryMatch = SUMMARY_PATTERN.exec(returnText);
   const nextStepsMatch = NEXT_STEPS_PATTERN.test(returnText);
 
+  const exitCodeValue = exitCodeMatch?.[1] ?? exitCodeMatch?.[2] ?? null;
+  const exitCodeIsLiteral = exitCodeMatch?.[1] !== undefined;
+
   return {
-    line: 0,
     exitCodePresent: exitCodeMatch !== null,
-    exitCodeValue: exitCodeMatch?.[1] ?? exitCodeMatch?.[2] ?? null,
+    exitCodeValue,
+    exitCodeIsLiteral,
     summaryPresent: summaryMatch !== null,
     summaryValue: summaryMatch?.[1] ?? summaryMatch?.[2] ?? summaryMatch?.[3] ?? null,
     nextStepsPresent: nextStepsMatch,
     isHelperReturn: false,
-    helperName: null,
   };
 }
 
@@ -173,10 +166,7 @@ function inferCommandName(filePath: string, workspaceRoot: string): string {
   return fileName.replace(/-/g, ".");
 }
 
-async function scanFile(
-  filePath: string,
-  workspaceRoot: string,
-): Promise<Diagnostic[]> {
+async function scanFile(filePath: string, workspaceRoot: string): Promise<Diagnostic[]> {
   const content = await readFile(filePath, "utf8").catch(() => "");
   if (!content || !isHandlerFile(content)) return [];
 
@@ -223,9 +213,7 @@ async function scanFile(
       });
     }
 
-    const isFailure =
-      violation.exitCodeValue === "1" ||
-      (violation.exitCodeValue !== null && violation.exitCodeValue !== "0");
+    const isFailure = violation.exitCodeIsLiteral && violation.exitCodeValue === "1";
     if (isFailure && (!violation.nextStepsPresent || returnText.includes("nextSteps: []"))) {
       diagnostics.push({
         ruleId: "CMD-OUTPUT-03",
