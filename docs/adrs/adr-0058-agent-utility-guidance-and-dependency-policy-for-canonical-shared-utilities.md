@@ -5,12 +5,12 @@ title: "Agent utility guidance and dependency policy for canonical shared utilit
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: implemented
 scope: workspace
 decider: architecture
 createdAt: 2026-08-21
 updatedAt: 2026-08-21
-implementedAt:
+implementedAt: 2026-08-21
 closedAt:
 supersedes: []
 supersededBy:
