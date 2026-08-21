@@ -10,6 +10,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-21
 updatedAt: 2026-08-21
+enhancedAt: 2026-08-21
 implementedAt:
 closedAt:
 supersedes: []
@@ -19,9 +20,9 @@ amendedBy: []
 related:
   - RFC-0317
   - RFC-0162
+  - DNA-61
 satisfies:
   - DNA-57
-  - DNA-61
 versionBump: patch
 commands:
   proposed:
@@ -65,16 +66,16 @@ Three unprotected gaps:
 
 Two new post-build validators are added to `SITES_CHECK_POSTBUILD_PIPELINE`:
 
-1. **`seo.domain.validate`** — scans every rendered HTML file in `dist/client/` for `<link rel="canonical">`, `<meta property="og:url">`, `<link rel="alternate" hreflang>` hrefs, and JSON-LD `url` fields. Checks that all origins match the `Astro.site` origin from `astro.config.mjs`. Also checks that no URL contains dev/staging hostname patterns (`dev.`, `staging.`, `localhost`, `127.0.0.1`, `.local`).
+1. **`seo.domain.validate`** — scans every rendered HTML file in `dist/client/` for `<link rel="canonical">`, `<meta property="og:url">`, `<link rel="alternate" hreflang>` hrefs, and all `url` properties in every `<script type="application/ld+json">` block (WebPage, Organization, BreadcrumbList, etc.). Checks that all origins match the `Astro.site` origin from `astro.config.mjs`. Also checks that no URL contains dev/staging hostname patterns (`dev.`, `staging.`, `localhost`, `127.0.0.1`, `0.0.0.0`, `.local`).
 
-2. **`seo.cross-lang-links.validate`** — scans every rendered HTML file in `dist/client/` for internal `<a href>` links. For each page, determines the page's language from its path prefix (or default for unprefixed). Checks that internal links to same-site pages use the same language prefix. Flags links that cross language boundaries without an explicit `hreflang` attribute on the `<a>` tag.
+2. **`seo.cross-lang-links.validate`** — scans every rendered HTML file in `dist/client/` for internal `<a href>` links. For each page, determines the page's language from its path prefix (or default for unprefixed). Checks that internal links to same-site pages use the same language prefix. Links with an explicit `hreflang` attribute on the `<a>` tag are fully skipped — they are intentional cross-language links (language switcher, "view in another language"). Links within `<nav>` elements containing the language switcher are also skipped.
 
-Additionally, page templates are hardened to pass `canonicalUrl` explicitly to `BaseLayout`, eliminating the `Astro.url.toString()` fallback.
+Additionally, page templates are hardened to pass `canonicalUrl` explicitly to `BaseLayout`, eliminating the `Astro.url.toString()` fallback. The `canonicalUrl` prop already exists on `BaseLayout` (RFC-0159) as an optional override; this change makes templates pass it unconditionally.
 
 ## Architectural fit
 
-- **DNA-57 (Dev/prod egress parity):** The dev server must reflect production output. By catching domain drift at build time, we ensure that what operators see in dev matches what will be published.
-- **DNA-61 (Resolved content regression gate):** Cross-language link errors are content regressions that should be caught before publication, not after an expert audit.
+- **DNA-57 (Dev/prod egress parity):** Satisfies — by catching canonical domain drift at build time, the validator ensures that the published output uses the configured `Astro.site` origin, not the request host. This is the build-time enforcement arm of dev/prod parity: if `Astro.site` is misconfigured or a template falls back to `Astro.url.toString()`, the build fails before the wrong domain reaches production. The dev server itself is not modified (DNA-57's dev-mode arm is owned by RFC-0235's dev adapter), but the build-time arm is owned by this RFC.
+- **DNA-61 (Resolved content regression gate):** Related — cross-language link errors are content regressions conceptually aligned with the regression gate, but this RFC does not mechanically extend DNA-61 (it does not use golden snapshots or the content regression check mechanism). The validators are standalone HTML scanners.
 - **Existing validators:** `canonical.url.validate` (RFC-0317) checks sitemap/feed/llms parity. `seo.meta.validate` (RFC-0162) checks OG tag presence and og:url vs canonical parity. This RFC adds the missing domain-origin check and the cross-language link check.
 
 ## Design
@@ -105,22 +106,21 @@ interface CrossLangLinksValidateResult {
 ### Rule catalog
 
 | Rule ID | Severity | Description |
-|---|---|---|
+| --- | --- | --- |
 | `SEO-DOMAIN-01` | error | Canonical URL origin does not match `Astro.site` origin |
 | `SEO-DOMAIN-02` | error | `og:url` origin does not match `Astro.site` origin |
 | `SEO-DOMAIN-03` | error | hreflang href origin does not match `Astro.site` origin |
 | `SEO-DOMAIN-04` | error | JSON-LD `url` field origin does not match `Astro.site` origin |
 | `SEO-DOMAIN-05` | error | Any SEO tag URL contains a dev/staging hostname pattern |
 | `SEO-XLANG-01` | error | Internal link on a DE page points to `/uk/...` without `hreflang` attribute |
-| `SEO-XLANG-02` | warning | Internal link crosses language boundary with `hreflang` but target language differs from page language |
 
 ### File system responsibilities
 
-| Path | Role |
-|---|---|
+| Path                    | Role                                                                 |
+| ----------------------- | -------------------------------------------------------------------- |
 | `dist/client/**/*.html` | Scanned for canonical, og:url, hreflang, JSON-LD, and internal links |
-| `astro.config.mjs` | Read for `site` property (via `readAstroSiteUrl`) |
-| `src/content/system.md` | Read for i18n config (default language, supported languages) |
+| `astro.config.mjs`      | Read for `site` property (via `readAstroSiteUrl`)                    |
+| `src/content/system.md` | Read for i18n config (default language, supported languages)         |
 
 ### Output format
 
@@ -147,23 +147,40 @@ interface CrossLangLinksValidateResult {
 
 ### Template hardening
 
-Page templates (`[...slug].template.astro` and `[lang]/[...slug].template.astro`) are updated to pass `canonicalUrl` explicitly to `BaseLayout`:
+The `canonicalUrl` prop already exists on `BaseLayout` (RFC-0159) as an optional override. Currently, templates do not pass it, so the layout falls back to `Astro.url.toString()` (which in SSR/hybrid mode reflects the request host, not the configured site).
+
+Page templates (`[...slug].template.astro` and `[lang]/[...slug].template.astro`) are updated in two ways:
+
+1. **Remove the `Astro.url.origin` fallback in `siteUrl` passed to `resolvePageRoute`:**
+
+```astro
+// Before:
+siteUrl: Astro.site?.toString() ?? Astro.url.origin,
+// After:
+siteUrl: Astro.site?.toString(),
+```
+
+When `Astro.site` is undefined, `resolvePageRoute` receives `undefined` and `data.semanticPage.url` will be undefined — making the misconfiguration visible rather than silently falling back to the request host.
+
+2. **Pass `canonicalUrl` to `BaseLayout` without a fallback:**
 
 ```astro
 <BaseLayout
-  canonicalUrl={data.semanticPage?.url ?? Astro.url.toString()}
+  canonicalUrl={data.semanticPage?.url}
   ...
 >
 ```
 
-This eliminates the `Astro.url.toString()` fallback in the layout, ensuring canonical URLs are always derived from `Astro.site` via `resolvePageRoute`.
+The layout's own fallback (`canonicalUrlOverride ?? Astro.url.toString()`) remains as a last-resort safety net, but when the template passes `canonicalUrl`, the fallback is never hit. This ensures canonical URLs are always derived from `Astro.site` via `resolvePageRoute`.
+
+**Workpiece migration:** Existing materialized workpieces have copies of the old templates in `missions/<id>/workpiece/src/pages/`. These workpieces need re-materialization (or manual template updates) to benefit from the hardening. The `mission.materialize` command copies template files from the package, so the next materialization cycle picks up the hardened templates automatically.
 
 ## Rollout
 
 - **Default behavior:** Both validators run in `SITES_CHECK_POSTBUILD_PIPELINE` and `build.post`. They fail the build on error-severity diagnostics.
 - **Existing apps:** All existing sites should pass — if they don't, it indicates a real SEO issue that needs fixing. No grace period is needed because the validators catch real bugs.
 - **New apps:** Automatically compliant from day one.
-- **Integration point:** Added to `SITES_CHECK_POSTBUILD_PIPELINE` after `canonical.url.validate` (RFC-0317) and before `image.delivery.validate`.
+- **Integration point:** Both validators are added to `SITES_CHECK_POSTBUILD_PIPELINE` immediately after `canonical.url.validate` (RFC-0317). The intervening validators between `canonical.url.validate` and `image.delivery.validate` (`passport.verify`, `lighthouse.budget.check`, `mobile.layout.check`, `generated.marker.validate`, `need.markers.validate`, `dist.content-references.validate`, `cloudflare.assets.validate`) remain in their current positions.
 
 ## Alternatives considered
 
@@ -173,7 +190,7 @@ This eliminates the `Astro.url.toString()` fallback in the layout, ensuring cano
 
 ## Risks
 
-- **False positives on cross-language links:** Some links legitimately cross language boundaries (e.g., language switcher, "view in another language" links). The validator skips links with `hreflang` attribute on the `<a>` tag, and also skips links within `<nav>` elements that contain the language switcher.
+- **False positives on cross-language links:** Some links legitimately cross language boundaries (e.g., language switcher, "view in another language" links). The validator fully skips links with `hreflang` attribute on the `<a>` tag, and also skips links within `<nav>` elements that contain the language switcher. There is no `SEO-XLANG-02` warning rule — links with `hreflang` are intentionally cross-language and are not flagged at any severity.
 - **Regex-based HTML parsing:** Using regex to extract URLs from HTML is less robust than a proper parser. However, the existing validators in this codebase use the same approach (e.g., `seo-meta.ts`, `canonical-url.ts`), and the HTML is generated by Astro (well-structured, predictable output).
 - **Performance:** Scanning all HTML files in `dist/client/` adds to build time. For sites with hundreds of pages, this is a few hundred milliseconds — acceptable for a post-build validator.
 
@@ -183,8 +200,10 @@ This eliminates the `Astro.url.toString()` fallback in the layout, ensuring cano
 - [ ] `seo.cross-lang-links.validate` command registered in `05-seo-audit.ts` command table
 - [ ] Both commands added to `SITES_CHECK_POSTBUILD_PIPELINE`
 - [ ] `SEO-DOMAIN-01` through `SEO-DOMAIN-05` rules implemented
-- [ ] `SEO-XLANG-01` and `SEO-XLANG-02` rules implemented
-- [ ] Page templates pass `canonicalUrl` explicitly to `BaseLayout`
+- [ ] `SEO-XLANG-01` rule implemented
+- [ ] Page templates pass `canonicalUrl` explicitly to `BaseLayout` (no `Astro.url.toString()` fallback)
+- [ ] `docs/verification-plan.xml` updated with verification mappings for `SEO-DOMAIN-*` and `SEO-XLANG-01` rules
+- [ ] `packages/werkstatt-site/AGENTS.md` updated with `seo.domain.validate` and `seo.cross-lang-links.validate` entries in Check commands section
 - [ ] Unit tests for each rule (passing and failing cases)
 - [ ] `rfc.validate` passes on this file before merging
 
