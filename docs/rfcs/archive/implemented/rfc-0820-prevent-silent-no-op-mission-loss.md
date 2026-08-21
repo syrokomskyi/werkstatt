@@ -13,6 +13,8 @@ related:
   - RFC-0480
   - RFC-0644
   - RFC-0797
+amendedBy:
+  - RFC-0913
 reviewers: []
 ---
 
