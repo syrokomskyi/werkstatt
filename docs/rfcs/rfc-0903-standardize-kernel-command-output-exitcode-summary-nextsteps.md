@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-21
 updatedAt: 2026-08-21
+enhancedAt: 2026-08-21
 implementedAt:
 closedAt:
 supersedes: []
@@ -103,7 +104,7 @@ There is no automated enforcement of output format consistency. A command handle
 - **No invariant requires `summary` format consistency.** Agents and operators parsing command output cannot rely on a stable prefix pattern. Log aggregation tools cannot filter by command name reliably.
 - **No invariant requires `nextSteps` on failure paths.** Three modules (`integrity.*`, `artifact.store.*`, `changelog.*`) return `exitCode: 1` without any `nextSteps`, leaving operators and agents without actionable guidance on what to do next.
 - **No automated validator checks command output format.** The existing `result-helpers.ts` functions (`failResult`, `diagnosticsResult`) auto-generate `nextSteps` on failure, but commands that construct `KernelCommandResult` directly bypass this safety net. There is no static analysis that catches missing fields.
-- **DNA-82 does not exist yet.** Without a DNA invariant, the standard is not formally established and cannot be referenced by other RFCs or enforced by `app.contract.full` (DNA-35).
+- **DNA-82 is already documented** in `docs/architecture-dna.md:343-345` (added during RFC preparation). However, no automated validator enforces it yet — the invariant exists as prose only.
 
 ## Decision
 
@@ -111,12 +112,14 @@ Every kernel command handler in `packages/werkstatt/src/` and `packages/werkstat
 
 ## Architectural fit
 
-- **DNA-82** (new): Establishes the kernel command output standard — explicit `exitCode`, `[command.name]`-prefixed `summary`, `nextSteps` on failure.
+- **DNA-82** (already documented at `docs/architecture-dna.md:343-345`): Establishes the kernel command output standard — explicit `exitCode`, `[command.name]`-prefixed `summary`, `nextSteps` on failure. This RFC adds the enforcement mechanism (`werkstatt.commands.validate`) that makes the invariant machine-checkable.
 - **DNA-35** (`app.contract.full`): `werkstatt.commands.validate` is a workspace-level validator that can be integrated into `PACKAGES_CHECK_PIPELINE` once all commands comply, contributing to the canonical readiness signal.
 - **RFC-0542**: Established self-documenting output for forge CLI commands. This RFC extends the same principle (structured `nextSteps`, consistent output) to the engine and site plugin kernel commands, which are a separate runtime surface.
 - **RFC-0579**: Introduced `nextSteps` as an optional `KernelCommandResult` field. This RFC makes `nextSteps` mandatory on failure paths, building on RFC-0579's foundation.
 - **RFC-0609**: Standardized command argument patterns to flag-only. This RFC standardizes command output format — the two are complementary (input standard + output standard).
-- **Site OS operator model**: `werkstatt.commands.validate` is a `scope: workspace` command registered in the engine kernel. It scans handler files in `packages/werkstatt/src/` and `packages/werkstatt-site/src/` without executing commands.
+- **Site OS operator model**: `werkstatt.commands.validate` is a `scope: workspace` command registered in the engine kernel via the `werkstatt-shared-validate` module (existing module in `packages/werkstatt/src/os/werkstatt-shared-validate-module.ts`). It scans handler files in `packages/werkstatt/src/`, `packages/werkstatt-site/src/`, and `packages/werkstatt-shared/src/` without executing commands.
+- **Compass sync**: `docs/verification-plan.xml` does not need updating during gated adoption — the command is not in any pipeline. When a future RFC adds `werkstatt.commands.validate` to `PACKAGES_CHECK_PIPELINE`, that RFC must also add a `<check-set>` entry to `docs/verification-plan.xml`.
+- **AGENTS.md sync**: `packages/werkstatt/AGENTS.md` "Command handler patterns" section must be updated with the output standard rules (explicit `exitCode`, `[command.name]`-prefixed `summary`, failure `nextSteps`). Root `AGENTS.md` does not need changes — it covers monorepo layout, not command handler patterns.
 
 ## Design
 
@@ -154,16 +157,15 @@ export interface KernelCommandResult<TData = unknown> {
 }
 ```
 
-The validator produces diagnostics using the existing `Diagnostic` type:
+The validator produces diagnostics using the canonical `Diagnostic` type from `@warpgogol/werkstatt/schemas` (RFC-0852). File path, command name, and line number are carried in the `data` field:
 
 ```ts
-interface CommandOutputViolation {
-  ruleId: string;       // CMD-OUTPUT-01 | CMD-OUTPUT-02 | CMD-OUTPUT-03
+// Output diagnostics are canonical Diagnostic[] — RFC-0852
+// data payload for CMD-OUTPUT-* rules:
+interface CommandOutputDiagnosticData {
   file: string;         // handler file path
   commandName: string;  // inferred from file/registration
   line?: number;        // return statement line (if extractable)
-  message: string;
-  severity: "error" | "warning";
 }
 ```
 
@@ -179,9 +181,11 @@ interface CommandOutputViolation {
 | --- | --- |
 | `packages/werkstatt/src/**/*.ts` | Scanned for command handler return statements |
 | `packages/werkstatt-site/src/**/*.ts` | Scanned for command handler return statements |
+| `packages/werkstatt-shared/src/**/*.ts` | Scanned for command handler return statements (contains `result-helpers.ts`) |
 | `packages/werkstatt/src/kernel/registry.ts` | Read to identify registered command names and handler file mappings |
-| `packages/werkstatt-shared/src/checks/result-helpers.ts` | Read to identify helper-based returns (exempt from direct return scanning) |
-| `docs/architecture-dna.md` | Updated with DNA-82 entry (already added in this RFC's preparation) |
+| `packages/werkstatt-shared/src/checks/result-helpers.ts` | Read to verify helper compliance (exempt from direct return scanning) |
+| `packages/werkstatt-site/src/checks/audit/helpers.ts` | Read to verify `buildAuditResult` helper compliance |
+| `docs/architecture-dna.md` | Already contains DNA-82 entry (no change needed) |
 
 The command does **not** modify any files. It produces diagnostics only.
 
@@ -220,10 +224,11 @@ In pretty mode, violations are listed grouped by file with rule ID and message.
 - **CMD-OUTPUT-01** (error): A return statement in a command handler does not include `exitCode`.
 - **CMD-OUTPUT-02** (error): A return statement is missing `summary`, or `summary` does not start with `[command.name]`.
 - **CMD-OUTPUT-03** (error): A return statement has `exitCode: 1` but does not include `nextSteps` or includes an empty `nextSteps: []`.
-- **Helper-exempt returns**: Return statements that delegate to `passResult`, `failResult`, `diagnosticsResult`, or `buildAuditResult` are exempt — the helpers are trusted to produce compliant output. The validator verifies helper compliance separately by scanning `result-helpers.ts`.
+- **Helper-exempt returns**: Return statements that delegate to `passResult`, `failResult`, `diagnosticsResult`, `resultFromViolations`, or `buildAuditResult` are exempt — the helpers are trusted to produce compliant output. The validator verifies helper compliance separately by scanning `result-helpers.ts` (in `@warpgogol/werkstatt-shared`) and `audit/helpers.ts` (in `@warpgogol/werkstatt-site`).
 - **`--mode=warning`**: All violations become warnings (non-blocking, `exitCode: 0`). Default is `--mode=error` (blocking, `exitCode: 1`).
 - **No handler files found**: Exits `0` with summary `[werkstatt.commands.validate] no handler files found`.
-- **Static analysis limitations**: The validator uses regex/AST scanning of return statements. False negatives are possible for dynamically constructed return objects. False positives are possible for non-`KernelCommandResult` returns in the same file. Mitigated by only scanning files with command handler registration patterns (`registry.registerCommand` or `ALL_COMMANDS` entries).
+- **Static analysis limitations**: The validator uses regex/AST scanning of return statements. False negatives are possible for dynamically constructed return objects. False positives are possible for non-`KernelCommandResult` returns in the same file. Mitigated by scanning files that (a) import `KernelCommandResult` or `KernelNextStep` types, or (b) contain `registry.registerCommand` / `ALL_COMMANDS` patterns, or (c) contain functions with return statements yielding objects with `exitCode`/`summary`/`nextSteps` properties. This three-tier detection covers direct registration, `ALL_COMMANDS` array entries, and factory-pattern handlers (e.g., `createStandardCheckModule`) where the `execute` function is defined in the factory closure.
+- **Performance**: The scan targets ~200–300 `.ts` files across three packages. A regex-based scan of return statements completes in under 1 second on a modern machine. No caching is needed for a workspace-scoped command that runs on-demand.
 
 ## Rollout
 
@@ -265,12 +270,13 @@ In pretty mode, violations are listed grouped by file with rule ID and message.
 - [ ] DNA-82 is documented in `docs/architecture-dna.md` (evidence: `docs/architecture-dna.md:343-345`)
 - [ ] `werkstatt.commands.validate` command is registered in the engine kernel with `scope: workspace`
 - [ ] `werkstatt.commands.validate` produces `CMD-OUTPUT-01`, `CMD-OUTPUT-02`, `CMD-OUTPUT-03` diagnostics
-- [ ] `werkstatt.commands.validate` exempts returns that delegate to `passResult`/`failResult`/`diagnosticsResult`/`buildAuditResult`
+- [ ] `werkstatt.commands.validate` exempts returns that delegate to `passResult`/`failResult`/`diagnosticsResult`/`resultFromViolations`/`buildAuditResult`
 - [ ] `--json` output format is documented and stable (evidence: `--json` output includes `command`, `status`, `diagnostics`, `summary`)
 - [ ] `--mode=warning|error` flag is implemented (default: `error`)
 - [ ] Unit tests cover all three rule IDs and helper-exempt returns
-- [ ] `packages/werkstatt-shared/src/checks/result-helpers.ts` `passResult` returns explicit `exitCode: 0` and `[command.name]`-prefixed `summary`
-- [ ] `packages/werkstatt-shared/src/checks/result-helpers.ts` `failResult` returns `[command.name]`-prefixed `summary`
+- [ ] `packages/werkstatt-shared/src/checks/result-helpers.ts` `passResult` returns explicit `exitCode: 0` and `[command.name]`-prefixed `summary` (evidence: `packages/werkstatt-shared/src/checks/result-helpers.ts:88-93`)
+- [ ] `packages/werkstatt-shared/src/checks/result-helpers.ts` `failResult` returns `[command.name]`-prefixed `summary` (evidence: `packages/werkstatt-shared/src/checks/result-helpers.ts:104-121`)
+- [ ] `packages/werkstatt/AGENTS.md` "Command handler patterns" section documents the output standard (explicit `exitCode`, `[command.name]`-prefixed `summary`, failure `nextSteps`)
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
