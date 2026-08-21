@@ -98,9 +98,9 @@ scope:
 
 ---
 
-### Step 2. Unit tests for client-testimonial schema
+### Step 2. Unit tests for client-testimonial schema and section filter logic
 
-**Goal:** Write unit tests verifying the Zod schema accepts valid entities and rejects invalid ones.
+**Goal:** Write unit tests verifying the Zod schema accepts valid entities and rejects invalid ones, and integration tests for the section's filter and empty-state behavior.
 
 **Agent actions:**
 
@@ -113,6 +113,10 @@ scope:
   - Test extra unknown field fails (strict mode)
   - Test `status` accepts all `pbpEntityStatusSchema` values (draft, published, suspended, retired, superseded)
   - Test `schema` field must match `pbp/client-testimonial@1`
+- Create `packages/werkstatt-site/src/domain/ui/sections/gratitude/__tests__/gratitude-section.test.ts`:
+  - Test filter logic: entities with `status === "published"` are included, `status === "draft"` are excluded
+  - Test empty-state: when no published testimonials exist, section renders nothing (no DOM element)
+  - Test partial locale coverage: DE with published testimonials renders, UK without testimonials renders nothing
 
 **Validation:**
 
@@ -187,8 +191,9 @@ scope:
     - Quote text (italic)
     - Author name (bold)
     - Author role + organization (small, only if filled)
-    - Optional link "Zum Nachweis →" to `/{lang}/nachweise/{evidenceRef}` when `evidenceRef` is set
+    - Optional link "Zum Nachweis →" to `/{lang}/nachweise/{slug}` when `evidenceRef` is set, where `slug` is resolved from the referenced evidence-source entity (look up the evidence-source by `id === evidenceRef` and use its `slug` field for the URL). If the evidence-source has no `slug` or is not found, omit the link.
   - Use `--ds-*` design tokens for styling
+  - **Consent note:** Content authoring of a `client-testimonial` entity implies the client has consented to public display of their name, role, organization, and quote. The `consent` PBP entity workflow (RFC-0706) handles consent records separately — no `consentRef` field is needed on the testimonial entity.
 - Create `packages/werkstatt-site/src/domain/ui/sections/gratitude/gratitude-section.css`:
   - Card grid layout (2 columns on desktop, 1 column on mobile)
   - Glass-effect or subtle card styling using `--ds-*` tokens
