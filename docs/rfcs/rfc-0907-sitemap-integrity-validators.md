@@ -1,7 +1,7 @@
 ---
 id: RFC-0907
 title: "Sitemap integrity validators: placeholder expansion and route coverage"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
