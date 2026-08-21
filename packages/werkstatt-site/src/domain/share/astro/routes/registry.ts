@@ -277,6 +277,7 @@ export async function getRouteRegistry(): Promise<RouteRegistry> {
           pageId: nachweis.pageId,
           cosmicStar: nachweis.pageId,
           routes: nachweis.routes,
+          parentPageId: "nachweise",
         };
         byPageId.set(nachweis.pageId, entry);
         for (const [lang, slug] of Object.entries(nachweis.routes)) {
