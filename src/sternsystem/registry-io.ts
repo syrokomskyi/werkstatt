@@ -111,6 +111,7 @@ export async function readSystemState(
       currentMission: null,
       lastRelease: null,
       lastPropagated: {},
+      accessPin: null,
     };
   }
   const raw = await readFile(filePath, "utf8");
