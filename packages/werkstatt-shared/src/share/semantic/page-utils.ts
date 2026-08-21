@@ -11,18 +11,12 @@
   <item>Unified single blocksToMarkdown signature (was duplicated with different signatures in app).</item>
   <item>Added slugify export and markdown answer-block extraction utilities.</item>
   <item>RFC-0372: toSemanticAnswerBlocks now returns SemanticBlock[] with blockType: "prose".</item>
+  <item>RFC-0915: replaced slugify import from extract.ts with slugId from canonical slug module.</item>
 </CHANGE_SUMMARY>
 */
 
 import type { SemanticBlock } from "./models.ts";
-import { slugify } from "./extract.ts";
-
-export { slugify };
-
-/**
- * Creates a URL-friendly slug from a string.
- * Re-exports from extract.ts to keep page-utils self-contained for consumers.
- */
+import { slugId } from "../slug/index.ts";
 
 /**
  * Extracts structured answer blocks from markdown body text.
@@ -99,7 +93,7 @@ export function toSemanticAnswerBlocks(
     const hasMultipleParagraphs = /\n[ \t]*\n/.test(block.content.trim());
     if (hasTable || hasMultipleParagraphs) {
       return {
-        id: slugify(block.heading),
+        id: slugId(block.heading),
         blockType: "prose",
         heading: block.heading,
         summary: block.content.trim(),
@@ -115,7 +109,7 @@ export function toSemanticAnswerBlocks(
       !firstLine.startsWith("-") && !firstLine.startsWith("*") && !firstLine.startsWith("#");
 
     return {
-      id: slugify(block.heading),
+      id: slugId(block.heading),
       blockType: "prose",
       heading: block.heading,
       summary: isSummary ? firstLine : undefined,

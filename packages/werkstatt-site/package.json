@@ -10359,9 +10359,7 @@
       "default": "./src/domain/integration/index.ts"
     }
   },
-  "files": [
-    "src"
-  ],
+  "files": ["src"],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
@@ -10377,7 +10375,6 @@
     "@lordicon/element": "^2.3.1",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "@noble/ed25519": "^3.1.0",
-    "@sindresorhus/slugify": "^3.0.0",
     "@tansuasici/country-state-city": "^2.0.15",
     "@upstash/qstash": "2.11.2",
     "@warpgogol/forge": "workspace:*",
@@ -10388,10 +10385,8 @@
     "astro": "^7.2.0",
     "big.js": "^6.2.1",
     "bs58": "^6.0.0",
-    "cyrillic-to-translit-js": "^3.2.1",
     "expr-eval": "^2.0.2",
     "file-type": "^22.0.1",
-    "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
     "hls.js": "^1.6.16",
     "i18n-iso-countries": "^7.14.0",

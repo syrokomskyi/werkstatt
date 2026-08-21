@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0133: backfilled MODULE_MAP and CHANGE_SUMMARY markers for compass.validate compliance.</item>
+  <item>RFC-0915: removed custom slugify() — replaced by slugId from @warpgogol/werkstatt-shared/share/slug.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -14,17 +15,6 @@ import type { SemanticPerson, SemanticPostalAddress } from "./models.ts";
 
 export function normalizeWhitespace(value: string): string {
   return value.replace(/\s+/g, " ").trim();
-}
-
-export function slugify(value: string): string {
-  return (
-    value
-      .toLowerCase()
-      .normalize("NFKD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "") || "entity"
-  );
 }
 
 export type MarkdownSection = {
