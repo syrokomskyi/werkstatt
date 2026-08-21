@@ -76,7 +76,9 @@ function stripJsoncComments(text: string): string {
 }
 
 function routePatternToRegex(pattern: string): RegExp {
-  const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*");
+  const slashIndex = pattern.indexOf("/");
+  const pathPart = slashIndex >= 0 ? pattern.slice(slashIndex) : "/";
+  const escaped = pathPart.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*");
   return new RegExp(`^${escaped}$`);
 }
 

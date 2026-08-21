@@ -2,7 +2,10 @@ import { describe, it, expect } from "vitest";
 import { mkdtemp, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { resolveDeploymentAdapter } from "../public-surface/managed-public.ts";
+import {
+  resolveDeploymentAdapter,
+  checkStaticFileShadow,
+} from "../public-surface/managed-public.ts";
 import type { KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 
 /*
@@ -108,6 +111,67 @@ describe("resolveDeploymentAdapter (RFC-0589)", () => {
       const ctx = await makeContext(root);
       const adapter = await resolveDeploymentAdapter(ctx, "warpgogol-com");
       expect(adapter).toBeNull();
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("checkStaticFileShadow (RFC-0905 REDIR-07/RSHAD-01)", () => {
+  it("returns true when index.html exists at source path", async () => {
+    const root = await mkdtemp(join(tmpdir(), "redir-shadow-"));
+    try {
+      const distClient = join(root, "dist", "client");
+      await import("node:fs/promises").then((fs) =>
+        fs.mkdir(join(distClient, "old-page"), { recursive: true }),
+      );
+      await writeFile(join(distClient, "old-page", "index.html"), "<html></html>");
+      const ctx = await makeContext(root);
+      const result = await checkStaticFileShadow(ctx, distClient, "/old-page");
+      expect(result).toBe(true);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("returns true when .html file exists at source path", async () => {
+    const root = await mkdtemp(join(tmpdir(), "redir-shadow-"));
+    try {
+      const distClient = join(root, "dist", "client");
+      await import("node:fs/promises").then((fs) => fs.mkdir(distClient, { recursive: true }));
+      await writeFile(join(distClient, "old-page.html"), "<html></html>");
+      const ctx = await makeContext(root);
+      const result = await checkStaticFileShadow(ctx, distClient, "/old-page");
+      expect(result).toBe(true);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("returns false when no static file exists", async () => {
+    const root = await mkdtemp(join(tmpdir(), "redir-shadow-"));
+    try {
+      const distClient = join(root, "dist", "client");
+      await import("node:fs/promises").then((fs) => fs.mkdir(distClient, { recursive: true }));
+      const ctx = await makeContext(root);
+      const result = await checkStaticFileShadow(ctx, distClient, "/old-page");
+      expect(result).toBe(false);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("returns false for pattern sources", async () => {
+    const root = await mkdtemp(join(tmpdir(), "redir-shadow-"));
+    try {
+      const distClient = join(root, "dist", "client");
+      await import("node:fs/promises").then((fs) =>
+        fs.mkdir(join(distClient, "old"), { recursive: true }),
+      );
+      await writeFile(join(distClient, "old", "page.html"), "<html></html>");
+      const ctx = await makeContext(root);
+      const result = await checkStaticFileShadow(ctx, distClient, "/old/*");
+      expect(result).toBe(false);
     } finally {
       await rm(root, { recursive: true, force: true });
     }
