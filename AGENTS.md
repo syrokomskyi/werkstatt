@@ -128,6 +128,8 @@ Agents MUST NEVER use raw `git commit` anywhere in this repository. Two canonica
 
 The workspace-level `hooks/pre-commit` already blocks raw `git commit` for platform-scope files. Workpiece repos have their own `.git` and are not covered by this hook — the AGENTS.md rule is the primary guard for workpieces, reinforced by a workpiece pre-commit hook installed at materialization time (RFC-0821).
 
+**Pre-staged foreign changes**: before any commit, run `git status --porcelain` and inspect the index for changes staged by someone else (parallel agent, interrupted `ecosystem.commit`). A bare `git commit` sweeps everything already staged, including foreign work. When the index contains changes you did not stage, either unstage them (`git restore --staged <file>`) or commit with an explicit pathspec (`git commit -- <paths>`). Discovered 2026-08-21: a session-end `git commit` swept a foreign staged `pnpm-lock.yaml` pruning into an unrelated commit and had to be rebuilt with `git reset --soft` + pathspec commit.
+
 **`git commit --no-verify` on closed missions is a LAST RESORT ONLY.** `mission.git.commit` fails on closed missions (state: `closed`). If workpiece changes are needed after close, prefer: (1) reopen the mission, or (2) ask the operator to reopen it. Only use `git commit --no-verify` as a last resort when reopening is not feasible — it bypasses pre-commit validators and bordbuch recording. Never use `--no-verify` routinely or as a convenience shortcut.
 
 **Rationale**: raw `git commit` bypasses pre-commit validators, bordbuch recording, signed-commit support, and the mission lifecycle. This causes silent mission loss when work is reported as done but never properly persisted through the platform.
