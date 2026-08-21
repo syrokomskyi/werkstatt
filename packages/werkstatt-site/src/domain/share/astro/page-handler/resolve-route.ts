@@ -635,6 +635,99 @@ async function resolveNachweisEvidenceProps(
     }
     if (doc?.url && !props.pdfUrl) props.pdfUrl = doc.url;
 
+    // RFC-0876: populate technical-assessment fields from the assessment object
+    const assessment = data.assessment as Record<string, unknown> | undefined;
+    if (assessment && kind === "technical-assessment") {
+      const provider = assessment.provider as Record<string, unknown> | undefined;
+      if (provider) {
+        props.provider = {
+          id: provider.id as string,
+          name: provider.name as string,
+          ...(provider.homepage ? { homepage: provider.homepage as string } : {}),
+        };
+      }
+
+      const tool = assessment.tool as Record<string, unknown> | undefined;
+      if (tool) {
+        props.tool = {
+          name: tool.name as string,
+          ...(tool.version ? { version: tool.version as string } : {}),
+        };
+      }
+
+      if (assessment.executionMode) {
+        props.executionMode = assessment.executionMode as string;
+      }
+
+      const subject = assessment.subject as Record<string, unknown> | undefined;
+      if (subject?.url) {
+        props.subjectUrl = subject.url as string;
+      }
+
+      if (assessment.observedAt) {
+        const observedAt = assessment.observedAt;
+        props.observedAt =
+          observedAt instanceof Date
+            ? observedAt.toISOString()
+            : typeof observedAt === "string"
+              ? observedAt
+              : String(observedAt);
+      }
+
+      const methodology = assessment.methodology as Record<string, unknown> | undefined;
+      if (methodology) {
+        props.methodology = {
+          id: methodology.id as string,
+          version: methodology.version as string,
+          runCount: methodology.runCount as number,
+          aggregation: methodology.aggregation as "provider" | "median" | "none",
+        };
+      }
+
+      const overall = assessment.overall as Record<string, unknown> | undefined;
+      if (overall) {
+        props.overall = {
+          ...(overall.score !== undefined ? { score: overall.score as number } : {}),
+          ...(overall.level !== undefined ? { level: overall.level as string } : {}),
+        };
+      }
+
+      const dimensions = assessment.dimensions as Array<Record<string, unknown>> | undefined;
+      if (Array.isArray(dimensions)) {
+        props.dimensions = dimensions.map((d) => ({
+          id: d.id as string,
+          providerLabel: d.providerLabel as string,
+          ...(d.score !== undefined ? { score: d.score as number } : {}),
+          ...(d.numerator !== undefined ? { numerator: d.numerator as number } : {}),
+          ...(d.denominator !== undefined ? { denominator: d.denominator as number } : {}),
+          ...(d.status ? { status: d.status as "pass" | "fail" | "not-checked" } : {}),
+          ...(d.level ? { level: d.level as string } : {}),
+        }));
+      }
+
+      // Collect source hashes from all items
+      const sourceHashes: string[] = [];
+      if (items) {
+        for (const item of Object.values(items)) {
+          if (item?.sha256 && typeof item.sha256 === "string") {
+            sourceHashes.push(item.sha256);
+          }
+        }
+      }
+      props.sourceHashes = sourceHashes;
+
+      // Required string fields with empty defaults (content author can override via page block props)
+      if (!props.verificationLevel) props.verificationLevel = "N0";
+      if (!props.limitation) props.limitation = "";
+      if (!props.whatItMeasures) props.whatItMeasures = "";
+      if (!props.whatItDoesNotProve) props.whatItDoesNotProve = "";
+
+      const providerHomepage = provider?.homepage as string | undefined;
+      if (providerHomepage && !props.providerReportUrl) {
+        props.providerReportUrl = providerHomepage;
+      }
+    }
+
     return props;
   }
   return {};
