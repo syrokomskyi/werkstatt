@@ -69,6 +69,7 @@ describe("buildSemanticPageModelWith with price markers", () => {
         description: "Test description",
         blocks: [
           {
+            id: "hero",
             type: "hero",
             props: {
               header: {
@@ -102,6 +103,7 @@ describe("buildSemanticPageModelWith with price markers", () => {
         description: "Test description",
         blocks: [
           {
+            id: "hero",
             type: "hero",
             props: {
               header: {
@@ -134,6 +136,7 @@ describe("buildSemanticPageModelWith with price markers", () => {
       description: "A page without price markers",
       blocks: [
         {
+          id: "hero",
           type: "hero",
           props: {
             header: {

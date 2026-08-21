@@ -140,7 +140,12 @@ function extractContentBlocks(
   const result: SemanticBlock[] = [];
   for (const block of blocks) {
     const blockType = String(block["type"] ?? "");
-    const blockId = String(block["id"] ?? `block-${result.length}`);
+    const blockId = block["id"];
+    if (typeof blockId !== "string" || !blockId) {
+      throw new Error(
+        `[extractContentBlocks] Block #${result.length} in page ${ctx.pageId} (${ctx.lang}) is missing required \`id\` field. Run \`block.id.generate\` to backfill.`,
+      );
+    }
     if (!blockType) continue;
     const extractor = BLOCK_EXTRACTORS.get(blockType);
     if (!extractor) continue;

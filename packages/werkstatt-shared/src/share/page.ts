@@ -44,7 +44,7 @@ export interface PageEntry {
 }
 
 export interface BlockEntry {
-  id?: string;
+  id: string;
   type?: string; // CMS-facing archetype slug — validated by page.block.validate
   use?: string; // PlanetName or MoonName — normalized from type for internal resolution
   props: Record<string, unknown>;

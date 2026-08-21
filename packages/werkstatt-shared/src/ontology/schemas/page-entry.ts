@@ -66,14 +66,12 @@ const visibilityExprSchema: z.ZodType<unknown> = z.lazy(() =>
 export const BlockEntrySchema = z
   .object({
     /**
-     * Optional stable block identifier for analytics, anchor links, and
-     * block-level attribution. Must be kebab-case when provided.
-     * page.block.validate enforces uniqueness within a page.
+     * Mandatory stable block identifier for analytics, anchor links, and
+     * block-level attribution. Must be kebab-case. RFC-0914 makes this required.
+     * page.block.validate enforces uniqueness within a page (B-05).
+     * page.blocks.extract.validate enforces presence and format (BLOCK-ID-MISSING, BLOCK-ID-INVALID).
      */
-    id: z
-      .string()
-      .regex(/^[a-z0-9-]+$/, "Block id must be kebab-case")
-      .optional(),
+    id: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Block id must be kebab-case"),
 
     /**
      * Cosmic name identifying the section/component for this block.
