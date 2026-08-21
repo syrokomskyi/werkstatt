@@ -288,7 +288,7 @@ New Sternsystems registered after this RFC is implemented automatically comply �
 - [ ] `fleet/fleet.sites.yaml` regenerated with `warpgogol` site ID — **operator task**
 - [ ] Downstream service configs updated to reference `warpgogol` instead of `warpgogol-com` — **operator task**
 - [ ] `sternsystem.validate` passes with zero violations after migration — **operator task (post-migration)**
-- [ ] `rfc.validate` passes on this file before merging
+- [x] (evidence: `rfc.validate --id RFC-0902` passed with zero violations) `rfc.validate` passes on this file before merging
 - [x] (evidence: `docs/architecture-dna.md` DNA-44 and DNA-45 text) DNA-44 and DNA-45 updated to mention "no TLD suffix" requirement
 
 ## Implementation notes for agents
