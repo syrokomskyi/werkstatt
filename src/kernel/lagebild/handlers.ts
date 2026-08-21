@@ -95,6 +95,7 @@ export async function runLagebildTenantAdd(
           commandsToRun: [],
           message: `Tenant already exists for site ${site} (tenant_id: ${existing.tenant_id}, enabled: ${existing.enabled}). Use lagebild.tenant.enable to activate.`,
         },
+        exitCode: 0,
         summary: `[lagebild.tenant.add] skipped — tenant already exists for ${site}`,
       };
     }
@@ -130,6 +131,7 @@ export async function runLagebildTenantAdd(
         commandsToRun,
         message,
       },
+      exitCode: 0,
       summary: `[lagebild.tenant.add] ${tenant.tenant_id} for ${site}`,
     };
   } catch (err) {
@@ -203,6 +205,7 @@ export async function runLagebildTenantEnable(
         enabled: tenant.enabled,
         message: `Tenant ${site} enabled`,
       },
+      exitCode: 0,
       summary: `[lagebild.tenant.enable] ${site} enabled`,
     };
   } catch (err) {
@@ -273,6 +276,7 @@ export async function runLagebildTenantDisable(
         enabled: tenant.enabled,
         message: `Tenant ${site} disabled`,
       },
+      exitCode: 0,
       summary: `[lagebild.tenant.disable] ${site} disabled`,
     };
   } catch (err) {

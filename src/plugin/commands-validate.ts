@@ -52,6 +52,7 @@ const FILE_DETECTION_PATTERNS = [
 
 const RETURN_OBJECT_PATTERN = /return\s*\{/g;
 const EXIT_CODE_PATTERN = /exitCode\s*:\s*(?:(\d+)|(\w+))/;
+const SUMMARY_KEY_PATTERN = /summary\s*(?::|,|})/;
 const SUMMARY_PATTERN = /summary\s*:\s*(?:"([^"]*)"|'([^']*)'|`([^`]*)`)/;
 const NEXT_STEPS_PATTERN = /nextSteps\s*:/;
 const HELPER_RETURN_PATTERN = new RegExp(
@@ -193,18 +194,32 @@ function analyzeReturnObject(
   }
 
   const exitCodeMatch = EXIT_CODE_PATTERN.exec(returnText);
+  const summaryKeyMatch = SUMMARY_KEY_PATTERN.test(returnText);
   const summaryMatch = SUMMARY_PATTERN.exec(returnText);
   const nextStepsMatch = NEXT_STEPS_PATTERN.test(returnText);
 
   const exitCodeValue = exitCodeMatch?.[1] ?? exitCodeMatch?.[2] ?? null;
   const exitCodeIsLiteral = exitCodeMatch?.[1] !== undefined;
 
+  let summaryValue = summaryMatch?.[1] ?? summaryMatch?.[2] ?? summaryMatch?.[3] ?? null;
+  if (summaryValue === null && summaryKeyMatch) {
+    const ternaryMatch = returnText.match(/summary\s*:\s*[^"'`\n]*?\?\s*`([^`]*)`/s);
+    if (ternaryMatch) {
+      summaryValue = ternaryMatch[1];
+    } else {
+      const anyStringMatch = returnText.match(/summary\s*:\s*[\s\S]*?`([^`]*)`/);
+      if (anyStringMatch) {
+        summaryValue = anyStringMatch[1];
+      }
+    }
+  }
+
   return {
     exitCodePresent: exitCodeMatch !== null,
     exitCodeValue,
     exitCodeIsLiteral,
-    summaryPresent: summaryMatch !== null,
-    summaryValue: summaryMatch?.[1] ?? summaryMatch?.[2] ?? summaryMatch?.[3] ?? null,
+    summaryPresent: summaryKeyMatch,
+    summaryValue,
     nextStepsPresent: nextStepsMatch,
     isHelperReturn: false,
   };
@@ -244,7 +259,7 @@ async function scanFile(filePath: string, workspaceRoot: string): Promise<Diagno
       });
     }
 
-    if (!violation.summaryPresent || !violation.summaryValue) {
+    if (!violation.summaryPresent) {
       diagnostics.push({
         ruleId: "CMD-OUTPUT-02",
         severity: "error",
@@ -253,7 +268,7 @@ async function scanFile(filePath: string, workspaceRoot: string): Promise<Diagno
         line,
         fixHint: `Add summary: "[${commandName}] <description>" to the return object.`,
       });
-    } else if (!violation.summaryValue.startsWith("[")) {
+    } else if (violation.summaryValue && !violation.summaryValue.startsWith("[")) {
       diagnostics.push({
         ruleId: "CMD-OUTPUT-02",
         severity: "error",
