@@ -74,6 +74,8 @@ All 25 packets (000–240) are completed. The Astro profile identity survives. T
 
 Notable check commands registered by this package:
 
+- `page.blocks.extract.validate` (RFC-0914) — validates that every block in page frontmatter has a mandatory `id` field in strict kebab-case format. Emits `BLOCK-ID-INVALID` for missing or malformed ids. Integrated into `SITES_CHECK_AUTHOR_PIPELINE` after `page.block.validate`.
+- `block.id.generate` (RFC-0914) — migration command that backfills missing `blocks[].id` in page content files using `slugId(heading)` with suffix deduplication (-2, -3) for duplicates within a page. Emits failure diagnostics if a block has no heading and no id.
 - `template.imports.validate` (RFC-0557) — validates template imports against root devDependencies.
 - `workpiece.imports.validate` (RFC-0557) — validates workpiece imports against root node_modules.
 - `pnpm.store.health-check` — probes pnpm store health by running `pnpm licenses list --prod --json` in the workpiece. Detects `ERR_PNPM_MISSING_PACKAGE_INDEX_FILE` (stale store index) before the heavy build pipeline starts. Emits `PNPM-STORE-03` with fix hint `rm -rf node_modules && pnpm install --no-frozen-lockfile`. Integrated into `SITES_BUILD_PREPARE_PIPELINE` and `SITES_BUILD_PREPARE_DEV_PIPELINE` as the first step, before `config.regenerate`.
