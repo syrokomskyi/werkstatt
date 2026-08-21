@@ -1,0 +1,28 @@
+id: gratitude
+displayName: Gratitude
+version: 1.0.0
+semanticRole: client-gratitude
+description: |
+  Client gratitude testimonials displayed as quote cards. Complements cryptographic
+  evidence on the Nachweise page with human trust signals. RFC-0900.
+expectedIntents:
+  - build-trust
+  - differentiation
+expectedIndustryFit:
+  - non-profit
+  - consulting-and-coaching
+  - trades-and-construction
+layoutHint: card-grid
+bodyKind: composite
+propsSchema:
+  $shape: zod
+  compose:
+    - section-visual
+    - section-header
+  shape: |
+    z.object({
+      tag: z.string().optional(),
+    }).strict()
+acceptedCosmicNames:
+  - Gonggong
+constraints: {}
