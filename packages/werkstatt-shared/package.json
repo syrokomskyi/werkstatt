@@ -250,6 +250,10 @@
       "types": "./src/share/middleware/language-redirect.ts",
       "default": "./src/share/middleware/language-redirect.ts"
     },
+    "./share/middleware/access-protection": {
+      "types": "./src/share/middleware/access-protection.ts",
+      "default": "./src/share/middleware/access-protection.ts"
+    },
     "./share/offer-capacity": {
       "types": "./src/share/offer-capacity.ts",
       "default": "./src/share/offer-capacity.ts"
