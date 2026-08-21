@@ -15,7 +15,7 @@
 import { getCountry } from "./countries.ts";
 import { getRegion } from "./regions.ts";
 import { buildCityCatalog } from "./cities.ts";
-import { citySlug } from "./slug.ts";
+import { slugUrl as citySlug } from "@warpgogol/werkstatt-shared/share/slug";
 import type {
   GeoService,
   GeoOverrides,

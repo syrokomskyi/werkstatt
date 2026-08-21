@@ -15,7 +15,7 @@
 
 import { createRequire } from "node:module";
 import type { City as CSCCity } from "@tansuasici/country-state-city";
-import { citySlug } from "./slug.ts";
+import { slugUrl as citySlug } from "@warpgogol/werkstatt-shared/share/slug";
 import type { GeoCity, GeoOverrides } from "./types.ts";
 
 // Load CJS build via createRequire — the ESM build (index.node.mjs) uses

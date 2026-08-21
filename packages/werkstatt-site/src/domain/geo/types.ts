@@ -70,10 +70,6 @@ export interface GeoProviderResult {
   localized: Map<string, GeoLocalizedSlug>;
 }
 
-export interface SlugStrategy {
-  slug(name: string): string;
-}
-
 export interface GeoService {
   country(alpha2: Alpha2): GeoCountry | undefined;
   region(code: RegionCode): GeoRegion | undefined;

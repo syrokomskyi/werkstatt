@@ -23,6 +23,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
+import { slugUrl } from "@warpgogol/werkstatt-shared/share/slug";
 import { readDefaultLanguageCode } from "./lib/i18n.ts";
 
 async function pathExists(p: string): Promise<boolean> {
@@ -32,14 +33,6 @@ async function pathExists(p: string): Promise<boolean> {
   } catch {
     return false;
   }
-}
-
-function slugify(value: string): string {
-  return value
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
 }
 
 export async function runPersonCreate(
@@ -54,7 +47,7 @@ export async function runPersonCreate(
   ).trim();
   const withPage = input.flags.page === true || input.flags.page === "true";
 
-  const slug = rawSlug ? slugify(rawSlug) : name ? slugify(name) : "";
+  const slug = rawSlug ? slugUrl(rawSlug) : name ? slugUrl(name) : "";
   if (!slug) {
     return { exitCode: 1, summary: "person.create requires --slug=<slug> (or --name=<name>)" };
   }

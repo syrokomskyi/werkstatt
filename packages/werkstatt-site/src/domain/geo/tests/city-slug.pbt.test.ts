@@ -14,7 +14,7 @@
 
 import { test, expect } from "vitest";
 import fc from "fast-check";
-import { citySlug } from "../slug.ts";
+import { slugUrl as citySlug } from "@warpgogol/werkstatt-shared/share/slug";
 
 const cityNameArbitrary = fc
   .string({ minLength: 1, maxLength: 100 })

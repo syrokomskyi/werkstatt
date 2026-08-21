@@ -27,7 +27,7 @@ import {
   resolveReferencesInString,
   EMPTY_CONTENT_REF_INDEX,
 } from "@warpgogol/werkstatt-shared/share/content-reference";
-import GithubSlugger from "github-slugger";
+import { HeadingSlugger } from "@warpgogol/werkstatt-shared/share/slug";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
 import { resolveProseImages, markdownHasImages } from "./prose-image-resolver.ts";
@@ -44,7 +44,7 @@ import {
  * any markdown document renders the same GFM features as Astro's render() path.
  */
 function injectHeadingIds(html: string): string {
-  const slugger = new GithubSlugger();
+  const slugger = new HeadingSlugger();
   return html.replace(/<h([1-6])>(.*?)<\/h\1>/gs, (_match, level, content) => {
     const text = content.replace(/<[^>]+>/g, "");
     const id = slugger.slug(text);

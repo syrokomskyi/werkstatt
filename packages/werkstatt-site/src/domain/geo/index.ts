@@ -27,4 +27,4 @@ export type {
 } from "./types.ts";
 
 export { createGeoService } from "./service.ts";
-export { citySlug } from "./slug.ts";
+export { slugUrl as citySlug } from "@warpgogol/werkstatt-shared/share/slug";
