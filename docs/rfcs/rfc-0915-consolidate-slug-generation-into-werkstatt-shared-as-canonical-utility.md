@@ -235,16 +235,16 @@ No flag day, no migration period — all changes are internal import-path refact
 
 ## Acceptance criteria
 
-- [ ] `packages/werkstatt-shared/src/share/slug/index.ts` exports `slugUrl`, `slugId`, and `HeadingSlugger` (evidence: `packages/werkstatt-shared/src/share/slug/index.ts:1`)
-- [ ] No custom `slugify` function exists outside `packages/werkstatt-shared/src/share/slug/` (evidence: `grep -rn "function slugify" packages/ --include="*.ts" | grep -v share/slug/` returns zero results)
-- [ ] `@sindresorhus/slugify`, `cyrillic-to-translit-js`, and `github-slugger` appear only in `packages/werkstatt-shared/package.json` deps, not in `packages/werkstatt-site/package.json` (evidence: `packages/werkstatt-shared/package.json` and `packages/werkstatt-site/package.json`)
-- [ ] `packages/werkstatt-site/src/domain/geo/slug.ts` is deleted (evidence: file does not exist)
-- [ ] `packages/werkstatt-site/src/checks/person-create.ts` imports `slugUrl` from `@warpgogol/werkstatt-shared/share/slug` (evidence: `packages/werkstatt-site/src/checks/person-create.ts:1`)
-- [ ] `packages/werkstatt-site/src/domain/ui/sections/markdown/prose-pipeline.ts` imports `HeadingSlugger` from `@warpgogol/werkstatt-shared/share/slug` (evidence: `packages/werkstatt-site/src/domain/ui/sections/markdown/prose-pipeline.ts:1`)
-- [ ] DNA-88 is added to `docs/architecture-dna.md` (evidence: `docs/architecture-dna.md` contains `## DNA-88`)
-- [ ] Unit tests verify slug output compatibility for DE, UK, and default locales (evidence: `packages/werkstatt-shared/src/share/slug/tests/`)
-- [ ] `build:check` passes across all impacted packages (evidence: `pnpm run build:check` exit code 0)
-- [ ] `rfc.validate` passes on this file (evidence: `rfc.validate --id RFC-0915` exit code 0)
+- [x] `packages/werkstatt-shared/src/share/slug/index.ts` exports `slugUrl`, `slugId`, and `HeadingSlugger` (evidence: `packages/werkstatt-shared/src/share/slug/index.ts:1`)
+- [x] No custom `slugify` function exists outside `packages/werkstatt-shared/src/share/slug/` (evidence: `grep -rn "function slugify" packages/ --include="*.ts" | grep -v share/slug/` returns zero results)
+- [x] `@sindresorhus/slugify`, `cyrillic-to-translit-js`, and `github-slugger` appear only in `packages/werkstatt-shared/package.json` deps, not in `packages/werkstatt-site/package.json` (evidence: `packages/werkstatt-shared/package.json:1356` and `packages/werkstatt-site/package.json:10372`)
+- [x] `packages/werkstatt-site/src/domain/geo/slug.ts` is deleted (evidence: file does not exist)
+- [x] `packages/werkstatt-site/src/checks/person-create.ts` imports `slugUrl` from `@warpgogol/werkstatt-shared/share/slug` (evidence: `packages/werkstatt-site/src/checks/person-create.ts:26`)
+- [x] `packages/werkstatt-site/src/domain/ui/sections/markdown/prose-pipeline.ts` imports `HeadingSlugger` from `@warpgogol/werkstatt-shared/share/slug` (evidence: `packages/werkstatt-site/src/domain/ui/sections/markdown/prose-pipeline.ts:30`)
+- [x] DNA-88 is added to `docs/architecture-dna.md` (evidence: `docs/architecture-dna.md:363`)
+- [x] Unit tests verify slug output compatibility for DE, UK, and default locales (evidence: `packages/werkstatt-shared/src/share/slug/tests/slug.test.ts:1`)
+- [x] `build:check` passes across all impacted packages (evidence: `pnpm run build:check` exit code 0)
+- [x] `rfc.validate` passes on this file (evidence: `rfc.validate --id RFC-0915` exit code 0)
 
 ## Implementation notes for agents
 
