@@ -255,6 +255,7 @@ export async function runNachweisScreenshotProcess(
     mediaType: "image/webp",
     storage: "public",
     url: publicUrl,
+    r2Key,
     ...(capturedAt ? { capturedAt } : {}),
   };
   const updatedContent = stringifyMarkdownFrontmatter(evidenceContent, currentEvidence);
