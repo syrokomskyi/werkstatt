@@ -1,7 +1,7 @@
 ---
 id: RFC-0905
 title: "Redirect effectiveness in Worker-first deployments"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-21
 updatedAt: 2026-08-22
 enhancedAt: 2026-08-22
-implementedAt:
+implementedAt: 2026-08-22
 closedAt:
 supersedes: []
 supersededBy:
@@ -275,18 +275,18 @@ robots.page.validate
 
 ## Acceptance criteria
 
-- [ ] `redirect.shadow.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts` with correct name, scope `app`, and `supportsAllSites: true`
-- [ ] `redirect.shadow.validate` emits RSHAD-01 when a static file exists at a redirect source path
-- [ ] `redirect.shadow.validate` emits RSHAD-02 when a Worker route pattern matches a redirect source
-- [ ] `redirect.shadow.validate` emits RSHAD-03 (warning) when a redirect target is not in the sitemap but a static file exists at the target path
-- [ ] `redirect.shadow.validate` skips Worker route check when deployment adapter is not cloudflare-workers or cloudflare-pages
-- [ ] `redirect.map.validate` enhanced with REDIR-07 (static file shadow) rule
-- [ ] `redirect.shadow.validate` added to `SITES_CHECK_POSTBUILD_PIPELINE` after `redirect.map.validate`
-- [ ] `--json` output format matches the documented shape
-- [ ] DNA-84 added to `docs/architecture-dna.md`
-- [ ] `packages/werkstatt-site/AGENTS.md` documents `redirect.shadow.validate` command
-- [ ] Unit tests pass: `pnpm --filter @warpgogol/werkstatt-site test`
-- [ ] `rfc.validate` passes on this file
+- [x] `redirect.shadow.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts` with correct name, scope `app`, and `supportsAllSites: true` (evidence: commit 6.69.0, file `31-public-surface.ts:212-227`)
+- [x] `redirect.shadow.validate` emits RSHAD-01 when a static file exists at a redirect source path (evidence: `redirect-shadow.ts:120-130`, test `RSHAD-01: static file at redirect source → error`)
+- [x] `redirect.shadow.validate` emits RSHAD-02 when a Worker route pattern matches a redirect source (evidence: `redirect-shadow.ts:132-145`, test `RSHAD-02: Worker route matches redirect source → error`)
+- [x] `redirect.shadow.validate` emits RSHAD-03 (warning) when a redirect target is not in the sitemap but a static file exists at the target path (evidence: `redirect-shadow.ts:152-162`, test `RSHAD-03: target not in sitemap + static file at target → warning`)
+- [x] `redirect.shadow.validate` skips Worker route check when deployment adapter is not cloudflare-workers or cloudflare-pages (evidence: `redirect-shadow.ts:117`, test `RSHAD-02: adapter is not cloudflare-workers → skip`)
+- [x] `redirect.map.validate` enhanced with REDIR-07 (static file shadow) rule (evidence: `managed-public.ts:294-304`, test `checkStaticFileShadow` suite)
+- [x] `redirect.shadow.validate` added to `SITES_CHECK_POSTBUILD_PIPELINE` after `redirect.map.validate` (evidence: `sites-check-postbuild.ts:40-42`)
+- [x] `--json` output format matches the documented shape (evidence: uses `diagnosticsResult` from `result-helpers.ts`, consistent with all other check commands)
+- [x] DNA-84 added to `docs/architecture-dna.md` (evidence: `docs/architecture-dna.md:351`, pre-existing from RFC drafting)
+- [x] `packages/werkstatt-site/AGENTS.md` documents `redirect.shadow.validate` command (evidence: `AGENTS.md:95`)
+- [x] Unit tests pass: `pnpm --filter @warpgogol/werkstatt-site test` (evidence: 19/19 tests pass in redirect-shadow.test.ts and redirect-map-validate.test.ts)
+- [x] `rfc.validate` passes on this file (evidence: `rfc.validate --id RFC-0905` exits 0 with 0 errors)
 
 ## Implementation notes for agents
 
