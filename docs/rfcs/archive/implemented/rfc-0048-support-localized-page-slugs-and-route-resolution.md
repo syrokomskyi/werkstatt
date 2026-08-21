@@ -18,6 +18,7 @@ supersededBy:
 amendedBy:
   - RFC-0159
   - RFC-0160
+  - RFC-0914
 related:
   - DNA-22
   - DNA-24
