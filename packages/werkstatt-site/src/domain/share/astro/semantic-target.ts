@@ -16,13 +16,12 @@ navigation/CTA links from content-declared targets.
 </CHANGE_SUMMARY>
 */
 
-import { resolveLocalizedPagePath, resolveAnchorFragment } from "./routes.ts";
+import { resolveLocalizedPagePath } from "./routes.ts";
 
 export interface InternalTargetRef {
   kind: "internal";
   pageId: string;
-  // RFC-0048: anchor may be a plain string (language-neutral) or a
-  // language-keyed record (e.g. { de: "unser-ansatz", en: "our-approach" })
+  // RFC-0914: anchor is a stable block.id used directly as HTML id
   anchor?: string | Record<string, string>;
 }
 
@@ -47,13 +46,11 @@ export async function resolveSemanticTarget(
     return null;
   }
 
-  // RFC-0048: Resolve anchor through registry (anchorId -> lang-specific HTML id)
-  // Falls back to raw string if not found in registry (no regression)
+  // RFC-0914: Use anchor string directly as HTML id (no registry lookup)
   if (target.anchor) {
     const anchorStr = typeof target.anchor === "string" ? target.anchor : target.anchor[lang];
     if (anchorStr) {
-      const fragment = await resolveAnchorFragment(anchorStr, target.pageId, lang);
-      return `${path}#${fragment}`;
+      return `${path}#${anchorStr}`;
     }
   }
   return path;

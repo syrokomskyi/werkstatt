@@ -51,7 +51,6 @@ import { readScopeFiles, outOfScope } from "./scope.ts";
  */
 const UNIVERSAL_BLOCK_PROPS: ReadonlySet<string> = new Set([
   "hideSectionNumber", // suppress auto-generated "01"/"02" section number
-  "anchorId", // RFC-0048: stable anchor id for resolveSectionAnchor, not a section prop
 ]);
 
 // ---------------------------------------------------------------------------

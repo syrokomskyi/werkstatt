@@ -40,7 +40,7 @@ export {
   getStaticPathsForDefaultLangRedirects,
 } from "./routes/resolve.ts";
 
-export { resolveAnchorFragment, hasLocalizedPage, resolveSectionAnchor } from "./routes/anchors.ts";
+export { hasLocalizedPage, resolveSectionAnchor } from "./routes/anchors.ts";
 
 export type { SitemapLocaleEntry, PageCluster } from "./routes/sitemap.ts";
 export { buildSitemapClusters, generateSitemapXml, getAlternateLinks } from "./routes/sitemap.ts";

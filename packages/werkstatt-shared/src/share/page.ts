@@ -121,6 +121,8 @@ export interface SectionProps {
   defaultLanguageCode: string;
   /** Zero-padded section index (01, 02, ...) for anchors and styling */
   sectionNumber: string;
+  /** RFC-0914: Stable kebab-case block id from content entry, used as HTML id */
+  blockId: string;
   /** Optional link registry for CTA/link resolution */
   linkRegistry?: Record<string, string | null>;
   /** Complete block.props as declared in page frontmatter */

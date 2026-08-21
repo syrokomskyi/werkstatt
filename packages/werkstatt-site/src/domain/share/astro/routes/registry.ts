@@ -29,8 +29,6 @@ export interface LocalizedRouteEntry {
   pageId: PageId;
   cosmicStar: string;
   routes: Record<LanguageCode, string>;
-  // RFC-0048: optional anchor registry — stable anchorId -> lang -> HTML fragment id
-  anchors?: Record<string, Record<LanguageCode, string>>;
   // RFC-0049: exclude from public sitemap (e.g. platform-internal overlay pages)
   sitemapExclude?: boolean;
   // RFC-0097: explicit opt-in locale set. When set, the page exists only in
@@ -130,7 +128,6 @@ export async function getRouteRegistry(): Promise<RouteRegistry> {
       pages?: Array<{
         pageId?: string;
         routes?: Record<string, string>;
-        anchors?: Record<string, Record<string, string>>;
         output?: { sitemap?: boolean | { include?: boolean } };
         cosmicStar?: string;
         semanticType?: string;
@@ -181,8 +178,6 @@ export async function getRouteRegistry(): Promise<RouteRegistry> {
         pageId: page.pageId,
         cosmicStar: page.cosmicStar ?? page.pageId,
         routes: page.routes,
-        // RFC-0048: carry anchor registry if declared
-        ...(page.anchors ? { anchors: page.anchors } : {}),
         // RFC-0143: carry sitemap exclusion from output.sitemap
         ...(isSitemapExcluded(page.output) ? { sitemapExclude: true } : {}),
         // RFC-0097: carry explicit locale opt-in
