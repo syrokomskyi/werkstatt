@@ -25,9 +25,22 @@
  */
 
 import type { SectionProps } from "@warpgogol/werkstatt-shared/share/page";
-import { cast } from "@warpgogol/werkstatt-site/share";
+import { need, cast } from "@warpgogol/werkstatt-site/share";
 import SectionShell from "../section-shell/section-shell.astro";
 import "./nachweis-verify-component.css";
+
+export interface NachweisVerifyLabels {
+  titleTemplate: string;
+  sourceHash: string;
+  publicDerivative: string;
+  recordHash: string;
+  envelopeHash: string;
+  verificationLevel: string;
+  qualifiedTimestamp: string;
+  rfc3161Timestamp: string;
+  qualificationEvidence: string;
+  operatorSignature: string;
+}
 
 interface NachweisVerifyContent {
   slug: string;
@@ -48,6 +61,7 @@ interface NachweisVerifyContent {
   effects?: unknown;
   density?: "compact" | "normal" | "spacious";
   tone?: "default" | "warning" | "success" | "muted";
+  labels: NachweisVerifyLabels;
 }
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
@@ -64,6 +78,8 @@ const {
   verificationLevel,
 } = props;
 
+const t = need("labels", props.labels) as NachweisVerifyLabels;
+
 const headingId = `nachweis-verify-${slug}-${version}-title`;
 ---
 
@@ -78,18 +94,18 @@ const headingId = `nachweis-verify-${slug}-${version}-title`;
 >
   <div class="nachweis-verify" data-component="nachweis-verify" aria-labelledby={headingId}>
     <h2 id={headingId} class="nachweis-verify__title">
-      Kryptographische Verifikation — Version {version}
+      {t.titleTemplate.replace("{version}", version)}
     </h2>
 
     <dl class="nachweis-verify__data">
       <div class="nachweis-verify__entry">
-        <dt>Quell-Hash (SHA-256)</dt>
+        <dt>{t.sourceHash}</dt>
         <dd><code class="nachweis-verify__hash">{sourceSha256}</code></dd>
       </div>
       {
         publicDerivativeSha256 && (
           <div class="nachweis-verify__entry">
-            <dt>Öffentliche Ableitung (SHA-256)</dt>
+            <dt>{t.publicDerivative}</dt>
             <dd>
               <code class="nachweis-verify__hash">{publicDerivativeSha256}</code>
             </dd>
@@ -99,7 +115,7 @@ const headingId = `nachweis-verify-${slug}-${version}-title`;
       {
         recordPayloadSha256 && (
           <div class="nachweis-verify__entry">
-            <dt>Datensatz-Hash (SHA-256)</dt>
+            <dt>{t.recordHash}</dt>
             <dd>
               <code class="nachweis-verify__hash">{recordPayloadSha256}</code>
             </dd>
@@ -109,7 +125,7 @@ const headingId = `nachweis-verify-${slug}-${version}-title`;
       {
         envelopeSha256 && (
           <div class="nachweis-verify__entry">
-            <dt>Umschlag-Hash (SHA-256)</dt>
+            <dt>{t.envelopeHash}</dt>
             <dd>
               <code class="nachweis-verify__hash">{envelopeSha256}</code>
             </dd>
@@ -119,7 +135,7 @@ const headingId = `nachweis-verify-${slug}-${version}-title`;
       {
         verificationLevel && (
           <div class="nachweis-verify__entry">
-            <dt>Prüfungsniveau</dt>
+            <dt>{t.verificationLevel}</dt>
             <dd>{verificationLevel}</dd>
           </div>
         )
@@ -129,14 +145,14 @@ const headingId = `nachweis-verify-${slug}-${version}-title`;
           <div class="nachweis-verify__entry">
             <dt>
               {timestamp.assurance === "eidas-qualified"
-                ? "Qualifizierter elektronischer Zeitstempel (eIDAS)"
-                : "RFC 3161-Zeitstempel"}
+                ? t.qualifiedTimestamp
+                : t.rfc3161Timestamp}
             </dt>
             <dd>
               {timestamp.providerName && <span>{timestamp.providerName}</span>}
               {timestamp.qualificationEvidenceRef && (
                 <a href={timestamp.qualificationEvidenceRef} rel="noopener noreferrer">
-                  Qualifikationsnachweis
+                  {t.qualificationEvidence}
                 </a>
               )}
             </dd>
@@ -146,7 +162,7 @@ const headingId = `nachweis-verify-${slug}-${version}-title`;
       {
         operatorSignature && (
           <div class="nachweis-verify__entry">
-            <dt>Operator-Signatur</dt>
+            <dt>{t.operatorSignature}</dt>
             <dd>
               <code class="nachweis-verify__hash">{operatorSignature}</code>
             </dd>

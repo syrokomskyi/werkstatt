@@ -140,7 +140,7 @@ function resolveEvidenceLink(evidenceRef?: string): string | null {
               )}
               {evidenceLink && (
                 <a class="gratitude-card__evidence-link" href={evidenceLink}>
-                  {lang === "de" ? "Zum Nachweis" : "To evidence"} &rarr;
+                  {need("evidenceLinkLabel", props.evidenceLinkLabel)} &rarr;
                 </a>
               )}
             </footer>

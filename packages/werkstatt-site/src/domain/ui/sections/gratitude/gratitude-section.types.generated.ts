@@ -101,4 +101,5 @@ export interface GratitudeSectionContent {
     hideSectionNumber?: boolean;
   };
   tag?: string;
+  evidenceLinkLabel: string;
 }

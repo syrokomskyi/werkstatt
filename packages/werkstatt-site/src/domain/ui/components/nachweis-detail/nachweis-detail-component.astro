@@ -27,13 +27,46 @@
  */
 
 import type { SectionProps } from "@warpgogol/werkstatt-shared/share/page";
-import { cast, type Effect } from "@warpgogol/werkstatt-site/share";
+import { need, cast, type Effect } from "@warpgogol/werkstatt-site/share";
 import SectionShell from "../section-shell/section-shell.astro";
 import NachweisCard, {
   type NachweisAssessmentDimension,
+  type NachweisCardLabels,
 } from "../nachweis-card/nachweis-card-component.astro";
 import EffectHost from "../effects/effect-host.astro";
 import "./nachweis-detail-component.css";
+
+export interface NachweisDetailLabels {
+  pdfDocument: string;
+  pdfNotSupported: string;
+  pdfDownload: string;
+  sha256Hash: string;
+  websiteScreenshot: string;
+  screenshotAltTemplate: string;
+  screenshotAltFallback: string;
+  homepageCapture: string;
+  websiteVisit: string;
+  sichtpass: string;
+  sourceHash: string;
+  publicDerivative: string;
+  recordHash: string;
+  envelopeHash: string;
+  verificationLevel: string;
+  qualifiedTimestamp: string;
+  rfc3161Timestamp: string;
+  qualificationEvidence: string;
+  operatorSignature: string;
+  technicalDetails: string;
+  whatItMeasures: string;
+  whatItDoesNotProve: string;
+  providerReport: string;
+  observationHistory: string;
+  colDate: string;
+  colResult: string;
+  colVerificationLevel: string;
+  colDetail: string;
+  viewLink: string;
+}
 
 interface Sichtpass {
   sourceSha256: string;
@@ -96,6 +129,8 @@ interface NachweisAttestationDetailContent {
   effects?: unknown;
   density?: "compact" | "normal" | "spacious";
   tone?: "default" | "warning" | "success" | "muted";
+  labels: NachweisDetailLabels;
+  cardLabels: NachweisCardLabels;
 }
 
 interface NachweisTechnicalAssessmentDetailContent {
@@ -127,6 +162,8 @@ interface NachweisTechnicalAssessmentDetailContent {
   effects?: unknown;
   density?: "compact" | "normal" | "spacious";
   tone?: "default" | "warning" | "success" | "muted";
+  labels: NachweisDetailLabels;
+  cardLabels: NachweisCardLabels;
 }
 
 type NachweisDetailContent =
@@ -138,6 +175,13 @@ const props = cast<NachweisDetailContent>(pageOverride);
 const defaultGlassEffects: Effect[] = [
   { kind: "glass", enabled: true, blur: 16, saturate: 180, tintOpacity: 0.6 },
 ];
+
+const t = need("labels", props.labels) as NachweisDetailLabels;
+const cardLabels = need("cardLabels", props.cardLabels) as NachweisCardLabels;
+
+function screenshotAlt(domain: string): string {
+  return t.screenshotAltTemplate.replace("{domain}", domain);
+}
 
 const sichtpassHeadingId = `nachweis-detail-${props.slug}-sichtpass`;
 const historyHeadingId = `nachweis-detail-${props.slug}-history`;
@@ -183,7 +227,8 @@ function toDate(value: unknown): Date | undefined {
 function formatDate(value: unknown): string {
   const d = toDate(value);
   if (!d) return String(value);
-  return d.toLocaleDateString("de-DE", {
+  const locale = lang === "uk" ? "uk-UA" : "de-DE";
+  return d.toLocaleDateString(locale, {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -227,6 +272,8 @@ function toISOString(value: unknown): string {
           verifiedDate={props.verifiedDate}
           display={display}
           websiteUrl={websiteUrl}
+          lang={lang}
+          labels={cardLabels}
         />
 
         {display?.document === "visible" && (pdfUrl || pdfSha256) && (
@@ -237,7 +284,7 @@ function toISOString(value: unknown): string {
             aria-labelledby={pdfHeadingId}
           >
             <h2 id={pdfHeadingId} class="nachweis-detail__section-title">
-              PDF-Dokument
+              {t.pdfDocument}
             </h2>
             {pdfUrl && (
               <object
@@ -247,16 +294,16 @@ function toISOString(value: unknown): string {
                 class="nachweis-detail__pdf-viewer"
               >
                 <p>
-                  Ihr Browser kann kein PDF anzeigen.
+                  {t.pdfNotSupported}
                   <a href={pdfUrl} download>
-                    Dokument herunterladen
+                    {t.pdfDownload}
                   </a>
                 </p>
               </object>
             )}
             {pdfSha256 && (
               <p class="nachweis-detail__pdf-hash">
-                <span class="sr-only">SHA-256-Hash: </span>
+                <span class="sr-only">{t.sha256Hash}</span>
                 <code>{pdfSha256}</code>
               </p>
             )}
@@ -271,12 +318,12 @@ function toISOString(value: unknown): string {
             aria-labelledby={screenshotHeadingId}
           >
             <h2 id={screenshotHeadingId} class="nachweis-detail__section-title">
-              Website-Screenshot
+              {t.websiteScreenshot}
             </h2>
             <figure class="nachweis-detail__screenshot-figure">
               <img
                 src={websiteScreenshot.url}
-                alt={`Screenshot von ${domain ?? "der Website"}`}
+                alt={screenshotAlt(domain ?? t.screenshotAltFallback)}
                 loading="lazy"
                 decoding="async"
                 fetchpriority="low"
@@ -285,7 +332,9 @@ function toISOString(value: unknown): string {
               />
               <figcaption>
                 {captureDate && (
-                  <time datetime={captureDatetime}>Homepage-Aufnahme vom {captureDate}</time>
+                  <time datetime={captureDatetime}>
+                    {t.homepageCapture} {captureDate}
+                  </time>
                 )}
               </figcaption>
             </figure>
@@ -303,7 +352,7 @@ function toISOString(value: unknown): string {
               <span class="nachweis-detail__website-link-icon" aria-hidden="true">
                 ↗
               </span>
-              Website besuchen: {domain}
+              {t.websiteVisit} {domain}
             </a>
           </section>
         )}
@@ -316,19 +365,19 @@ function toISOString(value: unknown): string {
             aria-labelledby={sichtpassHeadingId}
           >
             <h2 id={sichtpassHeadingId} class="nachweis-detail__sichtpass-title">
-              Sichtpass
+              {t.sichtpass}
             </h2>
 
             <dl class="nachweis-detail__hashes">
               <div class="nachweis-detail__entry">
-                <dt>Quell-Hash (SHA-256)</dt>
+                <dt>{t.sourceHash}</dt>
                 <dd>
                   <code class="nachweis-detail__hash">{props.sichtpass.sourceSha256}</code>
                 </dd>
               </div>
               {props.sichtpass.publicDerivativeSha256 && (
                 <div class="nachweis-detail__entry">
-                  <dt>Öffentliche Ableitung (SHA-256)</dt>
+                  <dt>{t.publicDerivative}</dt>
                   <dd>
                     <code class="nachweis-detail__hash">
                       {props.sichtpass.publicDerivativeSha256}
@@ -338,7 +387,7 @@ function toISOString(value: unknown): string {
               )}
               {props.sichtpass.recordPayloadSha256 && (
                 <div class="nachweis-detail__entry">
-                  <dt>Datensatz-Hash (SHA-256)</dt>
+                  <dt>{t.recordHash}</dt>
                   <dd>
                     <code class="nachweis-detail__hash">{props.sichtpass.recordPayloadSha256}</code>
                   </dd>
@@ -346,7 +395,7 @@ function toISOString(value: unknown): string {
               )}
               {props.sichtpass.envelopeSha256 && (
                 <div class="nachweis-detail__entry">
-                  <dt>Umschlag-Hash (SHA-256)</dt>
+                  <dt>{t.envelopeHash}</dt>
                   <dd>
                     <code class="nachweis-detail__hash">{props.sichtpass.envelopeSha256}</code>
                   </dd>
@@ -354,7 +403,7 @@ function toISOString(value: unknown): string {
               )}
               {props.sichtpass.verificationLevel && (
                 <div class="nachweis-detail__entry">
-                  <dt>Prüfungsniveau</dt>
+                  <dt>{t.verificationLevel}</dt>
                   <dd>{props.sichtpass.verificationLevel}</dd>
                 </div>
               )}
@@ -362,8 +411,8 @@ function toISOString(value: unknown): string {
                 <div class="nachweis-detail__entry">
                   <dt>
                     {props.sichtpass.timestamp.assurance === "eidas-qualified"
-                      ? "Qualifizierter elektronischer Zeitstempel (eIDAS)"
-                      : "RFC 3161-Zeitstempel"}
+                      ? t.qualifiedTimestamp
+                      : t.rfc3161Timestamp}
                   </dt>
                   <dd>
                     {props.sichtpass.timestamp.providerName && (
@@ -374,7 +423,7 @@ function toISOString(value: unknown): string {
                         href={props.sichtpass.timestamp.qualificationEvidenceRef}
                         rel="noopener noreferrer"
                       >
-                        Qualifikationsnachweis
+                        {t.qualificationEvidence}
                       </a>
                     )}
                   </dd>
@@ -382,7 +431,7 @@ function toISOString(value: unknown): string {
               )}
               {props.sichtpass.operatorSignature && (
                 <div class="nachweis-detail__entry">
-                  <dt>Operator-Signatur</dt>
+                  <dt>{t.operatorSignature}</dt>
                   <dd>
                     <code class="nachweis-detail__hash">{props.sichtpass.operatorSignature}</code>
                   </dd>
@@ -417,6 +466,8 @@ function toISOString(value: unknown): string {
           verificationLevel={props.verificationLevel}
           sourceHashes={props.sourceHashes}
           limitation={props.limitation}
+          lang={lang}
+          labels={cardLabels}
         />
 
         <EffectHost
@@ -426,21 +477,21 @@ function toISOString(value: unknown): string {
           aria-labelledby={technicalHeadingId}
         >
           <h2 id={technicalHeadingId} class="nachweis-detail__section-title">
-            Technische Details
+            {t.technicalDetails}
           </h2>
 
           <dl class="nachweis-detail__technical-dl">
             <div class="nachweis-detail__entry">
-              <dt>Was dieser Test misst</dt>
+              <dt>{t.whatItMeasures}</dt>
               <dd>{props.whatItMeasures}</dd>
             </div>
             <div class="nachweis-detail__entry">
-              <dt>Was dieser Test nicht beweist</dt>
+              <dt>{t.whatItDoesNotProve}</dt>
               <dd>{props.whatItDoesNotProve}</dd>
             </div>
             {props.providerReportUrl && (
               <div class="nachweis-detail__entry">
-                <dt>Anbieter-Bericht</dt>
+                <dt>{t.providerReport}</dt>
                 <dd>
                   <a href={props.providerReportUrl} rel="noopener noreferrer">
                     {props.providerReportUrl}
@@ -459,15 +510,15 @@ function toISOString(value: unknown): string {
             aria-labelledby={historyHeadingId}
           >
             <h2 id={historyHeadingId} class="nachweis-detail__section-title">
-              Beobachtungshistorie
+              {t.observationHistory}
             </h2>
             <table class="nachweis-detail__history-table">
               <thead>
                 <tr>
-                  <th scope="col">Datum</th>
-                  <th scope="col">Ergebnis</th>
-                  <th scope="col">Prüfungsniveau</th>
-                  <th scope="col">Detail</th>
+                  <th scope="col">{t.colDate}</th>
+                  <th scope="col">{t.colResult}</th>
+                  <th scope="col">{t.colVerificationLevel}</th>
+                  <th scope="col">{t.colDetail}</th>
                 </tr>
               </thead>
               <tbody>
@@ -486,7 +537,7 @@ function toISOString(value: unknown): string {
                     </td>
                     <td>{obs.verificationLevel}</td>
                     <td>
-                      <a href={`/nachweise/${obs.detailSlug}/`}>Ansehen</a>
+                      <a href={`/nachweise/${obs.detailSlug}/`}>{t.viewLink}</a>
                     </td>
                   </tr>
                 ))}
@@ -503,19 +554,19 @@ function toISOString(value: unknown): string {
             aria-labelledby={sichtpassHeadingId}
           >
             <h2 id={sichtpassHeadingId} class="nachweis-detail__sichtpass-title">
-              Sichtpass
+              {t.sichtpass}
             </h2>
 
             <dl class="nachweis-detail__hashes">
               <div class="nachweis-detail__entry">
-                <dt>Quell-Hash (SHA-256)</dt>
+                <dt>{t.sourceHash}</dt>
                 <dd>
                   <code class="nachweis-detail__hash">{props.sichtpass.sourceSha256}</code>
                 </dd>
               </div>
               {props.sichtpass.publicDerivativeSha256 && (
                 <div class="nachweis-detail__entry">
-                  <dt>Öffentliche Ableitung (SHA-256)</dt>
+                  <dt>{t.publicDerivative}</dt>
                   <dd>
                     <code class="nachweis-detail__hash">
                       {props.sichtpass.publicDerivativeSha256}
@@ -525,7 +576,7 @@ function toISOString(value: unknown): string {
               )}
               {props.sichtpass.recordPayloadSha256 && (
                 <div class="nachweis-detail__entry">
-                  <dt>Datensatz-Hash (SHA-256)</dt>
+                  <dt>{t.recordHash}</dt>
                   <dd>
                     <code class="nachweis-detail__hash">{props.sichtpass.recordPayloadSha256}</code>
                   </dd>
@@ -533,7 +584,7 @@ function toISOString(value: unknown): string {
               )}
               {props.sichtpass.envelopeSha256 && (
                 <div class="nachweis-detail__entry">
-                  <dt>Umschlag-Hash (SHA-256)</dt>
+                  <dt>{t.envelopeHash}</dt>
                   <dd>
                     <code class="nachweis-detail__hash">{props.sichtpass.envelopeSha256}</code>
                   </dd>
@@ -541,7 +592,7 @@ function toISOString(value: unknown): string {
               )}
               {props.sichtpass.verificationLevel && (
                 <div class="nachweis-detail__entry">
-                  <dt>Prüfungsniveau</dt>
+                  <dt>{t.verificationLevel}</dt>
                   <dd>{props.sichtpass.verificationLevel}</dd>
                 </div>
               )}
@@ -549,8 +600,8 @@ function toISOString(value: unknown): string {
                 <div class="nachweis-detail__entry">
                   <dt>
                     {props.sichtpass.timestamp.assurance === "eidas-qualified"
-                      ? "Qualifizierter elektronischer Zeitstempel (eIDAS)"
-                      : "RFC 3161-Zeitstempel"}
+                      ? t.qualifiedTimestamp
+                      : t.rfc3161Timestamp}
                   </dt>
                   <dd>
                     {props.sichtpass.timestamp.providerName && (
@@ -561,7 +612,7 @@ function toISOString(value: unknown): string {
                         href={props.sichtpass.timestamp.qualificationEvidenceRef}
                         rel="noopener noreferrer"
                       >
-                        Qualifikationsnachweis
+                        {t.qualificationEvidence}
                       </a>
                     )}
                   </dd>
@@ -569,7 +620,7 @@ function toISOString(value: unknown): string {
               )}
               {props.sichtpass.operatorSignature && (
                 <div class="nachweis-detail__entry">
-                  <dt>Operator-Signatur</dt>
+                  <dt>{t.operatorSignature}</dt>
                   <dd>
                     <code class="nachweis-detail__hash">{props.sichtpass.operatorSignature}</code>
                   </dd>

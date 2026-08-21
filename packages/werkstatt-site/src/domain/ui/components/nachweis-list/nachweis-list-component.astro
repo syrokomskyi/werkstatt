@@ -29,10 +29,11 @@
 
 import { getCollection } from "astro:content";
 import type { SectionProps } from "@warpgogol/werkstatt-shared/share/page";
-import { cast } from "@warpgogol/werkstatt-site/share";
+import { need, cast } from "@warpgogol/werkstatt-site/share";
 import { getEntryLanguage } from "@warpgogol/werkstatt-shared/share/content";
 import NachweisCard, {
   type NachweisAssessmentDimension,
+  type NachweisCardLabels,
 } from "../nachweis-card/nachweis-card-component.astro";
 import SectionShell from "../section-shell/section-shell.astro";
 import SectionHeader from "../section-header/section-header.astro";
@@ -121,11 +122,13 @@ interface NachweisListContent {
   effects?: unknown;
   density?: "compact" | "normal" | "spacious";
   tone?: "default" | "warning" | "success" | "muted";
+  cardLabels: NachweisCardLabels;
 }
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const props = cast<NachweisListContent>(pageOverride);
-const emptyMessage = props.emptyMessage ?? "Weitere Nachweise werden derzeit vorbereitet.";
+const emptyMessage = need("emptyMessage", props.emptyMessage);
+const cardLabels = need("cardLabels", props.cardLabels) as NachweisCardLabels;
 const listVariant = props.variant ?? "registry";
 const kindFilter = props.kindFilter;
 const limit = props.limit;
@@ -411,7 +414,12 @@ if (groups && groups.length > 0) {
                 <ul class="nachweis-list__items" role="list">
                   {groupRecords.map((record) => (
                     <li class="nachweis-list__item">
-                      <NachweisCard {...record} compact={listVariant === "compact"} lang={lang} />
+                      <NachweisCard
+                        {...record}
+                        compact={listVariant === "compact"}
+                        lang={lang}
+                        labels={cardLabels}
+                      />
                     </li>
                   ))}
                 </ul>
@@ -423,7 +431,12 @@ if (groups && groups.length > 0) {
         <ul class="nachweis-list__items" role="list">
           {records.map((record) => (
             <li class="nachweis-list__item">
-              <NachweisCard {...record} compact={listVariant === "compact"} lang={lang} />
+              <NachweisCard
+                {...record}
+                compact={listVariant === "compact"}
+                lang={lang}
+                labels={cardLabels}
+              />
             </li>
           ))}
         </ul>

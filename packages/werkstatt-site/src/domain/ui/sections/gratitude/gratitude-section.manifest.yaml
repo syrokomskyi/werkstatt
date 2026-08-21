@@ -23,6 +23,9 @@ propsSchema:
   additionalProperties: false
   required:
     - header
+    - evidenceLinkLabel
   properties:
     tag:
+      type: string
+    evidenceLinkLabel:
       type: string
