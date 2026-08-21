@@ -54,10 +54,7 @@ function makeInput(flags: Record<string, string>): KernelCommandInput {
   return { flags, argv: [] };
 }
 
-function createSystemConfig(
-  workspaceRoot: string,
-  opts?: { withZoneId?: boolean },
-): void {
+function createSystemConfig(workspaceRoot: string, opts?: { withZoneId?: boolean }): void {
   const cacheDir = join(workspaceRoot, "..", "systems-cache", "warpgogol-com");
   mkdirSync(cacheDir, { recursive: true });
   const configContent = buildSystemConfig({
@@ -173,25 +170,85 @@ test("is idempotent — skips creation when A record and route already correct",
   expect(createdRoute).toBe(false);
 });
 
-test("errors when DNS record exists with wrong type", async () => {
+test("creates A record when only non-A records (MX/TXT) exist for the same domain", async () => {
+  createSystemConfig(tmpDir);
+
+  let createdDns = false;
+  let createdRoute = false;
+
+  setupCloudflareApiMock(mockFetch, {
+    dnsList: () =>
+      cfSuccessResponse([
+        {
+          id: "dns-mx",
+          type: "MX",
+          name: "warpgogol.com",
+          content: "route3.mx.cloudflare.net",
+          proxied: false,
+          priority: 10,
+        },
+        {
+          id: "dns-txt",
+          type: "TXT",
+          name: "warpgogol.com",
+          content: "v=spf1 include:_spf.mx.cloudflare.net ~all",
+          proxied: false,
+        },
+      ]),
+    createDns: () => {
+      createdDns = true;
+      return cfSuccessResponse({
+        id: "dns-new",
+        type: "A",
+        name: "warpgogol.com",
+        content: "192.0.2.1",
+        proxied: true,
+      });
+    },
+    createRoute: () => {
+      createdRoute = true;
+      return cfSuccessResponse({
+        id: "route-new",
+        pattern: "warpgogol.com/*",
+        script: "warpgogol-com",
+      });
+    },
+  });
+
+  const result = await runCustomdomainRegister(
+    makeInput({ site: "warpgogol-com" }),
+    makeContext(tmpDir),
+  );
+  const data = expectData(result);
+
+  expect(data.state).toBe("registered");
+  expect(data.dnsRecord.created).toBe(true);
+  expect(data.dnsRecord.id).toBe("dns-new");
+  expect(data.dnsRecord.type).toBe("A");
+  expect(data.workersRoute.created).toBe(true);
+  expect(createdDns).toBe(true);
+  expect(createdRoute).toBe(true);
+});
+
+test("errors when A record exists but is not proxied", async () => {
   createSystemConfig(tmpDir);
 
   setupCloudflareApiMock(mockFetch, {
     dnsList: () =>
       cfSuccessResponse([
         {
-          id: "dns-wrong",
-          type: "CNAME",
+          id: "dns-a-unproxied",
+          type: "A",
           name: "warpgogol.com",
-          content: "something.example.com",
-          proxied: true,
+          content: "192.0.2.1",
+          proxied: false,
         },
       ]),
   });
 
   await expect(
     runCustomdomainRegister(makeInput({ site: "warpgogol-com" }), makeContext(tmpDir)),
-  ).rejects.toThrow("DNS record for 'warpgogol.com' exists but has wrong values");
+  ).rejects.toThrow("A record for 'warpgogol.com' exists but is not proxied");
 });
 
 test("errors when Workers route exists with wrong script", async () => {
@@ -220,9 +277,7 @@ test("errors when Workers route exists with wrong script", async () => {
 
   await expect(
     runCustomdomainRegister(makeInput({ site: "warpgogol-com" }), makeContext(tmpDir)),
-  ).rejects.toThrow(
-    "Workers route for 'warpgogol.com/*' exists but points to wrong script",
-  );
+  ).rejects.toThrow("Workers route for 'warpgogol.com/*' exists but points to wrong script");
 });
 
 test("errors when CLOUDFLARE_API_TOKEN is missing", async () => {
@@ -245,7 +300,7 @@ test("errors when cloudflareZoneId is missing from system config", async () => {
 test("errors when --site is missing", async () => {
   createSystemConfig(tmpDir);
 
-  await expect(
-    runCustomdomainRegister(makeInput({}), makeContext(tmpDir)),
-  ).rejects.toThrow("--site is required");
+  await expect(runCustomdomainRegister(makeInput({}), makeContext(tmpDir))).rejects.toThrow(
+    "--site is required",
+  );
 });
