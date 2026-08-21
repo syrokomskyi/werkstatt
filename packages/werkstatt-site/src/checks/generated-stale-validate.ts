@@ -41,7 +41,11 @@ import {
   expandOwnershipPlaceholders,
 } from "./generated-files-validate.ts";
 
-export const STATIC_ASSET_EXEMPT_DIRS = ["public/textures/", "public/assets/"];
+export const STATIC_ASSET_EXEMPT_DIRS = [
+  "public/textures/",
+  "public/assets/",
+  "public/nachweis-pdfs/",
+];
 
 const PREVIEW_DIR = "public/preview/";
 
