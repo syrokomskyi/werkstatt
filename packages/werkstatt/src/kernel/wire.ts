@@ -394,6 +394,7 @@ export async function runKernelWire(
       modulesSkipped: skipped,
       warnings: warnings.length > 0 ? warnings : undefined,
     },
+    exitCode: 0,
     summary: `[kernel.wire] ${generated.length} file(s) ${context.dryRun ? "would be written" : "written"}`,
   };
 }

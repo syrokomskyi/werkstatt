@@ -124,7 +124,7 @@ export async function runSemanticPageValidate(
     logger.info(message);
     return {
       data: jsonOutput ? { markers: [], count: 0 } : undefined,
-      summary: message,
+      summary: `[semantic.page.validate] ${message}`,
       exitCode: 0,
     };
   }
@@ -152,13 +152,30 @@ export async function runSemanticPageValidate(
         shouldFail,
         isProduction,
       },
-      summary: message,
+      summary: `[semantic.page.validate] ${message}`,
       exitCode: shouldFail ? 1 : 0,
+      nextSteps: shouldFail
+        ? [
+            {
+              action:
+                "Fix the NEED_THIS_* markers listed above, then re-run semantic.page.validate",
+              kind: "required",
+            },
+          ]
+        : undefined,
     };
   }
 
   return {
-    summary: message,
+    summary: `[semantic.page.validate] ${message}`,
     exitCode: shouldFail ? 1 : 0,
+    nextSteps: shouldFail
+      ? [
+          {
+            action: "Fix the NEED_THIS_* markers listed above, then re-run semantic.page.validate",
+            kind: "required",
+          },
+        ]
+      : undefined,
   };
 }

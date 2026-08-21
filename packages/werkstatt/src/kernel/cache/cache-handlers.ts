@@ -41,9 +41,10 @@ export async function runKernelCacheStatus(
 
     return {
       data: status,
+      exitCode: 0,
       summary: status.available
-        ? `Cache active — ${status.namespaces.length} namespace(s)`
-        : `Cache unavailable: ${status.unavailableReason ?? "unknown"}`,
+        ? `[kernel.cache.status] Cache active — ${status.namespaces.length} namespace(s)`
+        : `[kernel.cache.status] Cache unavailable: ${status.unavailableReason ?? "unknown"}`,
     };
   } finally {
     await cache.close();
@@ -71,7 +72,10 @@ export async function runKernelCacheClear(
 
     return {
       data: { cleared: true, dbPath: status.dbPath, namespace },
-      summary: namespace ? `Cleared namespace "${namespace}"` : "Cleared all cache namespaces",
+      exitCode: 0,
+      summary: namespace
+        ? `[kernel.cache.clear] Cleared namespace "${namespace}"`
+        : "[kernel.cache.clear] Cleared all cache namespaces",
     };
   } finally {
     await cache.close();

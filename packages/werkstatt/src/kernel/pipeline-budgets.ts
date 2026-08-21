@@ -320,7 +320,7 @@ export async function runPipelineBudgetGenerate(
         skippedLines: 0,
       },
       exitCode: 0,
-      summary: "pipeline.budget.generate: no local telemetry history found — nothing to aggregate",
+      summary: "[pipeline.budget.generate] no local telemetry history found — nothing to aggregate",
     };
   }
 
@@ -335,7 +335,7 @@ export async function runPipelineBudgetGenerate(
         skippedLines: skipped,
       },
       exitCode: 0,
-      summary: "pipeline.budget.generate: telemetry history is empty — nothing to aggregate",
+      summary: "[pipeline.budget.generate] telemetry history is empty — nothing to aggregate",
     };
   }
 
@@ -357,6 +357,10 @@ export async function runPipelineBudgetGenerate(
     await writeFileAtomic(outputPath, content);
   }
 
+  const summaryText = dryRun
+    ? `[pipeline.budget.generate] dry-run — ${budgets.length} budget(s) from ${records.length} sample(s)`
+    : `[pipeline.budget.generate] wrote ${budgets.length} budget(s) from ${records.length} sample(s)${skipped > 0 ? ` (${skipped} unparseable line(s) skipped)` : ""}`;
+
   return {
     data: {
       command: "pipeline.budget.generate",
@@ -366,9 +370,7 @@ export async function runPipelineBudgetGenerate(
       skippedLines: skipped,
     },
     exitCode: 0,
-    summary: dryRun
-      ? `pipeline.budget.generate: dry-run — ${budgets.length} budget(s) from ${records.length} sample(s)`
-      : `pipeline.budget.generate: wrote ${budgets.length} budget(s) from ${records.length} sample(s)${skipped > 0 ? ` (${skipped} unparseable line(s) skipped)` : ""}`,
+    summary: summaryText,
   };
 }
 

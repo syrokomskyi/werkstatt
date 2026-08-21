@@ -313,6 +313,6 @@ export async function runChangeImpactDerive(
   return {
     data: result,
     exitCode: 0,
-    summary: `change.impact.derive: overall=${classification.overall}, ${paths.length} path(s), ${impactedApps.length} app(s)`,
+    summary: `[change.impact.derive] overall=${classification.overall}, ${paths.length} path(s), ${impactedApps.length} app(s)`,
   };
 }
