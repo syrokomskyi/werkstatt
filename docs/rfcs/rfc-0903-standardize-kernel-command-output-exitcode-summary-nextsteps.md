@@ -1,7 +1,7 @@
 ---
 id: RFC-0903
 title: "Standardize kernel command output: exitCode, summary, nextSteps"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-21
 updatedAt: 2026-08-21
 enhancedAt: 2026-08-21
-implementedAt:
+implementedAt: 2026-08-21
 closedAt:
 supersedes: []
 supersededBy:
