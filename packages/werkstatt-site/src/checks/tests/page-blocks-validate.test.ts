@@ -113,4 +113,50 @@ describe("page.blocks.extract.validate fixtures", () => {
       await rm(root, { recursive: true, force: true });
     }
   });
+
+  it("fails when a page block has a non-kebab-case id", async () => {
+    const { root, app } = await writeFixtureApp(`  - id: My Block
+    type: markdown
+    props:
+      body: Invalid id format
+`);
+    try {
+      const result = await runPageBlocksValidate(input, context(root, app));
+      expect(result.exitCode).toBe(1);
+      const diags = (result.data as { diagnostics?: Array<{ message: string }> }).diagnostics ?? [];
+      expect(diags.some((d) => d.message.includes("BLOCK-ID-INVALID"))).toBe(true);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("fails when a page block id has leading hyphen", async () => {
+    const { root, app } = await writeFixtureApp(`  - id: -leading-hyphen
+    type: markdown
+    props:
+      body: Invalid id format
+`);
+    try {
+      const result = await runPageBlocksValidate(input, context(root, app));
+      expect(result.exitCode).toBe(1);
+      const diags = (result.data as { diagnostics?: Array<{ message: string }> }).diagnostics ?? [];
+      expect(diags.some((d) => d.message.includes("BLOCK-ID-INVALID"))).toBe(true);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("passes when a page block id has digits and single hyphens", async () => {
+    const { root, app } = await writeFixtureApp(`  - id: block-01-intro
+    type: markdown
+    props:
+      body: Valid id
+`);
+    try {
+      const result = await runPageBlocksValidate(input, context(root, app));
+      expect(result.exitCode ?? 0).toBe(0);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
 });

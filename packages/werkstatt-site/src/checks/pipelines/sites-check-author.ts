@@ -9,6 +9,7 @@
   <item>Extracted from module.ts to shrink the registration surface.</item>
   <item>RFC-0600: added generated.stale.validate after generated.files.validate.</item>
   <item>RFC-0786: added agent.dns-aid.validate after agent.openapi.validate.</item>
+  <item>RFC-0914: added page.blocks.extract.validate after page.block.validate for block id presence, format, and extractor coverage.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -39,6 +40,8 @@ export const SITES_CHECK_AUTHOR_PIPELINE: KernelPipelineStep[] = [
   { command: "semantic.targets.validate" },
   // Wave 0 (RFC-0026): Block-declarative pages + RuntimeContext pipeline
   { command: "page.block.validate" },
+  // RFC-0914: block id presence, format, and extractor coverage
+  { command: "page.blocks.extract.validate" },
   // RFC-0205: localized twin prop parity (deepMergeEntryData array-replacement guard)
   { command: "page.blocks.mirror.validate" },
   { command: "shared.context.validate" },

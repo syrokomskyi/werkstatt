@@ -558,7 +558,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
   {
     name: "page.blocks.extract.validate",
     description:
-      "Validate that every block type has a registered extractor and every block has an id. Enforces the unified SemanticBlock contract (RFC-0208/RFC-0372).",
+      "Validate that every block type has a registered extractor, every block has an id, and every block id is kebab-case. Enforces the unified SemanticBlock contract (RFC-0208/RFC-0372/RFC-0914).",
     scope: "app",
     flags: {},
     supportsAllSites: true,

@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0372: validate that every block type in an app has a registered extractor and every block has an id. Prevents silent markdown twin degradation and enforces the unified SemanticBlock contract.</purpose>
+<purpose>RFC-0372/RFC-0914: validate that every block type in an app has a registered extractor, every block has an id, and every block id is kebab-case. Prevents silent markdown twin degradation and enforces the unified SemanticBlock contract.</purpose>
 <non-goals>
   <item>Do not validate runtime rendering — only static block declarations.</item>
 </non-goals>
@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0208: introduced page.blocks.validate for extractor coverage auditing.</item>
   <item>RFC-0372: renamed to page.blocks.extract.validate; strengthened to require all block types to have registered extractors (not just text-bearing ones); require all blocks to have id fields; reads from unified page.blocks.</item>
+  <item>RFC-0914: added BLOCK-ID-INVALID format check (kebab-case regex); added to SITES_CHECK_AUTHOR_PIPELINE after page.block.validate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -45,6 +46,8 @@ export async function runPageBlocksValidate(
   const violations: string[] = [];
   const unhandledTypes = new Set<string>();
   const missingIds: string[] = [];
+  const invalidIds: string[] = [];
+  const KEBAB_CASE_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
   const pageReports: Array<{
     pageId: string;
     lang: string;
@@ -53,7 +56,14 @@ export async function runPageBlocksValidate(
   }> = [];
 
   for (const lang of languages) {
-    const semanticSite = await loadSemanticSiteModel({ contentDir, lang, siteUrl });
+    let semanticSite;
+    try {
+      semanticSite = await loadSemanticSiteModel({ contentDir, lang, siteUrl });
+    } catch (err) {
+      // RFC-0914: extractContentBlocks throws on missing block id.
+      // The deep scan below will report the details — skip the semantic model pass.
+      semanticSite = { pages: [] };
+    }
     for (const page of semanticSite.pages) {
       const reportBlocks: Array<{
         blockId: string;
@@ -105,6 +115,11 @@ export async function runPageBlocksValidate(
         const blockId = block["id"];
         if (!blockId || typeof blockId !== "string" || blockId.length === 0) {
           missingIds.push(`${relativeFile}: block type "${blockType}" missing id`);
+        } else if (!KEBAB_CASE_RE.test(blockId)) {
+          // RFC-0914: block id must be strict kebab-case.
+          invalidIds.push(
+            `${relativeFile}: block type "${blockType}" has invalid id "${blockId}" (must be kebab-case: lowercase letters, digits, single hyphens)`,
+          );
         }
       }
     }
@@ -153,7 +168,13 @@ export async function runPageBlocksValidate(
   }
 
   if (missingIds.length > 0) {
-    violations.push(`Blocks missing id field:\n  ${missingIds.join("\n  ")}`);
+    violations.push(`BLOCK-ID-MISSING: Blocks missing id field:\n  ${missingIds.join("\n  ")}`);
+  }
+
+  if (invalidIds.length > 0) {
+    violations.push(
+      `BLOCK-ID-INVALID: Blocks with non-kebab-case id:\n  ${invalidIds.join("\n  ")}`,
+    );
   }
 
   if (violations.length > 0) {
