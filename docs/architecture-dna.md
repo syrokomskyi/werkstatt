@@ -104,7 +104,7 @@ Every site workspace has an explicit client-editable surface: `src/content/{busi
 
 ## DNA-24 · Block-declarative pages
 
-Every page content entry under `apps/*/src/content/pages/**/<slug>.md` (or `<lang>/<slug>.md`) is a **frontmatter-only document** with shape `kind: page`, `cosmicStar`, `title`, `description`, `lang`, `blocks[]`. No markdown body is permitted — prose content lives in separate `src/content/prose/<slug>.<lang>.md` entries referenced via `blocks[].props.contentRef`. Each `blocks[].type` is a `PlanetName` drawn from the `PlanetCatalog` and must also appear in `system.md pages[route].planets[]` for the owning page's route. Markdown bodies in page entries fail `mirror.quintet.validate` and `page.block.validate`. Established by RFC-0026.
+Every page content entry under `apps/*/src/content/pages/**/<slug>.md` (or `<lang>/<slug>.md`) is a **frontmatter-only document** with shape `kind: page`, `cosmicStar`, `title`, `description`, `lang`, `blocks[]`. No markdown body is permitted — prose content lives in separate `src/content/prose/<slug>.<lang>.md` entries referenced via `blocks[].props.contentRef`. Each `blocks[].type` is a `PlanetName` drawn from the `PlanetCatalog` and must also appear in `system.md pages[route].planets[]` for the owning page's route. Each `blocks[].id` is a mandatory stable kebab-case identifier used as the HTML `id` attribute — enforced by `page.blocks.extract.validate` (RFC-0914). Markdown bodies in page entries fail `mirror.quintet.validate` and `page.block.validate`. Established by RFC-0026, amended by RFC-0914.
 
 ## DNA-25 · Single `buildPage` pipeline
 
