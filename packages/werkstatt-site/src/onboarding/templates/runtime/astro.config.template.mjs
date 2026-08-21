@@ -42,6 +42,7 @@
 
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
+import { readdirSync, readFileSync, existsSync, unlinkSync } from "node:fs";
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import { defineConfig, sessionDrivers, sharpImageService } from "astro/config";
@@ -62,6 +63,74 @@ const monorepoRoot = resolve(__dirname, "..", "..", "..");
 // process crashes with EADDRINUSE. Disabling it for production builds is safe.
 if (!isAstroDev) {
   process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS || ""} --no-inspect`.trim();
+}
+
+// [RFC-0833/LH-12] Post-build plugin: removes orphaned JS chunks from dist/client/_astro/
+// that are not referenced by any HTML page or transitively imported by referenced JS.
+// Astro's React integration and section component scripts can emit chunks that no page
+// actually uses (e.g. when a section is only used on pages that aren't built, or when
+// the React integration emits a hydration runtime but no page has client: directives).
+function cleanupOrphanedJsChunks() {
+  return {
+    name: "cleanup-orphaned-js-chunks",
+    apply: "build",
+    closeBundle() {
+      const astroDir = resolve(__dirname, "dist", "client", "_astro");
+      if (!existsSync(astroDir)) return;
+      const htmlDir = resolve(__dirname, "dist", "client");
+
+      // Collect all HTML files
+      const htmlFiles = [];
+      function walkHtml(dir) {
+        for (const entry of readdirSync(dir, { withFileTypes: true })) {
+          const full = resolve(dir, entry.name);
+          if (entry.isDirectory()) walkHtml(full);
+          else if (entry.name.endsWith(".html")) htmlFiles.push(full);
+        }
+      }
+      walkHtml(htmlDir);
+
+      // Build referenced set from HTML script src tags
+      const referenced = new Set();
+      const scriptSrcRegex = /<script\s+[^>]*src=["']([^"']+)["'][^>]*>/gi;
+      for (const htmlFile of htmlFiles) {
+        const content = readFileSync(htmlFile, "utf8");
+        for (const match of content.matchAll(scriptSrcRegex)) {
+          const src = match[1].replace(/^\//, "");
+          referenced.add(src.split("/").pop());
+        }
+      }
+
+      // BFS through JS imports
+      const queue = [...referenced];
+      const importRegex =
+        /(?:import\s*\(\s*["']([^"']+)["']\s*\)|import\s*["']([^"']+)["']|from\s*["']([^"']+)["'])/g;
+      while (queue.length > 0) {
+        const basename = queue.shift();
+        const jsFile = resolve(astroDir, basename);
+        if (!existsSync(jsFile)) continue;
+        const content = readFileSync(jsFile, "utf8");
+        for (const match of content.matchAll(importRegex)) {
+          const importPath = match[1] ?? match[2] ?? match[3];
+          if (!importPath) continue;
+          if (!importPath.startsWith(".") && !importPath.startsWith("/")) continue;
+          const resolved = resolve(dirname(jsFile), importPath).split("/").pop();
+          if (!referenced.has(resolved)) {
+            referenced.add(resolved);
+            queue.push(resolved);
+          }
+        }
+      }
+
+      // Remove orphaned JS files
+      for (const entry of readdirSync(astroDir)) {
+        if (!entry.endsWith(".js")) continue;
+        if (!referenced.has(entry)) {
+          unlinkSync(resolve(astroDir, entry));
+        }
+      }
+    },
+  };
 }
 
 export default defineConfig({
@@ -104,6 +173,8 @@ export default defineConfig({
   },
   integrations: [react()],
   vite: {
+    // [RFC-0833/LH-12] Remove orphaned JS chunks after build
+    plugins: [cleanupOrphanedJsChunks()],
     // [dev-workflow] Allow Vite to serve and watch platform packages symlinked
     // from ../../../../../packages/* — without this, Vite blocks serving files
     // outside the workpiece root and HMR doesn't fire on package source edits.
@@ -169,9 +240,9 @@ export default defineConfig({
               const match = id.match(/node_modules\/(?:@[^/]+\/[^/]+|[^/]+)/);
               if (match) {
                 const pkg = match[0].replace("node_modules/", "");
-                if (pkg.includes("react") || pkg.includes("scheduler")) {
-                  return "vendor-react";
-                }
+                // [RFC-0833/LH-12] Removed vendor-react chunk — when no page uses
+                // React islands, a separate React chunk becomes an orphaned bundle.
+                // React is tree-shaken into page bundles only where needed.
                 if (pkg.includes("three") || pkg.includes("@react-three")) {
                   return "vendor-three";
                 }
