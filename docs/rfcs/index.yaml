@@ -17449,7 +17449,7 @@ entries:
       - RFC-0905
       - RFC-0906
       - RFC-0904
-    file: docs/rfcs/rfc-0908-host-canonicalization-and-url-normalization-validators.md
+    file: docs/rfcs/archive/implemented/rfc-0908-host-canonicalization-and-url-normalization-validators.md
   - id: RFC-0909
     title: Search engine verification surface and automated sitemap submission
     status: draft
