@@ -540,7 +540,7 @@ export async function runLagebildValidate(
   if (violations.length > 0) {
     return {
       data: { command: "lagebild.validate", status: "error", violations },
-      summary: `[lagebild.validate] ${violations.length} violation(s): ${violations.join("; ")}`,
+      summary: `[lagebild.validate] ${violations.length} violation${violations.length === 1 ? "" : "s"}: ${violations.join("; ")}`,
       exitCode: 1,
       nextSteps: [
         {

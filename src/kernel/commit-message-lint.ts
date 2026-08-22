@@ -252,6 +252,6 @@ export async function runCommitMessageLint(
   return {
     data: { command: "commit.message.lint", status, diagnostics, summary },
     exitCode: summary.error > 0 ? 1 : 0,
-    summary: `commit.message.lint: ${commits.length} commit(s) in range, ${summary.error} error(s), ${summary.warning} warning(s)`,
+    summary: `commit.message.lint: ${commits.length} commit(s) in range, ${summary.error} error${summary.error === 1 ? "" : "s"}, ${summary.warning} warning${summary.warning === 1 ? "" : "s"}`,
   };
 }

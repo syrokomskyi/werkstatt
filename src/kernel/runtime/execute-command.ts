@@ -156,7 +156,7 @@ export async function executeRegisteredCommand(
           info: 0,
         },
       };
-      const summary = `[${command.name}] ${errorDiagnostics.length} argument error(s)`;
+      const summary = `[${command.name}] ${errorDiagnostics.length} argument error${errorDiagnostics.length === 1 ? "" : "s"}`;
       logger.error(summary);
       for (const line of formatFailureDiagnostics(data)) {
         logger.error(line);

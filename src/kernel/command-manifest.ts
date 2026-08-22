@@ -228,6 +228,6 @@ function diagnosticsResultLocal(diagnostics: Diagnostic[]): KernelCommandResult<
   return {
     data: { command: "command.manifest.validate", status, diagnostics, summary },
     exitCode: summary.error > 0 ? 1 : 0,
-    summary: `command.manifest.validate: ${summary.error} error(s), ${summary.warning} warning(s)`,
+    summary: `command.manifest.validate: ${summary.error} error${summary.error === 1 ? "" : "s"}, ${summary.warning} warning${summary.warning === 1 ? "" : "s"}`,
   };
 }
