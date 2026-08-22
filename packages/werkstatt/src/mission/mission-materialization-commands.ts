@@ -76,6 +76,7 @@ import type { WorkpieceConfigPresenceResult } from "./workpiece-config-presence-
 import {
   restoreCacheCloneGitignore,
   untrackForbiddenGeneratedFiles,
+  CACHE_CLONE_GENERATED_PATTERNS,
 } from "./cache-clone-gitignore.ts";
 
 const STERNSYSTEM_DATA_PATHS = [
@@ -1410,17 +1411,39 @@ export async function runMissionReconcile(
                 encoding: "utf-8",
               });
             }
-            const pathArgs = conflictedPaths.map((p) => JSON.stringify(p)).join(" ");
-            execSync(`git checkout HEAD -- ${pathArgs}`, {
-              cwd: systemDir,
-              stdio: "pipe",
-              encoding: "utf-8",
-            });
-            execSync(`git add -- ${pathArgs}`, {
-              cwd: systemDir,
-              stdio: "pipe",
-              encoding: "utf-8",
-            });
+            // RFC-0916: Split conflicted paths into tracked (checkout HEAD) and
+            // untracked generated files (just git add to clear conflict marker).
+            // CACHE_CLONE_GENERATED_PATTERNS files are gitignored in the cache clone
+            // and not in HEAD — git checkout HEAD -- fails for them. The .gitignore
+            // restoration step later will untrack them anyway.
+            const isGeneratedUntracked = (p: string) =>
+              CACHE_CLONE_GENERATED_PATTERNS.some(
+                (pattern) => p === pattern || p.startsWith(pattern.replace(/\.[^.]+$/, "")),
+              );
+            const trackedConflicted = conflictedPaths.filter((p) => !isGeneratedUntracked(p));
+            const generatedConflicted = conflictedPaths.filter((p) => isGeneratedUntracked(p));
+
+            if (trackedConflicted.length > 0) {
+              const trackedArgs = trackedConflicted.map((p) => JSON.stringify(p)).join(" ");
+              execSync(`git checkout HEAD -- ${trackedArgs}`, {
+                cwd: systemDir,
+                stdio: "pipe",
+                encoding: "utf-8",
+              });
+              execSync(`git add -- ${trackedArgs}`, {
+                cwd: systemDir,
+                stdio: "pipe",
+                encoding: "utf-8",
+              });
+            }
+            if (generatedConflicted.length > 0) {
+              const generatedArgs = generatedConflicted.map((p) => JSON.stringify(p)).join(" ");
+              execSync(`git add -- ${generatedArgs}`, {
+                cwd: systemDir,
+                stdio: "pipe",
+                encoding: "utf-8",
+              });
+            }
             cacheCloneCommit(systemDir, "", { noEdit: true });
             autoResolvedPaths = conflictedPaths;
             logger.info(
