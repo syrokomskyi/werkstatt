@@ -64,7 +64,7 @@ function flagString(input: KernelCommandInput, key: string): string | undefined 
   return typeof v === "string" ? v : undefined;
 }
 
-const FORBIDDEN_PATTERNS = [
+export const FORBIDDEN_PATTERNS = [
   "dist",
   "node_modules",
   "packages",
