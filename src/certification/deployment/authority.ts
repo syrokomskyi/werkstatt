@@ -404,6 +404,8 @@ export interface DeploymentEffectRecordV1 {
   mainVerificationDecisionId: string | null;
   state: DeploymentOperationState;
   timestamp: string;
+  workerVersionId?: string;
+  releaseId?: string;
 }
 
 export function buildDeploymentEffectRecord(
@@ -417,6 +419,8 @@ export function buildDeploymentEffectRecord(
   mainVerificationDecisionId: string | null,
   state: DeploymentOperationState,
   timestamp: string,
+  workerVersionId?: string,
+  releaseId?: string,
 ): DeploymentEffectRecordV1 {
   const recordData = {
     operationId,
@@ -429,6 +433,8 @@ export function buildDeploymentEffectRecord(
     mainVerificationDecisionId,
     state,
     timestamp,
+    workerVersionId,
+    releaseId,
   };
   const effectHash = byteHash(JSON.stringify(recordData)) as Sha256Digest;
 

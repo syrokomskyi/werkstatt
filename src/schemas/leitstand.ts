@@ -13,6 +13,7 @@
   <item>RFC-0627: add channels.dev (required), make channels.alt required, add dev to lastPropagated.</item>
   <item>RFC-0666: remove secretRefSchema and SecretRef (dead code); change secretsFile field to z.string().optional() for detection (sternsystem.validate rejects any value).</item>
   <item>RFC-0790: add deploymentStaticConfigSchema (adapter + channels only, no lastPropagated) for system-config.yaml.</item>
+  <item>RFC-0926: add optional workerVersionId to propagationResultSchema and lastPropagatedChannelSchema for release-aware rollback.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -42,6 +43,7 @@ export const lastPropagatedChannelSchema = z.object({
   operationId: z.string(),
   leaseExpiresAt: z.string().datetime().nullable(),
   purgeResult: purgeResultSchema.optional(),
+  workerVersionId: z.string().optional(),
 });
 
 export const healthCheckSchema = z.object({
@@ -59,6 +61,7 @@ export const propagationResultSchema = z.object({
   releaseId: z.string(),
   state: z.enum(["succeeded", "failed", "failed-stale", "in-progress"]),
   deploymentUrl: z.string(),
+  workerVersionId: z.string().optional(),
   startedAt: z.string().datetime(),
   completedAt: z.string().datetime().nullable(),
   healthChecks: z.array(healthCheckSchema),

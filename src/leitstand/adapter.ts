@@ -11,6 +11,7 @@
   <item>RFC-0585: add nodeModulesBinPath to PropagateInput/RollbackInput for wrangler resolution from dist/server/.</item>
   <item>RFC-0587: add DeploymentLimits interface and getLimits() method for adapter-declared size limits.</item>
   <item>RFC-0627: extend channel type to include "dev" for the three-channel deployment chain.</item>
+  <item>RFC-0926: add optional versionId to RollbackInput and rolledBackToVersionId to RollbackResult for release-aware rollback.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -39,6 +40,7 @@ export interface RollbackInput {
   channel: "dev" | "alt" | "main";
   wranglerConfigDir: string;
   workerName: string;
+  versionId?: string;
 }
 
 export interface RollbackResult {
@@ -46,6 +48,7 @@ export interface RollbackResult {
   channel: "dev" | "alt" | "main";
   state: "succeeded" | "failed";
   workerName: string;
+  rolledBackToVersionId?: string;
   startedAt: string;
   completedAt: string;
   stdout: string;

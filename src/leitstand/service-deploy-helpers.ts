@@ -114,9 +114,14 @@ export async function runWranglerDeploy(
 export async function runWranglerRollback(
   serviceDir: string,
   env: Record<string, string>,
+  versionId?: string,
 ): Promise<{ exitCode: number; stdout: string; stderr: string }> {
+  const args = ["--yes", "wrangler", "rollback"];
+  if (versionId) {
+    args.push(versionId);
+  }
   return new Promise((resolve) => {
-    const child = spawn("npx", ["--yes", "wrangler", "rollback"], {
+    const child = spawn("npx", args, {
       cwd: serviceDir,
       env: { ...process.env, ...env },
       stdio: ["pipe", "pipe", "pipe"],
@@ -141,6 +146,11 @@ export async function runWranglerRollback(
 export function extractWorkersDevUrl(stdout: string): string | undefined {
   const match = stdout.match(/https?:\/\/[^\s]+\.workers\.dev[^\s]*/);
   return match ? match[0] : undefined;
+}
+
+export function extractWorkerVersionId(stdout: string): string | undefined {
+  const match = stdout.match(/Current Version ID:\s*([a-f0-9-]+)/i);
+  return match ? match[1] : undefined;
 }
 
 export async function runHealthCheck(

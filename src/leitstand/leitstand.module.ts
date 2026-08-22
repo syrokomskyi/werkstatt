@@ -221,7 +221,7 @@ export function createLeitstandModule(): KernelModule {
       registry.registerCommand({
         name: "leitstand.rollback",
         description:
-          "Rollback a site or service to its previous Cloudflare Worker deployment via native wrangler rollback (RFC-0895). Flags: --site OR --service (mutually exclusive), [--channel dev|alt|main].",
+          "Rollback a site or service to a previous Cloudflare Worker deployment via native wrangler rollback (RFC-0895, RFC-0926). Flags: --site OR --service (mutually exclusive), [--channel dev|alt|main], [--to-release <releaseId>].",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
@@ -233,15 +233,22 @@ export function createLeitstandModule(): KernelModule {
             kind: "string",
             description: "Deployment channel for site rollback: dev, alt, or main (default).",
           },
+          "to-release": {
+            kind: "string",
+            description:
+              "Target release ID for rollback (RFC-0926). Resolves Worker Version ID from deployment-effect-records.",
+          },
         },
         writes: [
           "systems-cache/{system}/system-state.yaml",
           "systems-cache/{system}/bordbuch/events.ndjson",
+          "systems-cache/{system}/deployment-operations/",
           "services/registry.yaml",
         ],
         reads: [
           "systems-cache/{system}/system-config.yaml",
           "systems-cache/{system}/system-state.yaml",
+          "systems-cache/{system}/deployment-operations/",
           "services/registry.yaml",
           "services/{service}/**",
         ],

@@ -1347,6 +1347,75 @@ export async function runLeitstandStatus(
 }
 
 // §5.3: leitstand.rollback (RFC-0895: native wrangler rollback, unified site+service)
+// RFC-0926: release-aware rollback with --to-release and Worker Version ID tracking
+
+interface ResolvedRollbackTarget {
+  versionId?: string;
+  releaseId?: string;
+}
+
+async function resolveRollbackVersionId(
+  cacheCloneDir: string,
+  channel: Channel,
+  targetRelease?: string,
+): Promise<ResolvedRollbackTarget> {
+  const opsDir = join(cacheCloneDir, "deployment-operations");
+  if (!existsSync(opsDir)) return {};
+
+  const files = readdirSync(opsDir).filter((f) => f.endsWith(".json"));
+  const records: Array<{
+    workerVersionId?: string;
+    releaseId?: string;
+    state: string;
+    channel?: string;
+    timestamp: string;
+  }> = [];
+
+  for (const file of files) {
+    try {
+      const content = await fs.readFile(join(opsDir, file), "utf8");
+      const parsed = JSON.parse(content);
+      if (parsed.state === "succeeded" && parsed.workerVersionId) {
+        records.push({
+          workerVersionId: parsed.workerVersionId,
+          releaseId: parsed.releaseId,
+          state: parsed.state,
+          channel: parsed.channel,
+          timestamp: parsed.timestamp,
+        });
+      }
+    } catch {
+      // Skip malformed files
+    }
+  }
+
+  // Sort by timestamp descending (most recent first)
+  records.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+
+  if (targetRelease) {
+    // Find the most recent succeeded record for the target release
+    const match = records.find((r) => r.releaseId === targetRelease);
+    if (match?.workerVersionId) {
+      return { versionId: match.workerVersionId, releaseId: match.releaseId };
+    }
+    return {};
+  }
+
+  // Default: find the previous release (different from the current release in system-state)
+  const state = await readSystemStateSmart(cacheCloneDir, path.basename(cacheCloneDir));
+  const currentReleaseId = state?.lastPropagated?.[channel]?.releaseId;
+
+  if (!currentReleaseId) return {};
+
+  // Find the most recent succeeded record with a different releaseId
+  const match = records.find((r) => r.releaseId && r.releaseId !== currentReleaseId);
+  if (match?.workerVersionId) {
+    return { versionId: match.workerVersionId, releaseId: match.releaseId };
+  }
+
+  return {};
+}
+
 export interface LeitstandRollbackData {
   command: "leitstand.rollback";
   target: "site" | "service";
@@ -1355,6 +1424,8 @@ export interface LeitstandRollbackData {
   channel?: Channel;
   workerName: string;
   rollbackState: "succeeded" | "failed";
+  rolledBackToVersionId?: string;
+  rolledBackToReleaseId?: string;
   startedAt: string;
   completedAt: string;
   operationId: string;
@@ -1369,16 +1440,12 @@ export async function runLeitstandRollback(
   const siteId = flagSite(input);
   const serviceId = flagString(input, "service");
   const channel = parseChannel(flagString(input, "channel"), "main");
+  const toRelease = flagString(input, "to-release");
 
   // Reject removed flags
   if (flagString(input, "gate-decision")) {
     throw new Error(
       "[leitstand.rollback] --gate-decision is no longer supported for rollback (RFC-0895)",
-    );
-  }
-  if (flagString(input, "to-release")) {
-    throw new Error(
-      "[leitstand.rollback] --to-release is no longer supported for rollback (RFC-0895)",
     );
   }
 
@@ -1394,9 +1461,17 @@ export async function runLeitstandRollback(
   const startedAt = new Date().toISOString();
 
   if (siteId) {
-    return runSiteRollback(workspaceRoot, siteId, channel, operationId, startedAt, logger);
+    return runSiteRollback(
+      workspaceRoot,
+      siteId,
+      channel,
+      operationId,
+      startedAt,
+      logger,
+      toRelease,
+    );
   } else {
-    return runServiceRollback(workspaceRoot, serviceId!, operationId, startedAt, logger);
+    return runServiceRollback(workspaceRoot, serviceId!, operationId, startedAt, logger, toRelease);
   }
 }
 
@@ -1407,6 +1482,7 @@ async function runSiteRollback(
   operationId: string,
   startedAt: string,
   logger: { info: (msg: string) => void },
+  toRelease?: string,
 ): Promise<KernelCommandResult<LeitstandRollbackData>> {
   const systemConfig = await readSystemConfigSmart(workspaceRoot, systemId);
   if (!systemConfig.deployment) {
@@ -1425,6 +1501,23 @@ async function runSiteRollback(
   const workerName = channelConfig?.workerName ?? systemId;
   const channelUrl = channelConfig?.url ?? "";
 
+  // Resolve Worker Version ID for targeted rollback (RFC-0926)
+  const cacheCloneDir = resolveCacheClonePath(workspaceRoot, systemId);
+  const rollbackTarget = await resolveRollbackVersionId(cacheCloneDir, channel, toRelease);
+  if (rollbackTarget.versionId) {
+    logger.info(
+      `[leitstand.rollback] resolved Worker Version ID ${rollbackTarget.versionId} for release ${rollbackTarget.releaseId ?? toRelease ?? "previous"}`,
+    );
+  } else if (toRelease) {
+    logger.info(
+      `[leitstand.rollback] no stored Worker Version ID for release '${toRelease}', falling back to wrangler rollback without version ID`,
+    );
+  } else {
+    logger.info(
+      `[leitstand.rollback] no previous release version ID found, falling back to wrangler rollback without version ID`,
+    );
+  }
+
   // Create temp directory with minimal wrangler.json for wrangler rollback
   const os = await import("node:os");
   const tmpDir = await fs.mkdtemp(join(os.tmpdir(), "wrangler-rollback-"));
@@ -1442,6 +1535,7 @@ async function runSiteRollback(
       channel,
       wranglerConfigDir: tmpDir,
       workerName,
+      versionId: rollbackTarget.versionId,
     });
 
     // Purge CDN cache for site rollbacks
@@ -1460,7 +1554,6 @@ async function runSiteRollback(
     }
 
     // Write deployment effect record
-    const cacheCloneDir = resolveCacheClonePath(workspaceRoot, systemId);
     const effectRecord = buildEffectRecord(
       operationId,
       systemId,
@@ -1472,6 +1565,8 @@ async function runSiteRollback(
       null,
       rollbackResult.state === "succeeded" ? "rolled-back" : "failed",
       new Date().toISOString(),
+      rollbackTarget.versionId,
+      rollbackTarget.releaseId,
     );
     await writeDeploymentEffectRecord(cacheCloneDir, effectRecord);
 
@@ -1483,6 +1578,8 @@ async function runSiteRollback(
       channel,
       workerName,
       rollbackState: rollbackResult.state,
+      rolledBackToVersionId: rollbackTarget.versionId,
+      rolledBackToReleaseId: rollbackTarget.releaseId,
       startedAt,
       completedAt,
       operationId,
@@ -1505,7 +1602,7 @@ async function runSiteRollback(
 
     return {
       data,
-      summary: `[leitstand.rollback] ${systemId}: rolled back to previous deployment`,
+      summary: `[leitstand.rollback] ${systemId}: rolled back to ${rollbackTarget.releaseId ?? "previous deployment"}${rollbackTarget.versionId ? ` (version ${rollbackTarget.versionId})` : ""}`,
       nextSteps: [
         {
           action: `Verify health: pnpm exec werkstatt run leitstand.health --site ${systemId} --channel ${channel}`,
@@ -1525,6 +1622,7 @@ async function runServiceRollback(
   operationId: string,
   startedAt: string,
   logger: { info: (msg: string) => void },
+  toRelease?: string,
 ): Promise<KernelCommandResult<LeitstandRollbackData>> {
   const { readServicesRegistry, findServiceEntry } = await import("../sternsystem/registry-io.ts");
   const {

@@ -11,6 +11,7 @@
 <item>RFC-0866 fix: add resolveGateDecisionPath helper for conventional gate-decision path resolution.</item>
 <item>RFC-0866 fix D-2: writeDeploymentEffectRecord accepts optional deploymentUrl for effect-record URL discovery.</item>
 <item>Fix hardcoded systems-cache paths: writeDeploymentEffectRecord and resolveGateDecisionPath now accept cacheCloneDir directly. writeDeploymentEffectRecord commits+pushes to cache clone git after write.</item>
+<item>RFC-0926: buildEffectRecord and writeDeploymentEffectRecord accept optional workerVersionId and releaseId for release-aware rollback.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -293,6 +294,8 @@ export function buildEffectRecord(
   mainVerificationDecisionId: string | null,
   state: DeploymentOperationState,
   timestamp: string,
+  workerVersionId?: string,
+  releaseId?: string,
 ): DeploymentEffectRecordV1 {
   return buildDeploymentEffectRecord(
     operationId,
@@ -305,6 +308,8 @@ export function buildEffectRecord(
     mainVerificationDecisionId,
     state,
     timestamp,
+    workerVersionId,
+    releaseId,
   );
 }
 
@@ -312,11 +317,16 @@ export async function writeDeploymentEffectRecord(
   cacheCloneDir: string,
   record: DeploymentEffectRecordV1,
   deploymentUrl?: string,
+  workerVersionId?: string,
+  releaseId?: string,
 ): Promise<string> {
   const dir = path.join(cacheCloneDir, "deployment-operations");
   await fs.mkdir(dir, { recursive: true });
   const filePath = path.join(dir, `${record.operationId}.json`);
-  const payload = deploymentUrl ? { ...record, deploymentUrl } : record;
+  let payload: Record<string, unknown> = { ...record };
+  if (deploymentUrl) payload = { ...payload, deploymentUrl };
+  if (workerVersionId) payload = { ...payload, workerVersionId };
+  if (releaseId) payload = { ...payload, releaseId };
   await writeFileIfChanged(filePath, JSON.stringify(payload, null, 2) + "\n");
 
   const relPath = path.join("deployment-operations", `${record.operationId}.json`);

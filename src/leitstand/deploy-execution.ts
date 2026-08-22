@@ -441,6 +441,7 @@ export async function executeDeployPhases(
           state: "succeeded",
           operationId: ctx.operationId,
           leaseExpiresAt: null,
+          workerVersionId: propagateResult.workerVersionId,
         };
         await writeSystemStateSmart(ctx.workspaceRoot, ctx.systemId, state);
         systemStateUpdated = true;
@@ -460,8 +461,16 @@ export async function executeDeployPhases(
       null,
       "succeeded",
       now,
+      propagateResult.workerVersionId,
+      ctx.releaseId ?? undefined,
     );
-    await writeDeploymentEffectRecord(ctx.cacheCloneDir, finalEffectRecord, actualDeploymentUrl);
+    await writeDeploymentEffectRecord(
+      ctx.cacheCloneDir,
+      finalEffectRecord,
+      actualDeploymentUrl,
+      propagateResult.workerVersionId,
+      ctx.releaseId ?? undefined,
+    );
 
     return {
       deploymentUrl: actualDeploymentUrl,

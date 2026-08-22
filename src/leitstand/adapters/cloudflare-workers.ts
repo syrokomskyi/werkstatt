@@ -29,7 +29,7 @@ import type {
   RollbackResult,
   HealthInput,
 } from "../adapter.ts";
-import { runWranglerRollback } from "../service-deploy-helpers.ts";
+import { runWranglerRollback, extractWorkerVersionId } from "../service-deploy-helpers.ts";
 
 const TRANSIENT_ERROR_PATTERNS: readonly RegExp[] = [
   /\b502\b/,
@@ -272,12 +272,14 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
       }
 
       const deployedUrl = input.url || extractDeploymentUrl(result.stdout) || "";
+      const workerVersionId = extractWorkerVersionId(result.stdout);
 
       return {
         systemId: input.systemId,
         releaseId: input.releaseId,
         state: "succeeded",
         deploymentUrl: deployedUrl,
+        workerVersionId,
         startedAt: now,
         completedAt: new Date().toISOString(),
         healthChecks: [],
@@ -289,7 +291,7 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
 
       const env: Record<string, string> = { ...filterEnv(process.env) };
 
-      const result = await runWranglerRollback(input.wranglerConfigDir, env);
+      const result = await runWranglerRollback(input.wranglerConfigDir, env, input.versionId);
 
       const state = result.exitCode === 0 ? "succeeded" : "failed";
 
@@ -298,6 +300,7 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
         channel: input.channel,
         state,
         workerName: input.workerName,
+        rolledBackToVersionId: input.versionId,
         startedAt: now,
         completedAt: new Date().toISOString(),
         stdout: result.stdout,
