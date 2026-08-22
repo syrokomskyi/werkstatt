@@ -1,7 +1,7 @@
 ---
 id: RFC-0908
 title: "Host canonicalization and URL normalization validators"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
