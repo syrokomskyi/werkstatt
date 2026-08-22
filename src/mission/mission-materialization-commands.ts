@@ -1499,7 +1499,7 @@ export async function runMissionReconcile(
       // The merge may overwrite .gitignore with the workpiece version, removing
       // cache-clone-only entries that exclude forbidden/generated files.
       try {
-        gitignoreRestored = restoreCacheCloneGitignore(systemDir);
+        gitignoreRestored = await restoreCacheCloneGitignore(systemDir);
         if (gitignoreRestored) {
           logger.info(`  Restored cache-clone-only .gitignore patterns after merge`);
           execSync("git add .gitignore", {
