@@ -32,11 +32,6 @@ import { resolveDeploymentAdapter } from "./public-surface/managed-public.ts";
 
 const COMMAND = "host.canonical.config.validate";
 
-interface HostCanonicalResult {
-  canonicalHost: string;
-  redirectConfigured: boolean;
-}
-
 function stripJsoncComments(text: string): string {
   return text
     .split(/\r?\n/)
@@ -261,9 +256,7 @@ export async function runHostCanonicalConfigValidate(
   const nonCanonical = nonCanonicalHost(canonicalHost);
   const isApexCanonical = isApex(canonicalHost);
   const missingRedirectRule = isApexCanonical ? "HOST-CANON-01" : "HOST-CANON-02";
-  const redirectDescription = isApexCanonical
-    ? `${nonCanonical} → ${canonicalHost}`
-    : `${nonCanonical} → ${canonicalHost}`;
+  const redirectDescription = `${nonCanonical} → ${canonicalHost}`;
 
   const adapter = await resolveDeploymentAdapter(context, context.site?.name ?? "");
   const checkWorkerRoutes = adapter === "cloudflare-workers" || adapter === "cloudflare-pages";
@@ -285,10 +278,6 @@ export async function runHostCanonicalConfigValidate(
   }
 
   if (redirectConfigured) {
-    const result: HostCanonicalResult = {
-      canonicalHost,
-      redirectConfigured: true,
-    };
     return passResult(
       COMMAND,
       `${COMMAND}: OK — canonical host "${canonicalHost}", ${redirectDescription} redirect configured`,

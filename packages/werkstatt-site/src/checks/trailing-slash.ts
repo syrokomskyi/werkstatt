@@ -33,11 +33,6 @@ import { diagnosticsResult, passResult } from "./result-helpers.ts";
 
 const COMMAND = "trailing.slash.config.validate";
 
-interface TrailingSlashResult {
-  policy: "always" | "never" | "ignore";
-  normalizationConfigured: boolean;
-}
-
 async function readAstroBuildFormat(appDirectory: string): Promise<string | undefined> {
   const configPath = join(appDirectory, "astro.config.mjs");
   try {
@@ -83,8 +78,6 @@ export async function runTrailingSlashConfigValidate(
   if (!configExists) {
     return passResult(COMMAND, `${COMMAND}: no astro.config.mjs — skipped`);
   }
-
-  const policy: TrailingSlashResult["policy"] = "always";
 
   const buildFormat = await readAstroBuildFormat(paths.appDirectory);
   const effectiveFormat = buildFormat ?? "directory";
@@ -148,13 +141,9 @@ export async function runTrailingSlashConfigValidate(
   }
 
   if (diagnostics.length === 0) {
-    const result: TrailingSlashResult = {
-      policy,
-      normalizationConfigured: true,
-    };
     return passResult(
       COMMAND,
-      `${COMMAND}: OK — policy "${policy}", build.format "${effectiveFormat}", normalization redirects present`,
+      `${COMMAND}: OK — policy "always", build.format "${effectiveFormat}", normalization redirects present`,
     );
   }
 
