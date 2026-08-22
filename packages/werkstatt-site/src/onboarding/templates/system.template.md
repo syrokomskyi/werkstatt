@@ -103,6 +103,13 @@ release:
     indexable: true
     keyVersion: v1
     heartbeatUrl: https://{{DOMAIN}}/.well-known/cosmic-passport.json
+
+# Search engine verification (RFC-0909).
+# Uncomment and set the token after obtaining it from Google Search Console.
+# verification:
+#   google:
+#     method: dns-txt  # or meta-tag
+#     token: google-site-verification=YOUR_TOKEN_HERE
 ---
 
 # System Configuration
