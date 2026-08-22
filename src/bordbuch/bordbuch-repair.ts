@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0583: initial bordbuch.repair command handler.</item>
+  <item>Bug fix: auto-commit repaired bordbuch to prevent dirty cache clone blocking mission.open; throw on commit failure.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -254,8 +255,10 @@ export async function runBordbuchRepair(
         `bordbuch.repair: ${systemId} — auto-repair ${orphans.length} orphan-mission-close event(s)`,
       );
       if (!commitResult.commitSha) {
-        logger.warn(
-          `[bordbuch.repair] ${systemId}: bordbuch file written but commit failed — cache clone may have unstaged changes`,
+        throw new Error(
+          `[bordbuch.repair] ${systemId}: bordbuch file written but commit failed — cache clone has unstaged changes. ` +
+            `Error: ${commitResult.error ?? "unknown"}. ` +
+            `Check git state in the cache clone and re-run bordbuch.repair.`,
         );
       }
     }

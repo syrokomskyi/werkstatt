@@ -206,3 +206,38 @@ test("lists available systems when --system is not found", async () => {
     /system 'nonexistent' not found. Available systems: warpgogol, other-system/,
   );
 });
+
+test("succeeds end-to-end when all preconditions are met", async () => {
+  mockAppendAndCommit.mockResolvedValue({
+    entry: { id: "event-000001", kind: "mission-open" } as never,
+    commitResult: { commitSha: "abc123", pushed: true, error: null },
+  });
+
+  const input = {
+    commandName: "mission.open",
+    flags: { system: "test-system", brief: "Test mission" },
+  } as never;
+
+  const context = {
+    workspaceRoot,
+    logger: {
+      info: () => {},
+      success: () => {},
+      error: () => {},
+      warn: () => {},
+      event: () => {},
+      getEvents: () => [],
+    },
+  } as never;
+
+  const result = await runMissionOpen(input, context);
+
+  expect(result.data!.state).toBe("open");
+  expect(result.data!.systemId).toBe("test-system");
+  expect(result.data!.brief).toBe("Test mission");
+  expect(result.summary).toContain("opened mission");
+
+  // Mission directory should exist
+  const missionDir = path.join(workspaceRoot, "missions", "test-system-m000001");
+  expect(existsSync(missionDir)).toBe(true);
+});

@@ -325,3 +325,26 @@ test("auto-commits repaired bordbuch when cache clone is a git repo", async () =
   const status = execSync("git status --porcelain", { cwd: cacheDir }).toString().trim();
   expect(status).toBe("");
 });
+
+test("throws on auto-commit failure to prevent dirty cache clone", async () => {
+  const entries = buildValidBordbuchWithOrphan();
+  await writeBordbuch(entries);
+
+  // Initialize a git repo with a pre-commit hook that always fails
+  const cacheDir = path.join(tmpDir, "..", "systems-cache", systemId);
+  execSync("git init", { cwd: cacheDir });
+  execSync("git config user.email test@test.com", { cwd: cacheDir });
+  execSync("git config user.name Test", { cwd: cacheDir });
+  execSync("git add -A", { cwd: cacheDir });
+  execSync('git commit -m "initial"', { cwd: cacheDir });
+  execSync("git branch -M main", { cwd: cacheDir });
+
+  // Install a pre-commit hook that rejects all commits
+  const hookPath = path.join(cacheDir, ".git", "hooks", "pre-commit");
+  await fs.writeFile(hookPath, "#!/bin/sh\necho 'reject' >&2\nexit 1\n");
+  await fs.chmod(hookPath, 0o755);
+
+  await expect(
+    runBordbuchRepair(makeInput({ system: systemId }), mockContext(tmpDir)),
+  ).rejects.toThrow(/commit failed/);
+});

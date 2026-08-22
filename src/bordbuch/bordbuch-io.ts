@@ -15,6 +15,7 @@
   <item>RFC-0706: add nachweis writer-role for nachweis-record and nachweis-consent kinds (ADR-0028).</item>
   <item>RFC-0715: add nachweis-signed and nachweis-timestamped to nachweis writer-role for N3 crypto verification.</item>
   <item>RFC-0724: add DEPRECATED_KIND_MIGRATIONS for forward-only kind renames (release-published -> release-ready).</item>
+  <item>Bug fix: guard against duplicate mission-close/abort events for the same missionId in appendBordbuchEntry.</item>
 </CHANGE_SUMMARY>
 */
 

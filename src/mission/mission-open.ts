@@ -14,6 +14,9 @@
   <item>ADR-0030: verify commitAndPushBordbuch succeeded — throw on commit failure (commitSha null) and push failure (pushed false) with distinct error messages.</item>
   <item>Bug fix: auto-repair orphan-mission-close bordbuch violations before lock acquisition; commit and push repaired bordbuch to avoid dirty cache clone blocking mission.reconcile.</item>
   <item>RFC-0796: add cleanupStaleMissionEntries pre-flight cleanup before createMissionDirectories; trash stale symlinks and empty dirs, skip non-empty real dirs with warning.</item>
+  <item>Bug fix: clean up mission directories on bordbuch push/commit failure to prevent stale entries on retry.</item>
+  <item>Bug fix: list available systems on unknown --system ID for better agent self-correction.</item>
+  <item>Bug fix: bordbuch.repair now auto-commits, removed redundant commitAndPushBordbuch call from auto-repair path.</item>
 </CHANGE_SUMMARY>
 */
 
