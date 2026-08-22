@@ -32,6 +32,8 @@ ignoreDirs:
 excludePathSegments:
   - .npmrc
   - src/tests
+  - src/kernel/tests/rfc-acceptance.test.ts
+  - src/kernel/tests/rfc-create.test.ts
   - pnpm-lock.yaml
 
 postProcess:
