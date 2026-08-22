@@ -21,14 +21,14 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-test("buildAuthHeader: base64 encoding matches middleware format (access:PIN)", () => {
+test("auth header encoding: base64 format matches middleware format (access:PIN)", () => {
   const pin = "1234";
   const encoded = btoa(`access:${pin}`);
   expect(encoded).toBe(btoa("access:1234"));
   expect(atob(encoded)).toBe("access:1234");
 });
 
-test("buildAuthHeader: base64 encoding for another PIN", () => {
+test("auth header encoding: base64 format for another PIN", () => {
   const pin = "9999";
   const encoded = btoa(`access:${pin}`);
   expect(atob(encoded)).toBe("access:9999");
