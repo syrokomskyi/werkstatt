@@ -58,10 +58,6 @@ export interface ReleaseSignatureArtifacts {
   reusedExistingSignature: boolean;
 }
 
-export function canonicalJson(value: unknown): string {
-  return Buffer.from(signingCanonicalBytes(value as Record<string, unknown>)).toString("utf8");
-}
-
 function pemFromBase64(label: "PRIVATE KEY" | "PUBLIC KEY", base64Value: string): string {
   const normalized = base64Value.replace(/\s+/g, "");
   const lines = normalized.match(/.{1,64}/g) ?? [normalized];
