@@ -26,6 +26,7 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 | `@warpgogol/werkstatt/artifact-store` | `./src/artifact-store/index.ts` |
 | `@warpgogol/werkstatt/evidence` | `./src/evidence/index.ts` |
 | `@warpgogol/werkstatt/integrity` | `./src/integrity/index.ts` |
+| `@warpgogol/werkstatt/signing` | `./src/signing/index.ts` |
 | `@warpgogol/werkstatt/observability` | `./src/observability/index.ts` |
 | `@warpgogol/werkstatt/fingerprint` | `./src/fingerprint/index.ts` |
 | `@warpgogol/werkstatt/fingerprint/semantic` | `./src/fingerprint/semantic.ts` |
