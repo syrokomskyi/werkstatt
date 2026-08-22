@@ -29,6 +29,7 @@
   <item>RFC-0820: add zero operator commit guard — block close when no commits since materialization; add --allow-no-op override flag.</item>
   <item>RFC-0822: persist .env* files to cache clone as final close step.</item>
   <item>RFC-0878: write .closed sentinel file to workpiece as final step before returning.</item>
+  <item>RFC-0913: add reconcile-freshness gate — compare workpiece HEAD against workpieceHeadAtReconcile from reconciliation report; fail-closed on missing report; add --skip-reconcile-check escape hatch.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -66,6 +67,7 @@ import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveActor } from "./actor-identity.ts";
 import { persistEnvFilesToCacheClone } from "./env-persist.ts";
 import { persistOperatorConfigFiles } from "./operator-config-files.ts";
+import { readFileSync } from "node:fs";
 
 // RFC-0597: Media cache directories to persist across missions
 const MEDIA_CACHE_DIRS = [".cache/video", ".cache/video-live"];
@@ -103,6 +105,10 @@ export interface CloseReportMirror {
 export interface CloseReportReconcile {
   reconciledAt: string;
   verified: boolean;
+  freshnessChecked: boolean;
+  unreconciledCommits: number;
+  workpieceHead: string | null;
+  reconciledSha: string | null;
 }
 
 export interface CloseReportTemplateSync {
@@ -189,6 +195,7 @@ export async function runMissionClose(
   const skipAutoSync = flagBoolean(input, "skip-auto-sync");
   const skipTemplateSync = flagBoolean(input, "skip-template-sync");
   const allowNoOp = flagBoolean(input, "allow-no-op");
+  const skipReconcileCheck = flagBoolean(input, "skip-reconcile-check");
 
   if (!missionId) throw new Error("[mission.close] --mission is required");
 
@@ -323,6 +330,66 @@ export async function runMissionClose(
             `  re-run with --allow-no-op to override this guard.\n`,
         );
       }
+    }
+
+    // RFC-0913: Reconcile-freshness gate — verify workpiece HEAD matches
+    // the SHA recorded at reconcile time. Fail-closed if report is missing.
+    let freshnessChecked = false;
+    let unreconciledCommits = 0;
+    let workpieceHead: string | null = null;
+    let reconciledSha: string | null = null;
+
+    if (!skipReconcileCheck) {
+      const reconcileReportPath = path.join(evidenceDir, "reconciliation-report.json");
+      let reconciledWorkpieceSha: string | null = null;
+      try {
+        const report = JSON.parse(readFileSync(reconcileReportPath, "utf8"));
+        reconciledWorkpieceSha = report.workpieceHeadAtReconcile ?? null;
+      } catch {
+        throw new Error(
+          `[mission.close] mission '${missionId}' reconciliation report not found or unreadable.\n` +
+            `Cannot verify reconcile freshness — re-run mission.reconcile --mission ${missionId}\n` +
+            `to regenerate the report, then re-run mission.close.\n` +
+            `If you are certain the workpiece is already synced, re-run with --skip-reconcile-check.`,
+        );
+      }
+
+      if (!reconciledWorkpieceSha) {
+        throw new Error(
+          `[mission.close] mission '${missionId}' reconciliation report missing workpieceHeadAtReconcile field.\n` +
+            `Re-run mission.reconcile --mission ${missionId} to regenerate the report.\n` +
+            `If you are certain the workpiece is already synced, re-run with --skip-reconcile-check.`,
+        );
+      }
+
+      workpieceHead = gitExec(workpieceDir, "rev-parse HEAD");
+      reconciledSha = reconciledWorkpieceSha;
+
+      if (workpieceHead !== reconciledWorkpieceSha) {
+        try {
+          const countOutput = gitExec(
+            workpieceDir,
+            `rev-list --count ${reconciledWorkpieceSha}..${workpieceHead}`,
+          );
+          unreconciledCommits = parseInt(countOutput, 10);
+        } catch {
+          unreconciledCommits = 0;
+        }
+        throw new Error(
+          `[mission.close] mission '${missionId}' has ${unreconciledCommits} unreconciled commit(s) —\n` +
+            `  workpiece HEAD:    ${workpieceHead.slice(0, 12)}\n` +
+            `  reconciled SHA:    ${reconciledWorkpieceSha.slice(0, 12)}\n` +
+            `Run mission.reconcile --mission ${missionId} to transfer them to the cache clone,\n` +
+            `then re-run mission.close.\n` +
+            `If you are certain the workpiece is already synced, re-run with --skip-reconcile-check.`,
+        );
+      }
+
+      freshnessChecked = true;
+    } else {
+      logger.warn(
+        `  Reconcile-freshness check skipped (--skip-reconcile-check) — bordbuch audit entry will be written`,
+      );
     }
 
     if (existsSync(path.join(workpieceDir, ".git"))) {
@@ -494,6 +561,29 @@ export async function runMissionClose(
       });
     }
 
+    // RFC-0913: Bordbuch audit entry for --skip-reconcile-check escape hatch
+    if (skipReconcileCheck) {
+      try {
+        await appendAndCommitBordbuch(
+          workspaceRoot,
+          manifest.systemId,
+          "mission-close",
+          `mission-close-reconcile-check-skipped: ${missionId}`,
+          actor,
+          {
+            missionId,
+            writerRole: "mission",
+            metadata: { reconcileCheckSkipped: true, reason: "operator-used-skip-reconcile-check" },
+          },
+          `Bordbuch: mission-close-reconcile-check-skipped ${missionId}`,
+        );
+      } catch (bordbuchErr) {
+        logger.warn(
+          `  Warning: failed to append reconcile-check-skipped Bordbuch entry: ${bordbuchErr instanceof Error ? bordbuchErr.message : String(bordbuchErr)}`,
+        );
+      }
+    }
+
     const closeReport: CloseReport = {
       releaseId,
       git: {
@@ -513,6 +603,10 @@ export async function runMissionClose(
       reconcile: {
         reconciledAt: manifest.reconciledAt,
         verified: true,
+        freshnessChecked,
+        unreconciledCommits,
+        workpieceHead,
+        reconciledSha,
       },
       templateSync: templateSyncResult,
       warnings,
