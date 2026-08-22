@@ -18,6 +18,7 @@
 */
 
 import { existsSync, lstatSync, readdirSync } from "node:fs";
+import fs from "node:fs/promises";
 import path from "node:path";
 import type {
   KernelCommandInput,
@@ -268,37 +269,48 @@ export async function runMissionOpen(
     await writeMissionManifest(workspaceRoot, manifest);
 
     // Append Bordbuch entry and commit+push atomically (RFC-0750, ADR-0030)
-    const { commitResult: pushResult } = await appendAndCommitBordbuch(
-      workspaceRoot,
-      systemId,
-      "mission-open",
-      brief,
-      actor,
-      {
-        missionId,
-        writerRole: "mission",
-        metadata: { brief, pinAtOpen },
-      },
-      `Bordbuch: mission-open ${missionId}`,
-    );
-    if (pushResult.commitSha === null) {
-      throw new Error(
-        `[mission.open] bordbuch commit failed for system '${systemId}' — mission-open event was not committed. ` +
-          `Check git state in the cache clone and re-run mission.open.`,
+    try {
+      const { commitResult: pushResult } = await appendAndCommitBordbuch(
+        workspaceRoot,
+        systemId,
+        "mission-open",
+        brief,
+        actor,
+        {
+          missionId,
+          writerRole: "mission",
+          metadata: { brief, pinAtOpen },
+        },
+        `Bordbuch: mission-open ${missionId}`,
       );
-    }
-    if (!pushResult.pushed) {
-      const cacheDir = resolveCacheClonePath(workspaceRoot, systemId);
-      try {
-        gitExec(cacheDir, "reset --hard HEAD~1");
-      } catch {
-        // best-effort rollback — if reset fails, manual intervention needed
+      if (pushResult.commitSha === null) {
+        throw new Error(
+          `[mission.open] bordbuch commit failed for system '${systemId}' — mission-open event was not committed. ` +
+            `Check git state in the cache clone and re-run mission.open.`,
+        );
       }
-      throw new Error(
-        `[mission.open] bordbuch push failed for system '${systemId}' — mission-open event was rolled back. ` +
-          `Error: ${pushResult.error ?? "unknown"}. ` +
-          `Check git remote connectivity and re-run mission.open.`,
-      );
+      if (!pushResult.pushed) {
+        const cacheDir = resolveCacheClonePath(workspaceRoot, systemId);
+        try {
+          gitExec(cacheDir, "reset --hard HEAD~1");
+        } catch {
+          // best-effort rollback — if reset fails, manual intervention needed
+        }
+        throw new Error(
+          `[mission.open] bordbuch push failed for system '${systemId}' — mission-open event was rolled back. ` +
+            `Error: ${pushResult.error ?? "unknown"}. ` +
+            `Check git remote connectivity and re-run mission.open.`,
+        );
+      }
+    } catch (bordbuchErr) {
+      // Clean up mission directories to prevent stale entries on retry
+      const missionDir = path.join(workspaceRoot, "missions", missionId);
+      try {
+        await fs.rm(missionDir, { recursive: true, force: true });
+      } catch {
+        // best-effort cleanup — if rm fails, manual intervention needed
+      }
+      throw bordbuchErr;
     }
 
     // Update state
