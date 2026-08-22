@@ -28,7 +28,7 @@ import { diagnosticsResult } from "./result-helpers.ts";
 import { extractSitemapUrls } from "./canonical-url.ts";
 import type { Diagnostic } from "@warpgogol/werkstatt/kernel";
 
-export interface SitemapPlaceholderResult {
+interface SitemapPlaceholderResult {
   checkedUrls: number;
   placeholderUrls: number;
 }
@@ -95,8 +95,7 @@ export async function runSitemapPlaceholderValidate(
         summary: { error: 0, warning: 0, info: 1 },
       },
       exitCode: 0,
-      summary:
-        "sitemap.placeholder.validate: skipped (no URLs found in sitemap files)",
+      summary: "sitemap.placeholder.validate: skipped (no URLs found in sitemap files)",
     };
   }
 

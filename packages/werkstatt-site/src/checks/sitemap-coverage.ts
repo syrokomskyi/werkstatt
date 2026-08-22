@@ -36,7 +36,7 @@ import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 import type { Diagnostic } from "@warpgogol/werkstatt/kernel";
 
-export interface SitemapCoverageResult {
+interface SitemapCoverageResult {
   expectedPages: number;
   sitemapUrls: number;
   missing: number;
@@ -65,9 +65,7 @@ export async function runSitemapCoverageValidate(
 
   let manifest;
   try {
-    const result = await loadSystemManifest(
-      join(paths.appDirectory, "src", "content"),
-    );
+    const result = await loadSystemManifest(join(paths.appDirectory, "src", "content"));
     manifest = result.manifest;
   } catch {
     return {
@@ -78,8 +76,7 @@ export async function runSitemapCoverageValidate(
         summary: { error: 0, warning: 0, info: 1 },
       },
       exitCode: 0,
-      summary:
-        "sitemap.coverage.validate: skipped (system.md manifest not found)",
+      summary: "sitemap.coverage.validate: skipped (system.md manifest not found)",
     };
   }
 
@@ -103,11 +100,7 @@ export async function runSitemapCoverageValidate(
 
   const siteUrl = (await readAstroSiteUrl(paths.appDirectory)) ?? "https://example.com";
   const defaultLang = defaultLanguageFromManifest(manifest);
-  const supportedLangs = Object.keys(
-    (manifest.i18n as { supported?: Record<string, unknown> } | undefined)?.supported ?? {
-      [defaultLang]: true,
-    },
-  );
+  const supportedLangs = Object.keys(manifest.i18n?.supported ?? { [defaultLang]: true });
   const canonicalOpts: CanonicalUrlOptions = {
     baseUrl: siteUrl.replace(/\/$/, ""),
     defaultLanguage: defaultLang,
@@ -147,8 +140,7 @@ export async function runSitemapCoverageValidate(
         severity: "error",
         file: sitemapFiles[0],
         message: `Indexable page missing from sitemap: ${expected}`,
-        fixHint:
-          "Ensure the sitemap generator includes all indexable pages from system.md",
+        fixHint: "Ensure the sitemap generator includes all indexable pages from system.md",
       });
     }
   }
