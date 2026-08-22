@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-08-21
-updatedAt: 2026-08-21
+updatedAt: 2026-08-22
+enhancedAt: 2026-08-22
 implementedAt:
 closedAt:
 supersedes: []
@@ -39,7 +40,8 @@ dependsOn: []
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
-satisfies: []
+satisfies:
+  - DNA-40
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -107,7 +109,7 @@ Introduce a search-engine verification surface: `system.md` gains a `verificatio
 
 ## Architectural fit
 
-- **DNA-40 (env-example and deploy-script contract)** — the service-account credential is an env var (`GOOGLE_APPLICATION_CREDENTIALS` / `GSC_SERVICE_ACCOUNT_JSON`) documented in `.env.example` with a `# How to obtain:` comment, never committed.
+- **DNA-40 (env-example and deploy-script contract)** — the service-account credential is an env var (`GSC_SERVICE_ACCOUNT_JSON`, inline JSON) documented in `.env.example` with a `# How to obtain:` comment, never committed. This RFC extends DNA-40 by adding a new env var to the canonical `.env.example`.
 - **DNA-72 (validator config location)** — the verification declaration lives in `system.md` (site content, mission-managed), not in package code.
 - **RFC-0753 (DNS record management protocol)** — the primary verification method reuses the existing DNS TXT machinery; this RFC adds no new DNS plumbing.
 - **RFC-0311 (IndexNow after deploy)** — `search.sitemap.submit` follows the same post-deploy submission pattern, extended to the Google channel that IndexNow cannot reach.
@@ -175,6 +177,10 @@ interface SitemapSubmitResult {
 
 The layout reads `verification.google` from the resolved system manifest and renders `<meta name="google-site-verification" content="...">` when `method: "meta-tag"`.
 
+### Google Search Console API approach
+
+`search.sitemap.submit` uses a **hand-rolled JWT + fetch** approach, not the `googleapis` npm package. Rationale: the `googleapis` package is not a dependency in the monorepo, adding it would significantly increase bundle size and supply-chain surface, and the only API call needed is a single `PUT` to `https://www.googleapis.com/webmasters/v3/sites/{site}/sitemaps/{sitemap}` with a service-account JWT bearer token. The handler constructs the JWT using the `GSC_SERVICE_ACCOUNT_JSON` env var (inline JSON containing `client_email`, `private_key`, and `token_uri`), signs it with the RSA private key, exchanges it for an access token via the OAuth 2.0 token endpoint, and calls the Search Console API with `fetch`. This follows the same raw-`fetch` pattern used by the IndexNow submission handler (RFC-0311).
+
 ### File system responsibilities
 
 | Path | Role |
@@ -183,7 +189,7 @@ The layout reads `verification.google` from the resolved system manifest and ren
 | `packages/werkstatt-site/src/onboarding/templates/system.template.md` | Gains a commented `verification:` stub so new sites are born compliant |
 | `packages/werkstatt-site/src/checks/` | Home of `search-verification.ts` and `search-sitemap-submit.ts` handlers |
 | `packages/werkstatt-site/src/domain/ui/components/layout/layout-component.astro` | Emits the meta tag when `method: meta-tag` |
-| `.env.example` (root) | Documents `GSC_SERVICE_ACCOUNT_JSON` with `# How to obtain:` (DNA-40) |
+| `.env.example` (root) | Documents `GSC_SERVICE_ACCOUNT_JSON` (inline JSON) with `# How to obtain:` (DNA-40) |
 | `docs/runbooks/search-console-setup.md` | New ops runbook: create property, add service account as user, first submission |
 | `public/`, `dist/` | Never written by these commands — submission is a pure API call |
 
@@ -224,6 +230,13 @@ Diagnostic rules:
 - `search.sitemap.submit` without credentials exits 1 with `skipped: true` and remediation steps; it never silently succeeds.
 - API quota/auth errors surface verbatim in `apiResponse` for post-mortem debugging.
 
+## Compass sync
+
+- `docs/technology.xml` — no new technology stack added (hand-rolled JWT, no new npm dependency).
+- `docs/verification-plan.xml` — add `search.verification.validate` to the author pipeline verification surface if the plan tracks individual validators.
+- `docs/requirements.xml` — no change (no new functional requirement beyond what this RFC introduces).
+- `docs/development-plan.xml` — no change (no new package or workspace).
+
 ## Rollout
 
 1. **Ops first (blocking prerequisite):** the operator creates the Search Console property for warpgogol.com, obtains the DNS TXT token, and adds it to the workpiece `system.md` through a mission. The DNS record is applied via the RFC-0753 protocol.
@@ -258,7 +271,7 @@ Diagnostic rules:
 - [ ] `.env.example` documents `GSC_SERVICE_ACCOUNT_JSON` with `# How to obtain:` (DNA-40) (evidence: `.env.example`)
 - [ ] `docs/runbooks/search-console-setup.md` exists and covers property creation, service-account authorization, first submission (evidence: runbook file)
 - [ ] warpgogol-com passes `search.verification.validate --live` after rollout step 1 (evidence: mission evidence)
-- [ ] `AGENTS.md` updated where agent behavior rules changed
+- [ ] `packages/werkstatt-site/AGENTS.md` documents both new commands in the Check commands section (evidence: AGENTS.md file)
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
