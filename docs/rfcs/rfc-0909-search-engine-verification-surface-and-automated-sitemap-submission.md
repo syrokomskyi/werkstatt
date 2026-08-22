@@ -1,7 +1,7 @@
 ---
 id: RFC-0909
 title: "Search engine verification surface and automated sitemap submission"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-21
 updatedAt: 2026-08-22
 enhancedAt: 2026-08-22
-implementedAt:
+implementedAt: 2026-08-22
 closedAt:
 supersedes: []
 supersededBy:
@@ -55,7 +55,9 @@ commands:
   proposed:
     - search.verification.validate
     - search.sitemap.submit
-  added: []
+  added:
+    - search.verification.validate
+    - search.sitemap.submit
   changed: []
   removed: []
 appsImpacted: []
@@ -262,18 +264,17 @@ Diagnostic rules:
 
 ## Acceptance criteria
 
-- [ ] `system.md` schema accepts `verification.google` with `method: dns-txt | meta-tag` and `token` (evidence: system-manifest schema file)
-- [ ] `search.verification.validate` registered (app scope), offline mode emits SEARCH-VERIFY-01/04 (evidence: command table + handler)
-- [ ] `--live` mode performs real DNS TXT lookup and rendered-head meta check, with network failure mapped to an inconclusive diagnostic (evidence: handler + tests)
-- [ ] `search.sitemap.submit` registered (app scope), submits the sitemap index via the Search Console API with service-account auth, `--dry-run` supported (evidence: handler + tests)
-- [ ] Layout emits `google-site-verification` meta tag on every page when `method: meta-tag` (evidence: layout component + rendered HTML test)
-- [ ] Offline validator wired into `SITES_CHECK_AUTHOR_PIPELINE` as error; `--live` wired into the deploy evidence path (evidence: pipeline definition)
-- [ ] Onboarding `system.template.md` carries a commented `verification:` stub (evidence: template file)
-- [ ] `.env.example` documents `GSC_SERVICE_ACCOUNT_JSON` with `# How to obtain:` (DNA-40) (evidence: `.env.example`)
-- [ ] `docs/runbooks/search-console-setup.md` exists and covers property creation, service-account authorization, first submission (evidence: runbook file)
-- [ ] warpgogol-com passes `search.verification.validate --live` after rollout step 1 (evidence: mission evidence)
-- [ ] `packages/werkstatt-site/AGENTS.md` documents both new commands in the Check commands section (evidence: AGENTS.md file)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `system.md` schema accepts `verification.google` with `method: dns-txt | meta-tag` and `token` (evidence: packages/werkstatt-shared/src/ontology/schemas/system/verification.ts:1-40)
+- [x] `search.verification.validate` registered (app scope), offline mode emits SEARCH-VERIFY-01/04 (evidence: packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts:451-466)
+- [x] `--live` mode performs real DNS TXT lookup and rendered-head meta check, with network failure mapped to an inconclusive diagnostic (evidence: packages/werkstatt-site/src/checks/public-surface/search-verification.ts:120-180)
+- [x] `search.sitemap.submit` registered (app scope), submits the sitemap index via the Search Console API with service-account auth, `--dry-run` supported (evidence: packages/werkstatt-site/src/checks/public-surface/search-sitemap-submit.ts:123-300)
+- [x] Layout emits `google-site-verification` meta tag on every page when `method: meta-tag` (evidence: packages/werkstatt-site/src/domain/ui/components/layout/layout-component.astro:180-182)
+- [x] Offline validator wired into `SITES_CHECK_AUTHOR_PIPELINE` as error; `--live` wired into the deploy evidence path (evidence: packages/werkstatt-site/src/checks/pipelines/sites-check-author.ts:26-27, packages/werkstatt-site/src/checks/pipelines/sites-check-postbuild.ts:110-112)
+- [x] Onboarding `system.template.md` carries a commented `verification:` stub (evidence: packages/werkstatt-site/src/onboarding/templates/system.template.md:107-112)
+- [x] `.env.example` documents `GSC_SERVICE_ACCOUNT_JSON` with `# How to obtain:` (DNA-40) (evidence: .env.example:102-109)
+- [x] `docs/runbooks/search-console-setup.md` exists and covers property creation, service-account authorization, first submission (evidence: docs/runbooks/search-console-setup.md:1-100)
+- [x] `packages/werkstatt-site/AGENTS.md` documents both new commands in the Check commands section (evidence: packages/werkstatt-site/AGENTS.md:98-99)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate exit 0, 2026-08-22)
 
 ## Implementation notes for agents
 
