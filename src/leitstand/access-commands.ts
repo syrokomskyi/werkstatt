@@ -23,8 +23,7 @@
 */
 
 import { spawn } from "node:child_process";
-import { mkdtemp, writeFile, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type {
   KernelCommandInput,
@@ -35,7 +34,9 @@ import {
   readSystemConfigSmart,
   readSystemStateSmart,
   writeSystemState,
+  resolveCacheClonePath,
 } from "../sternsystem/registry-io.ts";
+import { sourceDotenv, filterEnv } from "./adapters/index.ts";
 
 type ChannelName = "dev" | "alt";
 
@@ -60,80 +61,68 @@ async function runWranglerSecretPut(
   workerName: string,
   pin: string,
   env: Record<string, string | undefined>,
+  cwd: string,
 ): Promise<{ exitCode: number; stdout: string; stderr: string }> {
-  const tempDir = await mkdtemp(join(tmpdir(), "wrangler-secret-"));
-  try {
-    const wranglerJsonc = {
-      name: workerName,
-      compatibility_date: "2024-09-23",
-    };
-    await writeFile(join(tempDir, "wrangler.jsonc"), JSON.stringify(wranglerJsonc, null, 2));
-
-    return new Promise((resolve) => {
-      const child = spawn("npx", ["--yes", "wrangler", "secret", "put", "ACCESS_PIN"], {
-        cwd: tempDir,
+  return new Promise((resolve) => {
+    const child = spawn(
+      "npx",
+      ["--yes", "wrangler", "secret", "put", "ACCESS_PIN", "--name", workerName],
+      {
+        cwd,
         env: { ...process.env, ...env },
         stdio: ["pipe", "pipe", "pipe"],
-      });
-      let stdout = "";
-      let stderr = "";
-      child.stdout.on("data", (d) => {
-        stdout += d.toString();
-      });
-      child.stderr.on("data", (d) => {
-        stderr += d.toString();
-      });
-      child.on("error", () => {
-        resolve({ exitCode: 1, stdout, stderr: "Failed to spawn wrangler" });
-      });
-      child.on("exit", (code) => {
-        resolve({ exitCode: code ?? 1, stdout, stderr });
-      });
-      child.stdin.write(pin + "\n");
-      child.stdin.end();
+      },
+    );
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (d) => {
+      stdout += d.toString();
     });
-  } finally {
-    await rm(tempDir, { recursive: true, force: true });
-  }
+    child.stderr.on("data", (d) => {
+      stderr += d.toString();
+    });
+    child.on("error", () => {
+      resolve({ exitCode: 1, stdout, stderr: "Failed to spawn wrangler" });
+    });
+    child.on("exit", (code) => {
+      resolve({ exitCode: code ?? 1, stdout, stderr });
+    });
+    child.stdin.write(pin + "\n");
+    child.stdin.end();
+  });
 }
 
 async function runWranglerSecretDelete(
   workerName: string,
   env: Record<string, string | undefined>,
+  cwd: string,
 ): Promise<{ exitCode: number; stdout: string; stderr: string }> {
-  const tempDir = await mkdtemp(join(tmpdir(), "wrangler-secret-"));
-  try {
-    const wranglerJsonc = {
-      name: workerName,
-      compatibility_date: "2024-09-23",
-    };
-    await writeFile(join(tempDir, "wrangler.jsonc"), JSON.stringify(wranglerJsonc, null, 2));
-
-    return new Promise((resolve) => {
-      const child = spawn("npx", ["--yes", "wrangler", "secret", "delete", "ACCESS_PIN"], {
-        cwd: tempDir,
+  return new Promise((resolve) => {
+    const child = spawn(
+      "npx",
+      ["--yes", "wrangler", "secret", "delete", "ACCESS_PIN", "--name", workerName],
+      {
+        cwd,
         env: { ...process.env, ...env },
         stdio: ["pipe", "pipe", "pipe"],
-      });
-      let stdout = "";
-      let stderr = "";
-      child.stdout.on("data", (d) => {
-        stdout += d.toString();
-      });
-      child.stderr.on("data", (d) => {
-        stderr += d.toString();
-      });
-      child.on("error", () => {
-        resolve({ exitCode: 1, stdout, stderr: "Failed to spawn wrangler" });
-      });
-      child.on("exit", (code) => {
-        resolve({ exitCode: code ?? 1, stdout, stderr });
-      });
-      child.stdin.end();
+      },
+    );
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (d) => {
+      stdout += d.toString();
     });
-  } finally {
-    await rm(tempDir, { recursive: true, force: true });
-  }
+    child.stderr.on("data", (d) => {
+      stderr += d.toString();
+    });
+    child.on("error", () => {
+      resolve({ exitCode: 1, stdout, stderr: "Failed to spawn wrangler" });
+    });
+    child.on("exit", (code) => {
+      resolve({ exitCode: code ?? 1, stdout, stderr });
+    });
+    child.stdin.end();
+  });
 }
 
 function flagString(input: KernelCommandInput, name: string): string | undefined {
@@ -165,11 +154,18 @@ export async function runLeitstandAccessProtect(
     { channel: "alt" as const, ...systemConfig.deployment.channels.alt },
   ];
 
+  const cacheCloneDir = resolveCacheClonePath(workspaceRoot, systemId);
+  const envPath = join(cacheCloneDir, ".env");
+  const secretsEnv = existsSync(envPath) ? await sourceDotenv(envPath) : {};
+  const env: Record<string, string | undefined> = {
+    ...filterEnv(process.env as Record<string, string | undefined>),
+    ...secretsEnv,
+  };
+
   const results: ChannelSecretResult[] = [];
-  const env = { ...process.env };
 
   for (const ch of channels) {
-    const result = await runWranglerSecretPut(ch.workerName, pin, env);
+    const result = await runWranglerSecretPut(ch.workerName, pin, env, workspaceRoot);
     const channelResult: ChannelSecretResult = {
       channel: ch.channel,
       workerName: ch.workerName,
@@ -221,11 +217,18 @@ export async function runLeitstandAccessUnprotect(
     { channel: "alt" as const, ...systemConfig.deployment.channels.alt },
   ];
 
+  const cacheCloneDir = resolveCacheClonePath(workspaceRoot, systemId);
+  const envPath = join(cacheCloneDir, ".env");
+  const secretsEnv = existsSync(envPath) ? await sourceDotenv(envPath) : {};
+  const env: Record<string, string | undefined> = {
+    ...filterEnv(process.env as Record<string, string | undefined>),
+    ...secretsEnv,
+  };
+
   const results: ChannelSecretResult[] = [];
-  const env = { ...process.env };
 
   for (const ch of channels) {
-    const result = await runWranglerSecretDelete(ch.workerName, env);
+    const result = await runWranglerSecretDelete(ch.workerName, env, workspaceRoot);
     const channelResult: ChannelSecretResult = {
       channel: ch.channel,
       workerName: ch.workerName,
