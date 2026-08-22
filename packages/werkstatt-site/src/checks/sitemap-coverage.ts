@@ -113,6 +113,13 @@ export async function runSitemapCoverageValidate(
   for (const page of pages) {
     if (!page.routes) continue;
     if (isSitemapExcluded(page)) continue;
+    // Skip route template entries (e.g. nachweis-detail with [slug], nachweis-verify
+    // with [version]). These are patterns expanded by dedicated route generators,
+    // not actual pages.
+    const hasPlaceholder = Object.values(page.routes).some(
+      (slug) => typeof slug === "string" && (slug.includes("[") || slug.includes("]")),
+    );
+    if (hasPlaceholder) continue;
     for (const [lang, slug] of Object.entries(page.routes)) {
       const expected = canonicalPageUrl({ lang, route: slug, kind: "html" }, canonicalOpts);
       expectedUrls.add(expected);
