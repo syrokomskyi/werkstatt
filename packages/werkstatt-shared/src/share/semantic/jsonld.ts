@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Added initiative list graph node, breadcrumb fallback, and shared dedupe utility.</item>
+  <item>RFC-0912: added VideoObject node composition for opted-in content video blocks.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -22,12 +23,14 @@ import { buildPersonNodes } from "./jsonld/person.ts";
 import { buildServiceNodes } from "./jsonld/service.ts";
 import { dedupeGraph } from "./jsonld/shared.ts";
 import type { JsonLdDocument } from "./jsonld/types.ts";
+import { buildVideoObjectNodes } from "./jsonld/video.ts";
 import { buildWebPageNode } from "./jsonld/webpage.ts";
 import { buildWebSiteNode } from "./jsonld/website.ts";
 import type { SemanticPageModel } from "./models.ts";
 
 export type { JsonLdDocument } from "./jsonld/types.ts";
 export type { JsonLdContext } from "./jsonld/context.ts";
+export { buildVideoObjectNodes } from "./jsonld/video.ts";
 
 export function buildJsonLd(page: SemanticPageModel): JsonLdDocument {
   const context = createJsonLdContext(page);
@@ -68,6 +71,8 @@ export function buildJsonLd(page: SemanticPageModel): JsonLdDocument {
       ...(collectionListNode ? [collectionListNode] : []),
       ...(articleNode ? [articleNode] : []),
       ...(breadcrumbNode ? [breadcrumbNode] : []),
+      // RFC-0912: VideoObject nodes for opted-in content video blocks.
+      ...buildVideoObjectNodes(context),
       // RFC-0512: extra nodes from team profile pages (SoftwareApplication, CollectionPage).
       ...(page.extraGraphNodes ?? []),
     ]),

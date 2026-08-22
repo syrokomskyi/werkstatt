@@ -12,6 +12,7 @@
   <item>RFC-0490: Added "collection" to the SemanticPageType closed enum.</item>
   <item>RFC-0508: Added "participant" to the SemanticPageType closed enum.</item>
   <item>RFC-0372: Unified SemanticBlock type replaces SemanticAnswerBlock + SemanticContentBlock; SemanticPageModel.blocks replaces answerBlocks/contentBlocks/bodyText.</item>
+  <item>RFC-0912: Added VideoSeoData type and optional SemanticBlock.video field for opted-in content video structured data.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -59,6 +60,12 @@ export type SemanticBreadcrumb = {
  * Every block in a SemanticPageModel is represented by this single type, regardless of
  * whether it was derived from prose parsing or frontmatter block extraction.
  */
+/** RFC-0912: video SEO data populated by buildSemanticPageModelWith for opted-in content video blocks. */
+export type VideoSeoData = {
+  seo: { name: string; description: string; uploadDate: string };
+  manifest: { posterUrl: string; durationSec?: number; contentUrl: string };
+};
+
 export type SemanticBlock = {
   /** Stable id from frontmatter block.id (required) or slugified heading for prose-derived blocks. */
   id: string;
@@ -77,6 +84,8 @@ export type SemanticBlock = {
   /** Extractor metadata (absent for prose-derived blocks). */
   extractedAt?: string;
   extractorVersion?: string;
+  /** RFC-0912: video SEO data for opted-in content video blocks (seo.videoObject: true). Populated by buildSemanticPageModelWith from the variant manifest. */
+  video?: VideoSeoData;
 };
 
 /* RFC-0142: per-page llms inclusion depth. */

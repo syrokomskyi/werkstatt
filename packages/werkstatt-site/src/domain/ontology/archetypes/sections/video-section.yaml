@@ -21,6 +21,12 @@ propsSchema:
     z.object({
       media: z.record(z.unknown()),
       contentRef: z.string().optional(),
+      seo: z.object({
+        videoObject: z.literal(true),
+        name: z.string(),
+        description: z.string(),
+        uploadDate: z.string(),
+      }).optional(),
     }).strict()
 acceptedCosmicNames:
   - Quaoar

@@ -10,6 +10,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0144: initial extraction of the shared per-page builder from the two duplicated paths.</item>
   <item>RFC-0372: unified all page types through extractContentBlocks + extractPageHeading; removed home-specific branch and extractMarkdownProps; extractContentBlocks returns SemanticBlock[].</item>
+  <item>RFC-0912: extract seo.videoObject opt-in from block props and attach VideoSeoData to SemanticBlock.video.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -22,6 +23,7 @@ import type {
   SemanticPageModel,
   SemanticPageType,
   SemanticPerson,
+  VideoSeoData,
 } from "./models.ts";
 import { BLOCK_EXTRACTORS } from "./block-extraction.ts";
 import "./block-extractors/index.ts";
@@ -132,6 +134,31 @@ async function resolveFaqEntries(
   return faqEntries;
 }
 
+/** RFC-0912: extract video SEO data from block props when seo.videoObject opt-in is present. */
+function extractVideoSeoData(props: Record<string, unknown>): VideoSeoData | undefined {
+  const seo = props["seo"];
+  if (!seo || typeof seo !== "object") return undefined;
+  const seoRecord = seo as Record<string, unknown>;
+  if (seoRecord["videoObject"] !== true) return undefined;
+  const name = seoRecord["name"];
+  const description = seoRecord["description"];
+  const uploadDate = seoRecord["uploadDate"];
+  if (
+    typeof name !== "string" ||
+    typeof description !== "string" ||
+    typeof uploadDate !== "string"
+  ) {
+    return undefined;
+  }
+  // The manifest data (posterUrl, durationSec, contentUrl) is populated by the
+  // render layer when the variant manifest is available. At build-page time we
+  // carry the seo fields; the render layer fills in the manifest data.
+  return {
+    seo: { name, description, uploadDate },
+    manifest: { posterUrl: "", contentUrl: "" },
+  };
+}
+
 /** RFC-0372: extract semantic text from declared blocks into SemanticBlock[]. */
 function extractContentBlocks(
   blocks: Array<Record<string, unknown>>,
@@ -161,6 +188,12 @@ function extractContentBlocks(
       items: extracted.items,
       extractedAt: new Date().toISOString(),
       extractorVersion: "1.0.0",
+      // RFC-0912: attach video SEO data when the block has seo.videoObject opt-in.
+      ...((block["props"] ?? block) &&
+      typeof (block["props"] ?? block) === "object" &&
+      extractVideoSeoData((block["props"] ?? block) as Record<string, unknown>)
+        ? { video: extractVideoSeoData((block["props"] ?? block) as Record<string, unknown>) }
+        : {}),
     });
   }
   return result;
