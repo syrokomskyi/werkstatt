@@ -31,6 +31,7 @@ import {
   readSystemState,
   writeSystemState,
   resolveCacheClonePath,
+  discoverSystems,
 } from "../sternsystem/registry-io.ts";
 import { createMissionDirectories, writeMissionManifest, missionExists } from "./mission-io.ts";
 import {
@@ -142,6 +143,17 @@ export async function runMissionOpen(
 
   if (!systemId) throw new Error("[mission.open] --system is required");
   if (!brief) throw new Error("[mission.open] --brief is required");
+
+  // Check system exists before proceeding — list available systems on failure
+  try {
+    await readSystemConfig(workspaceRoot, systemId);
+  } catch {
+    const { systems: available } = await discoverSystems(workspaceRoot);
+    const ids = available.map((s) => s.id).join(", ");
+    throw new Error(
+      `[mission.open] system '${systemId}' not found. Available systems: ${ids || "(none)"}`,
+    );
+  }
 
   // RFC-0593: pre-flight bordbuch validation gate — refuse to open a new mission
   // if the system's bordbuch has any violations. This runs before lock acquisition

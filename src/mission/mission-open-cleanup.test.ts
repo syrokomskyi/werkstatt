@@ -33,16 +33,7 @@ vi.mock("../bordbuch/bordbuch-io.ts", () => ({
 
 // Mock registry-io
 vi.mock("../sternsystem/registry-io.ts", () => ({
-  readSystemConfig: vi.fn().mockResolvedValue({
-    schemaVersion: "1.0.0",
-    id: "test-system",
-    cosmicStar: "Vega",
-    mirrors: [{ path: "../systems-cache/test-system", storageType: "non-bare" }],
-    pinnedPlatform: "1.0.0",
-    status: "active",
-    registeredAt: "2026-01-01T00:00:00.000Z",
-    deployment: { adapter: "cloudflare-workers", channels: {} },
-  }),
+  readSystemConfig: vi.fn(),
   readSystemState: vi.fn().mockResolvedValue({
     schemaVersion: "1.0.0",
     systemId: "test-system",
@@ -53,6 +44,7 @@ vi.mock("../sternsystem/registry-io.ts", () => ({
   }),
   writeSystemState: vi.fn(),
   resolveCacheClonePath: vi.fn(),
+  discoverSystems: vi.fn(),
 }));
 
 // Mock git-exec
@@ -89,8 +81,11 @@ vi.mock("./actor-identity.ts", () => ({
 
 import { runMissionOpen } from "./mission-open.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
+import { readSystemConfig, discoverSystems } from "../sternsystem/registry-io.ts";
 
 const mockAppendAndCommit = vi.mocked(appendAndCommitBordbuch);
+const mockReadSystemConfig = vi.mocked(readSystemConfig);
+const mockDiscoverSystems = vi.mocked(discoverSystems);
 
 let testRoot: string;
 let workspaceRoot: string;
@@ -108,6 +103,16 @@ beforeEach(async () => {
   // Re-setup resolveCacheClonePath to return real dir
   const { resolveCacheClonePath } = await import("../sternsystem/registry-io.ts");
   vi.mocked(resolveCacheClonePath).mockReturnValue(cacheCloneDir);
+  mockReadSystemConfig.mockResolvedValue({
+    schemaVersion: "1.0.0",
+    id: "test-system",
+    cosmicStar: "Vega",
+    mirrors: [{ path: "../systems-cache/test-system", storageType: "non-bare" }],
+    pinnedPlatform: "1.0.0",
+    status: "active",
+    registeredAt: "2026-01-01T00:00:00.000Z",
+    deployment: { adapter: "cloudflare-workers", channels: {} },
+  } as never);
   mockAppendAndCommit.mockResolvedValue({
     entry: { id: "event-000001", kind: "mission-open" } as never,
     commitResult: { commitSha: "abc123", pushed: false, error: "git pull --rebase failed" },
@@ -171,4 +176,33 @@ test("cleans up mission directory when bordbuch commit fails", async () => {
   // Mission directory should not exist after cleanup
   const missionDir = path.join(workspaceRoot, "missions", "test-system-m000001");
   expect(existsSync(missionDir)).toBe(false);
+});
+
+test("lists available systems when --system is not found", async () => {
+  mockReadSystemConfig.mockRejectedValue(new Error("ENOENT") as never);
+  mockDiscoverSystems.mockResolvedValue({
+    systems: [{ id: "warpgogol" } as never, { id: "other-system" } as never],
+    errors: [],
+  });
+
+  const input = {
+    commandName: "mission.open",
+    flags: { system: "nonexistent", brief: "Test mission" },
+  } as never;
+
+  const context = {
+    workspaceRoot,
+    logger: {
+      info: () => {},
+      success: () => {},
+      error: () => {},
+      warn: () => {},
+      event: () => {},
+      getEvents: () => [],
+    },
+  } as never;
+
+  await expect(runMissionOpen(input, context)).rejects.toThrow(
+    /system 'nonexistent' not found. Available systems: warpgogol, other-system/,
+  );
 });
