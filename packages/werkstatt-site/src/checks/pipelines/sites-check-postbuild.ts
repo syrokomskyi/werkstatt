@@ -107,4 +107,7 @@ export const SITES_CHECK_POSTBUILD_PIPELINE: KernelPipelineStep[] = [
   { command: "surface.heading-uniqueness.validate" },
   // RFC-0832: WCAG 2.5.3 Label in Name — accessible name must include visible text.
   { command: "a11y.label-in-name.validate" },
+  // RFC-0909: live search engine verification check — DNS TXT or meta tag.
+  // Interim placement in postbuild; ideally runs in deploy evidence path after deployment.
+  { command: "search.verification.validate", args: ["--live"] },
 ];

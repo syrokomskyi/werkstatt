@@ -23,6 +23,8 @@ export const SITES_CHECK_AUTHOR_PIPELINE: KernelPipelineStep[] = [
   // Wave 0 (RFC-0025): Cosmic overlay + feature-first layout contract
   { command: "app.layout.validate" },
   { command: "system.manifest.validate" },
+  // RFC-0909: search engine verification config presence and shape (offline).
+  { command: "search.verification.validate" },
   { command: "biome.contract.validate" },
   { command: "cosmic.catalog.validate" },
   { command: "cosmic.name.unique" },
