@@ -309,16 +309,16 @@ Note: `robots.page.validate` runs before `canonical.url.validate` in the actual 
 
 ## Acceptance criteria
 
-- [ ] `sitemap.placeholder.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/09b-build-artifacts-part2.ts` with correct name, scope `app`, and `supportsAllSites: true`
-- [ ] `sitemap.coverage.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/09b-build-artifacts-part2.ts` with correct name, scope `app`, and `supportsAllSites: true`
-- [ ] `sitemap.placeholder.validate` emits SITEMAP-PH-01 for URLs containing `[slug]`, `[version]`, or any bracket placeholder
-- [ ] `sitemap.coverage.validate` emits SITEMAP-COV-01 for indexable pages missing from the sitemap
-- [ ] `sitemap.coverage.validate` emits SITEMAP-COV-02 (warning) for sitemap URLs not in the expected indexable set
-- [ ] Both commands added to `SITES_CHECK_POSTBUILD_PIPELINE` after `dist.sitemap.images.validate`
-- [ ] `--json` output format matches the documented shape for both commands
-- [ ] `packages/werkstatt-site/AGENTS.md` documents both new commands
-- [ ] Unit tests pass: `pnpm --filter @warpgogol/werkstatt-site test`
-- [ ] `rfc.validate` passes on this file
+- [x] `sitemap.placeholder.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/09b-build-artifacts-part2.ts` with correct name, scope `app`, and `supportsAllSites: true` (evidence: packages/werkstatt-site/src/checks/command-tables/09b-build-artifacts-part2.ts:899-910, rfc.validate)
+- [x] `sitemap.coverage.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/09b-build-artifacts-part2.ts` with correct name, scope `app`, and `supportsAllSites: true` (evidence: packages/werkstatt-site/src/checks/command-tables/09b-build-artifacts-part2.ts:911-921, rfc.validate)
+- [x] `sitemap.placeholder.validate` emits SITEMAP-PH-01 for URLs containing `[slug]`, `[version]`, or any bracket placeholder (evidence: packages/werkstatt-site/src/checks/sitemap-placeholder.ts:73-80, src/checks/tests/sitemap-placeholder.test.ts:88-96)
+- [x] `sitemap.coverage.validate` emits SITEMAP-COV-01 for indexable pages missing from the sitemap (evidence: packages/werkstatt-site/src/checks/sitemap-coverage.ts:113-121, src/checks/tests/sitemap-coverage.test.ts:170-178)
+- [x] `sitemap.coverage.validate` emits SITEMAP-COV-02 (warning) for sitemap URLs not in the expected indexable set (evidence: packages/werkstatt-site/src/checks/sitemap-coverage.ts:123-131, src/checks/tests/sitemap-coverage.test.ts:180-193)
+- [x] Both commands added to `SITES_CHECK_POSTBUILD_PIPELINE` after `dist.sitemap.images.validate` (evidence: packages/werkstatt-site/src/checks/pipelines/sites-check-postbuild.ts:57-59)
+- [x] `--json` output format matches the documented shape for both commands (evidence: packages/werkstatt-site/src/checks/sitemap-placeholder.ts:94-96, packages/werkstatt-site/src/checks/sitemap-coverage.ts:133-135, diagnosticsResult from @warpgogol/werkstatt-shared/checks/result-helpers)
+- [x] `packages/werkstatt-site/AGENTS.md` documents both new commands (evidence: packages/werkstatt-site/AGENTS.md:109-110)
+- [x] Unit tests pass: `pnpm --filter @warpgogol/werkstatt-site test` (evidence: 12 tests pass, src/checks/tests/sitemap-placeholder.test.ts + src/checks/tests/sitemap-coverage.test.ts)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0907 --json, exitCode: 0, errors: [])
 
 ## Implementation notes for agents
 
