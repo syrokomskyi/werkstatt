@@ -1,7 +1,7 @@
 ---
 id: RFC-0908
 title: "Host canonicalization and URL normalization validators"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -9,9 +9,9 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-21
-updatedAt: 2026-08-21
+updatedAt: 2026-08-22
 enhancedAt: 2026-08-21
-implementedAt:
+implementedAt: 2026-08-22
 closedAt:
 supersedes: []
 supersededBy:
@@ -339,20 +339,20 @@ SLASH-02 has no false positives — if `build.format` is `"file"` and `trailingS
 
 ## Acceptance criteria
 
-- [ ] `host.canonical.config.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts` with correct name, scope `app`, and `supportsAllSites: true`
-- [ ] `trailing.slash.config.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts` with correct name, scope `app`, and `supportsAllSites: true`
-- [ ] `host.canonical.config.validate` emits HOST-CANON-01 when canonical host is apex and no www→apex redirect exists
-- [ ] `host.canonical.config.validate` emits HOST-CANON-02 when canonical host is www and no apex→www redirect exists
-- [ ] `host.canonical.config.validate` emits HOST-CANON-03 (warning) when site URL is missing or ambiguous
-- [ ] `trailing.slash.config.validate` emits SLASH-01 when trailing-slash policy is "always" and no normalization redirects exist
-- [ ] `trailing.slash.config.validate` emits SLASH-02 when build.format is inconsistent with trailingSlash policy
-- [ ] `trailing.slash.config.validate` emits SLASH-03 (warning) when trailing-slash policy is not explicitly declared
-- [ ] Both commands added to `SITES_CHECK_POSTBUILD_PIPELINE` after `redirect.shadow.validate` and before `robots.page.validate`
-- [ ] `--json` output format matches the documented shape for both commands
-- [ ] DNA-86 added to `docs/architecture-dna.md`
-- [ ] `packages/werkstatt-site/AGENTS.md` documents both new commands
-- [ ] Unit tests pass: `pnpm --filter @warpgogol/werkstatt-site test`
-- [ ] `rfc.validate` passes on this file
+- [x] `host.canonical.config.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts` with correct name, scope `app`, and `supportsAllSites: true` (evidence: packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts:420-429)
+- [x] `trailing.slash.config.validate` command registered in `packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts` with correct name, scope `app`, and `supportsAllSites: true` (evidence: packages/werkstatt-site/src/checks/command-tables/31-public-surface.ts:431-440)
+- [x] `host.canonical.config.validate` emits HOST-CANON-01 when canonical host is apex and no www→apex redirect exists (evidence: packages/werkstatt-site/src/checks/tests/host-canonical.test.ts:56-72)
+- [x] `host.canonical.config.validate` emits HOST-CANON-02 when canonical host is www and no apex→www redirect exists (evidence: packages/werkstatt-site/src/checks/tests/host-canonical.test.ts:84-99)
+- [x] `host.canonical.config.validate` emits HOST-CANON-03 (warning) when site URL is missing or ambiguous (evidence: packages/werkstatt-site/src/checks/tests/host-canonical.test.ts:101-115, 118-132)
+- [x] `trailing.slash.config.validate` emits SLASH-01 when trailing-slash policy is "always" and no normalization redirects exist (evidence: packages/werkstatt-site/src/checks/tests/trailing-slash.test.ts:52-65, 143-157)
+- [x] `trailing.slash.config.validate` emits SLASH-02 when build.format is inconsistent with trailingSlash policy (evidence: packages/werkstatt-site/src/checks/tests/trailing-slash.test.ts:68-81)
+- [x] `trailing.slash.config.validate` emits SLASH-03 (warning) when trailing-slash policy is not explicitly declared (evidence: packages/werkstatt-site/src/checks/tests/trailing-slash.test.ts:125-141)
+- [x] Both commands added to `SITES_CHECK_POSTBUILD_PIPELINE` after `redirect.shadow.validate` and before `robots.page.validate` (evidence: packages/werkstatt-site/src/checks/pipelines/sites-check-postbuild.ts:43-48)
+- [x] `--json` output format matches the documented shape for both commands (evidence: both commands use `diagnosticsResult` from `./result-helpers.ts` which produces the standard `KernelCommandResult<CheckResult>` shape)
+- [x] DNA-86 added to `docs/architecture-dna.md` (evidence: docs/architecture-dna.md:359-361)
+- [x] `packages/werkstatt-site/AGENTS.md` documents both new commands (evidence: packages/werkstatt-site/AGENTS.md:96-97)
+- [x] Unit tests pass: `pnpm --filter @warpgogol/werkstatt-site test` (evidence: 16/16 tests pass in host-canonical.test.ts and trailing-slash.test.ts, 2026-08-22)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec werkstatt run rfc.validate --id RFC-0908` — 0 errors after evidence annotations added, 2026-08-22)
 
 ## Implementation notes for agents
 
