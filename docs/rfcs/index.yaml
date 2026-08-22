@@ -17415,10 +17415,10 @@ entries:
     file: docs/rfcs/archive/implemented/rfc-0906-canonical-url-trailing-slash-parity.md
   - id: RFC-0907
     title: "Sitemap integrity validators: placeholder expansion and route coverage"
-    status: accepted
+    status: implemented
     kind: command
     createdAt: 2026-08-21
-    implementedAt: ""
+    implementedAt: 2026-08-22
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -17430,7 +17430,7 @@ entries:
       - RFC-0318
       - RFC-0383
       - RFC-0906
-    file: docs/rfcs/rfc-0907-sitemap-integrity-validators.md
+    file: docs/rfcs/archive/implemented/rfc-0907-sitemap-integrity-validators.md
   - id: RFC-0908
     title: Host canonicalization and URL normalization validators
     status: accepted
