@@ -8,10 +8,11 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0148: extracted the shared org-profile assembler from the disk + Astro builders.</item>
+  <item>RFC-0910: Organization.url uses canonicalRootUrl (unprefixed root) instead of language-prefixed path.</item>
 </CHANGE_SUMMARY>
 */
 
-import { getBaseUrl, toAbsoluteUrl } from "./ids.ts";
+import { canonicalRootUrl, getBaseUrl, toAbsoluteUrl } from "./ids.ts";
 import type {
   SemanticInitiative,
   SemanticLocation,
@@ -104,7 +105,7 @@ export function buildOrganizationProfile(input: OrganizationProfileInput): Seman
     name: input.brandName,
     legalName: input.legalName,
     description: input.description,
-    url: toAbsoluteUrl(baseUrl, `/${input.lang}/`),
+    url: canonicalRootUrl(baseUrl),
     foundingYear: input.foundingYear,
     email: input.email,
     registration: input.registration,

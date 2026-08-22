@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Moved from app semantic/ids to packages/share/src/semantic/ids.ts — framework-agnostic, reusable across all apps.</item>
+  <item>RFC-0910: add canonicalRootUrl — unprefixed root URL for entity identity (Organization.url, WebSite.url).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -25,6 +26,18 @@ export function toCanonicalUrl(url: URL | string): string {
 
 export function toAbsoluteUrl(baseUrl: string, path: string): string {
   return new URL(path, `${baseUrl}/`).toString();
+}
+
+/**
+ * RFC-0910: produce the canonical root URL for entity identity.
+ *
+ * The entity root URL is language-independent — it is always `https://site/`
+ * regardless of the default language. This contrasts with page URLs, which
+ * are language-prefixed for non-default languages and unprefixed for the
+ * default language per RFC-0160.
+ */
+export function canonicalRootUrl(baseUrl: string): string {
+  return new URL("/", `${baseUrl}/`).toString();
 }
 
 export function toPathname(url: string): string {
