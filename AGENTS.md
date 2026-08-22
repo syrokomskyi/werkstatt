@@ -234,6 +234,13 @@ This is a **package** workspace. Expose stable typed APIs. Do not import from ap
 - `commitWorkpieceIfDirty(workpieceDir, missionId)` (RFC-0644): auto-commits all dirty files in the workpiece via `git add -A` + `git commit --no-verify`. Returns `{ committed: boolean, commitSha: string | null }`. Used by `mission.reconcile` and `mission.close` (RFC-0797) to auto-commit dirty workpieces instead of throwing.
 - `commitCacheCloneIfDirty(systemDir, systemId)` (RFC-0797): auto-commits all dirty files in the cache clone via `git add -A` + `git commit --no-verify`. Returns `{ committed: boolean, commitSha: string | null }`. Used by `mission.reconcile` (before the dirty guard) and `mission.validate` (post-validate cleanup) to auto-commit generated files instead of leaving the cache clone dirty.
 
+## Mission close dist-reuse prerequisite (RFC-0918)
+
+- `mission.close` runs `mission.validate` inline before acquiring locks. The inline validate call does NOT pass `force: true`, so the RFC-0635 distribution-reuse path is active by default: if `distribution/build-input-hash.json` matches the current workpiece state and `distribution/dist/` exists, the full build is skipped and dist is copied from the cache clone.
+- Run `release.prepare` or `mission.validate` before `mission.close` to produce `distribution/build-input-hash.json` that enables dist reuse (RFC-0635). Without this, `mission.close` runs a full build which may trigger the rebuild cycle (RFC-0918).
+- `mission.reconcile` includes a post-push divergence check (RFC-0918): after pushing to origin, it compares cache clone HEAD against `origin/main` using `git rev-parse`. If the SHAs differ, a `divergenceWarning` is logged and included in the reconciliation report. This is a non-fatal diagnostic — it does not block reconcile.
+- The band-aid fix from 6.92.5 (updating `workpieceHeadAtReconcile` after auto-commit in `mission.close`) remains as a safety net for the full-build path when dist reuse is not active.
+
 ## Env file persistence (RFC-0822)
 
 - `persistEnvFilesToCacheClone(workpieceDir, cacheCloneDir)` (RFC-0822): copies `.env*` files from workpiece to cache clone (untracked). Excludes `.env.example` and `.env.*.example`. Used by `mission.close` as a final step. Non-fatal on failure.
