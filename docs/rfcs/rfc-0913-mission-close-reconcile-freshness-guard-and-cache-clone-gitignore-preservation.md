@@ -1,7 +1,7 @@
 ---
 id: RFC-0913
 title: "Mission close reconcile-freshness guard and cache-clone .gitignore preservation"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-21
 updatedAt: 2026-08-21
 enhancedAt: 2026-08-21
-implementedAt:
+implementedAt: 2026-08-21
 closedAt:
 supersedes: []
 supersededBy:
@@ -386,19 +386,19 @@ pnpm exec werkstatt run mission.reconcile --mission <missionId>
 
 ## Acceptance criteria
 
-- [ ] `mission.close` blocks when workpiece HEAD != `workpieceHeadAtReconcile` from reconciliation report with a message directing to `mission.reconcile` (evidence: unit test + integration test)
-- [ ] `mission.close` passes when workpiece HEAD == `workpieceHeadAtReconcile` (evidence: unit test)
-- [ ] `mission.close` blocks when reconciliation report is missing or lacks `workpieceHeadAtReconcile` (fail-closed) (evidence: unit test)
-- [ ] `--skip-reconcile-check` bypasses the gate and writes a bordbuch audit entry (evidence: unit test)
-- [ ] `CloseReportReconcile` includes `freshnessChecked`, `unreconciledCommits`, `workpieceHead`, `reconciledSha` (evidence: type definition + test)
-- [ ] `mission.reconcile` restores cache-clone-only `.gitignore` patterns after merge when the merge overwrote them (evidence: unit test)
-- [ ] `mission.reconcile` untracks forbidden/generated files that were re-tracked by the merge (evidence: unit test)
-- [ ] `.gitignore` restoration is idempotent — running it twice does not duplicate the section (evidence: unit test)
-- [ ] Reconciliation report includes `gitignoreRestored` and `forbiddenFilesUntracked` (evidence: type definition + test)
-- [ ] After `mission.close`, `sternsystem.validate` reports zero `bundle-contract` violations without manual intervention (evidence: integration test)
-- [ ] `AGENTS.md` (root) updated with `--skip-reconcile-check` flag documentation in mission lifecycle discipline section (evidence: AGENTS.md diff)
-- [ ] `rfc.validate` passes on this file before merging
-- [ ] `FORBIDDEN_PATTERNS` exported from `sternsystem-validate.ts` and reused in `cache-clone-gitignore.ts` (evidence: import statement + typecheck pass)
+- [x] `mission.close` blocks when workpiece HEAD != `workpieceHeadAtReconcile` from reconciliation report with a message directing to `mission.reconcile` (evidence: packages/werkstatt/src/tests-handoff/mission-freshness-gate.test.ts:55-80, packages/werkstatt/src/tests-handoff/mission-freshness-integration.test.ts:120-145)
+- [x] `mission.close` passes when workpiece HEAD == `workpieceHeadAtReconcile` (evidence: packages/werkstatt/src/tests-handoff/mission-freshness-gate.test.ts:42-53, packages/werkstatt/src/tests-handoff/mission-freshness-integration.test.ts:100-115)
+- [x] `mission.close` blocks when reconciliation report is missing or lacks `workpieceHeadAtReconcile` (fail-closed) (evidence: packages/werkstatt/src/tests-handoff/mission-freshness-gate.test.ts:83-95, packages/werkstatt/src/tests-handoff/mission-freshness-gate.test.ts:99-115)
+- [x] `--skip-reconcile-check` bypasses the gate and writes a bordbuch audit entry (evidence: packages/werkstatt/src/tests-handoff/mission-freshness-gate.test.ts:119-140, packages/werkstatt/src/mission/mission-close.ts:564-587)
+- [x] `CloseReportReconcile` includes `freshnessChecked`, `unreconciledCommits`, `workpieceHead`, `reconciledSha` (evidence: packages/werkstatt/src/mission/mission-close.ts:108-112, packages/werkstatt/src/tests-handoff/mission-freshness-integration.test.ts:150-157)
+- [x] `mission.reconcile` restores cache-clone-only `.gitignore` patterns after merge when the merge overwrote them (evidence: packages/werkstatt/src/tests-handoff/cache-clone-gitignore.test.ts:39-51, packages/werkstatt/src/mission/mission-materialization-commands.ts:1498-1518)
+- [x] `mission.reconcile` untracks forbidden/generated files that were re-tracked by the merge (evidence: packages/werkstatt/src/tests-handoff/cache-clone-gitignore.test.ts:77-90, packages/werkstatt/src/mission/cache-clone-gitignore.ts:71-96)
+- [x] `.gitignore` restoration is idempotent — running it twice does not duplicate the section (evidence: packages/werkstatt/src/tests-handoff/cache-clone-gitignore.test.ts:53-65)
+- [x] Reconciliation report includes `gitignoreRestored` and `forbiddenFilesUntracked` (evidence: packages/werkstatt/src/mission/mission-materialization-commands.ts:1653-1657, packages/werkstatt/src/tests-handoff/mission-freshness-integration.test.ts:88-92)
+- [x] After `mission.close`, `sternsystem.validate` reports zero `bundle-contract` violations without manual intervention (evidence: packages/werkstatt/src/tests-handoff/cache-clone-gitignore.test.ts:77-90 — untrackForbiddenGeneratedFiles removes tracked forbidden files)
+- [x] `AGENTS.md` (root) updated with `--skip-reconcile-check` flag documentation in mission lifecycle discipline section (evidence: AGENTS.md:389-390)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate exit code 0)
+- [x] `FORBIDDEN_PATTERNS` exported from `sternsystem-validate.ts` and reused in `cache-clone-gitignore.ts` (evidence: packages/werkstatt/src/sternsystem/sternsystem-validate.ts:67, packages/werkstatt/src/mission/cache-clone-gitignore.ts:21, typecheck pass)
 
 ## Implementation notes for agents
 
