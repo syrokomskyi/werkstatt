@@ -34,6 +34,7 @@
   <item>RFC-0797: add commitCacheCloneIfDirty auto-commit before dirty cache clone guard in mission.reconcile; replace commitBordbuchProjections with commitCacheCloneIfDirty in post-validate cleanup.</item>
   <item>RFC-0820: add zero-transfer warning in mission.reconcile when transferredCommits is zero; add zeroTransferWarning field to reconciliation report.</item>
   <item>RFC-0913: add post-merge .gitignore restoration and untrackForbiddenGeneratedFiles call; add workpieceHeadAtReconcile, gitignoreRestored, forbiddenFilesUntracked to reconciliation report.</item>
+  <item>RFC-0918: add post-push divergence check in mission.reconcile comparing cache clone HEAD against origin/main; add divergenceWarning to reconciliation report.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -1247,6 +1248,12 @@ export async function runMissionReconcile(
       succeeded: false,
       error: null,
     };
+    // RFC-0918: post-push divergence diagnostic — populated inside the git branch
+    let divergenceWarning: {
+      cacheCloneHead: string;
+      originHead: string;
+      diverged: boolean;
+    } | null = null;
 
     if (!existsSync(path.join(workpieceDir, ".git"))) {
       throw new Error(
@@ -1615,6 +1622,31 @@ export async function runMissionReconcile(
         );
       }
 
+      // RFC-0918: Post-push divergence check — compare cache clone HEAD against
+      // origin/main to detect diverged history from multiple reconcile runs.
+      // Non-fatal diagnostic: logs a warning if SHAs differ, does not auto-fix.
+      try {
+        const cacheCloneHead = execSync("git rev-parse HEAD", {
+          cwd: systemDir,
+          stdio: "pipe",
+          encoding: "utf-8",
+        }).trim();
+        const originHead = execSync("git rev-parse origin/main", {
+          cwd: systemDir,
+          stdio: "pipe",
+          encoding: "utf-8",
+        }).trim();
+        if (cacheCloneHead !== originHead) {
+          divergenceWarning = { cacheCloneHead, originHead, diverged: true };
+          logger.warn(
+            `[mission.reconcile] WARNING: Cache clone HEAD (${cacheCloneHead.slice(0, 8)}) diverged from origin/main (${originHead.slice(0, 8)}).\n` +
+              `  Run \`git reset --hard origin/main\` in the cache clone to resolve.`,
+          );
+        }
+      } catch {
+        // Non-fatal — origin/main may not exist yet or git command failed
+      }
+
       // RFC-0705: Best-effort sternsystem.sync to push from bare to external mirrors.
       // Only called when external mirrors are configured (mirrors.length > 2).
       // Non-fatal: sync failure logs a warning but does not block reconcile.
@@ -1686,6 +1718,8 @@ export async function runMissionReconcile(
       gitignoreRestored,
       forbiddenFilesUntracked,
       mirrorSync: mirrorSync.attempted ? mirrorSync : undefined,
+      // RFC-0918: post-push divergence diagnostic
+      divergenceWarning,
     };
 
     await atomicWriteFile(
