@@ -59,6 +59,7 @@ export interface HealthInput {
   releaseId: string;
   expectedBehaviorSnapshotHash: string;
   workspaceRoot: string;
+  authHeaders?: Record<string, string>;
 }
 
 export interface DeploymentLimits {

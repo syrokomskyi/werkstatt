@@ -302,6 +302,7 @@ export async function verifyFreshness(
   deploymentUrl: string,
   localDistTreeHash: string,
   logger: { info: (m: string) => void },
+  authHeaders: Record<string, string> = {},
 ): Promise<FreshnessResult> {
   const base = deploymentUrl.replace(/\/$/, "");
   const url = `${base}${BUILD_IDENTITY_PATH}`;
@@ -318,7 +319,7 @@ export async function verifyFreshness(
     }
 
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, { headers: authHeaders });
       if (!response.ok) {
         lastCdnDistTreeHash = null;
         lastError = `CDN freshness fetch returned HTTP ${response.status} for ${url}`;

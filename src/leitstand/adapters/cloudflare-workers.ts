@@ -203,10 +203,11 @@ async function fetchWithRetry(
   url: string,
   maxAttempts: number,
   redirect: "follow" | "manual" = "follow",
+  authHeaders: Record<string, string> = {},
 ): Promise<{ ok: boolean; status: number; body: string; headers: Headers } | null> {
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {
-      const response = await fetch(url, { redirect });
+      const response = await fetch(url, { redirect, headers: authHeaders });
       const body = await response.text();
       return { ok: response.ok, status: response.status, body, headers: response.headers };
     } catch {
@@ -342,7 +343,12 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
         const url = `${input.deploymentUrl}${route.path === "/" ? "" : route.path}`;
 
         if (route.contentHash === null) {
-          const response = await fetchWithRetry(url, maxAttempts, "manual");
+          const response = await fetchWithRetry(
+            url,
+            maxAttempts,
+            "manual",
+            input.authHeaders ?? {},
+          );
 
           if (response === null) {
             anyNetworkFailure = true;
@@ -373,7 +379,7 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
           continue;
         }
 
-        const response = await fetchWithRetry(url, maxAttempts);
+        const response = await fetchWithRetry(url, maxAttempts, "follow", input.authHeaders ?? {});
 
         if (response === null) {
           anyNetworkFailure = true;

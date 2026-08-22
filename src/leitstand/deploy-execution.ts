@@ -12,6 +12,7 @@
 <item>RFC-0866: implement full 13-phase executeDeployPhases function with channel-specific behavior.</item>
 <item>RFC-0866 fix: populate HealthInput.releaseId and workspaceRoot from ctx, PropagateInput.expectedBehaviorSnapshotHash from localDistTreeHash.</item>
 <item>RFC-0866 fix: capture error message in outer catch and add errorMessage to DeployExecutionResult.</item>
+<item>RFC-0925: read accessPin from system-state.yaml, build authHeaders, pass to verifyFreshness and health checks for access-protected staging channels.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -51,6 +52,12 @@ const noopLogger = {
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function buildAuthHeader(pin: string | null | undefined): Record<string, string> {
+  if (!pin) return {};
+  const credentials = btoa(`access:${pin}`);
+  return { Authorization: `Basic ${credentials}` };
 }
 
 const HEALTH_CHECK_MAX_ATTEMPTS = 3;
@@ -133,6 +140,7 @@ async function runHealthCheckWithRetry(
   channel: "dev" | "alt" | "main",
   releaseId: string,
   workspaceRoot: string,
+  authHeaders: Record<string, string> = {},
 ): Promise<{ state: "healthy" | "unhealthy" | "unknown"; checks: HealthCheck[] }> {
   for (let attempt = 1; attempt <= HEALTH_CHECK_MAX_ATTEMPTS; attempt++) {
     if (attempt > 1) {
@@ -146,6 +154,7 @@ async function runHealthCheckWithRetry(
         releaseId,
         expectedBehaviorSnapshotHash: "",
         workspaceRoot,
+        authHeaders,
       };
       const result = await adapter.health(healthInput);
       if (result.state === "healthy") {
@@ -170,6 +179,9 @@ export async function executeDeployPhases(
   const channelConfig = getChannelConfig(ctx.systemConfig, channel);
   const deploymentUrl = channelConfig.url ?? "";
   const now = new Date().toISOString();
+
+  const systemState = await readSystemStateSmart(ctx.workspaceRoot, ctx.systemId);
+  const authHeaders = buildAuthHeader(systemState.accessPin);
 
   let buildSkipped = false;
   let buildIdentityPath = "";
@@ -291,7 +303,12 @@ export async function executeDeployPhases(
 
     if (channel !== "dev" || !isDevWorkersUrl(actualDeploymentUrl)) {
       if (localDistTreeHash) {
-        freshness = await verifyFreshness(actualDeploymentUrl, localDistTreeHash, noopLogger);
+        freshness = await verifyFreshness(
+          actualDeploymentUrl,
+          localDistTreeHash,
+          noopLogger,
+          authHeaders,
+        );
         if (!freshness.verified) {
           failingPhase = "freshness";
           throw new Error(`Freshness verification failed: ${freshness.error ?? "unknown"}`);
@@ -306,6 +323,7 @@ export async function executeDeployPhases(
       channel,
       ctx.releaseId ?? "",
       ctx.workspaceRoot,
+      authHeaders,
     );
     healthState = healthResult.state;
     healthChecks = healthResult.checks;
@@ -373,6 +391,7 @@ export async function executeDeployPhases(
           "alt",
           ctx.releaseId ?? "",
           ctx.workspaceRoot,
+          authHeaders,
         );
         if (altHealth.state !== "healthy") {
           failingPhase = "alt-health-check";
