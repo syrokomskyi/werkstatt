@@ -57,6 +57,7 @@ For repository-wide, cross-workspace, architectural, shared-package, or high-ris
 - Always use `writeFileIfChanged` from `@warpgogol/werkstatt` (re-exported from `@warpgogol/forge/utils`, RFC-0345) for generated file writes — both text and binary. It accepts `string | Uint8Array` and skips the disk write when content is byte-identical to the existing file.
 - Do NOT use raw `writeFile` from `node:fs/promises` for generated files. Raw `writeFile` always writes, creating git churn and LFS bloat on every regeneration cycle.
 - For binary generated files (PNG, icons), pass `Buffer` directly — `writeFileIfChanged` compares bytes via `Buffer.compare`.
+- **`writeFileIfChanged` is async** — it returns a `Promise`. Always `await` it. Calling it without `await` silently fails with `ENOENT` on the temp file because the atomic write's temp file is cleaned up before the async operation completes.
 
 ## Ownership boundaries
 
