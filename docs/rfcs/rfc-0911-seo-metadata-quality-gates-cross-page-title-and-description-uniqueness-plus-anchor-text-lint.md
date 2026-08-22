@@ -1,7 +1,7 @@
 ---
 id: RFC-0911
 title: "SEO metadata quality gates: cross-page title and description uniqueness plus anchor-text lint"
-status: implemented
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-21
 updatedAt: 2026-08-22
 enhancedAt: 2026-08-22
-implementedAt: 2026-08-22
+implementedAt:
 closedAt:
 supersedes: []
 supersededBy:
