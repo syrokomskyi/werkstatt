@@ -103,10 +103,19 @@ function isWarpgogolSite(manifest: SystemManifest, domain: string): boolean {
   return appId === "warpgogol-com" || domain === "warpgogol.com";
 }
 
-function surfaceRoutesFromGenerated(appDirectory: string, defaultLang: string): string[] {
+function surfaceRoutesFromGenerated(
+  appDirectory: string,
+  defaultLang: string,
+  includeRedirectStubs = false,
+): string[] {
   const surfacePath = path.join(appDirectory, "src", "surface.generated.yaml");
   let parsed: {
-    entries?: Array<{ routes?: Record<string, string>; indexable?: boolean; noindex?: boolean }>;
+    entries?: Array<{
+      routes?: Record<string, string>;
+      indexable?: boolean;
+      noindex?: boolean;
+      redirectToPageId?: string;
+    }>;
   };
   try {
     parsed = yamlParse(readFileSync(surfacePath, "utf8"));
@@ -114,7 +123,11 @@ function surfaceRoutesFromGenerated(appDirectory: string, defaultLang: string): 
     return [];
   }
   return (parsed.entries ?? [])
-    .filter((entry) => entry.indexable === true && entry.noindex !== true)
+    .filter((entry) => {
+      if (entry.indexable === true && entry.noindex !== true) return true;
+      if (includeRedirectStubs && entry.redirectToPageId) return true;
+      return false;
+    })
     .flatMap((entry) =>
       Object.entries(entry.routes ?? {}).map(([lang, route]) => {
         const normalized = normalizeRoutePath(route);
@@ -173,11 +186,13 @@ export function buildRetiredSurfaceRedirectBlock(
     ...manifestRoutes(manifest),
     ...surfaceRoutesFromGenerated(appDirectory, defaultLang),
   ]);
+  const redirectStubRoutes = new Set(surfaceRoutesFromGenerated(appDirectory, defaultLang, true));
   const redirects = new Map<string, string>();
   const addRedirect = (from: string, to: string, status = 301) => {
     const normalizedFrom = normalizeRoutePath(from);
     const normalizedTo = normalizeRoutePath(to);
     if (liveRoutes.has(normalizedFrom)) return;
+    if (redirectStubRoutes.has(normalizedFrom)) return;
     if (!liveRoutes.has(normalizedTo)) return;
     redirects.set(normalizedFrom, `${normalizedFrom} ${normalizedTo} ${status}`);
   };
