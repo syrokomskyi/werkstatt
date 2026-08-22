@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Extracted from module.ts to separate author-time from post-build concerns.</item>
+  <item>RFC-0910: add jsonld.canonical-entity.validate after jsonld.url.validate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -27,6 +28,7 @@ export const SITES_CHECK_POSTBUILD_PIPELINE: KernelPipelineStep[] = [
   { command: "seo.meta.validate" },
   // RFC-0163: per-page JSON-LD url/@id correctness + organization-identity parity.
   { command: "jsonld.url.validate" },
+  { command: "jsonld.canonical-entity.validate" },
   { command: "jsonld.parity" },
   // RFC-0371: no external font origins in rendered HTML (Fontsource CSS imports).
   { command: "fonts.origin.validate" },

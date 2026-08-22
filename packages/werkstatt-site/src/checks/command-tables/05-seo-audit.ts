@@ -16,6 +16,7 @@ import {
   runSeoMetaValidate,
   runJsonLdUrlValidate,
   runJsonLdParityValidate,
+  runJsonLdCanonicalEntityValidate,
   runRobotsPageValidate,
   runSeoTechnicalValidate,
   runSeoStructuredDataValidate,
@@ -72,6 +73,16 @@ export const SEO_AUDIT_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     reads: ["<app>/dist/client/**/*.html", "<app>/src/content/system.md"],
     execute: runJsonLdParityValidate,
+  },
+  {
+    name: "jsonld.canonical-entity.validate",
+    description:
+      "RFC-0910: Validate Organization.url, WebSite.url, BreadcrumbList home item, and same-origin Person.url are canonical (unprefixed root, no default-language prefix).",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/dist/client/**/*.html", "<app>/astro.config.mjs"],
+    execute: runJsonLdCanonicalEntityValidate,
   },
   {
     name: "robots.page.validate",

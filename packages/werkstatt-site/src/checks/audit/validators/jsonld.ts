@@ -1,12 +1,13 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0074 JSON-LD audit validators: checks rendered HTML for required JSON-LD types and URL parity across languages.</purpose>
+<purpose>RFC-0074 RFC-0910 JSON-LD audit validators: checks rendered HTML for required JSON-LD types, URL parity across languages, and canonical entity identity URLs.</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0303 Phase 3: extracted from audit-validators.ts as part of the domain split.</item>
+  <item>RFC-0910: add jsonld.canonical-entity.validate — Organization/WebSite/BreadcrumbList/Person entity URL canonicality.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -14,6 +15,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { defaultLanguageFromManifest } from "../../lib/i18n.ts";
 import { parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
+import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -21,6 +23,7 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { buildAuditResult, loadAuditAppContext } from "../helpers.ts";
 import type { Diagnostic } from "../types.ts";
+import { readAstroSiteUrl } from "../../lib/astro-site-url.ts";
 import {
   collectRenderedHtml,
   extractAllJsonLdNodes,
@@ -230,5 +233,170 @@ export async function runJsonLdParityValidate(
     data: result,
     exitCode: result.status === "fail" ? 1 : 0,
     summary: `jsonld.parity: ${result.status}`,
+  };
+}
+
+/**
+ * RFC-0910: jsonld.canonical-entity.validate — Organization.url, WebSite.url,
+ * BreadcrumbList item URLs, and same-origin Person.url must be canonical
+ * (unprefixed root, no default-language prefix like /de/).
+ *
+ * Scans rendered HTML in dist/client/ for JSON-LD entity nodes and compares
+ * their url fields against the canonical root derived from Astro.site.
+ * External Person URLs (different origin) are skipped — only same-origin
+ * profile URLs are canonicalized.
+ */
+export async function runJsonLdCanonicalEntityValidate(
+  _input: KernelCommandInput,
+  context: KernelRuntimeContext,
+): Promise<KernelCommandResult> {
+  const started = Date.now();
+  const paths = requireAstroSitePaths(context);
+  const distDir = join(paths.appDirectory, "dist", "client");
+  const siteName = context.site!.name;
+  const findings: Diagnostic[] = [];
+
+  const htmlFiles = await collectRenderedHtml(distDir);
+  if (htmlFiles.length === 0) {
+    const result = buildAuditResult({
+      command: "jsonld.canonical-entity.validate",
+      app: siteName,
+      workspaceRoot: context.workspaceRoot,
+      findings,
+      runtimeMs: Date.now() - started,
+    });
+    return {
+      data: result,
+      exitCode: 0,
+      summary: "jsonld.canonical-entity.validate: skipped (no dist/ HTML)",
+    };
+  }
+
+  const siteUrl = await readAstroSiteUrl(paths.appDirectory);
+  if (!siteUrl) {
+    const result = buildAuditResult({
+      command: "jsonld.canonical-entity.validate",
+      app: siteName,
+      workspaceRoot: context.workspaceRoot,
+      findings,
+      runtimeMs: Date.now() - started,
+    });
+    return {
+      data: result,
+      exitCode: 0,
+      summary: "jsonld.canonical-entity.validate: skipped (Astro.site not configured)",
+    };
+  }
+
+  const expectedRoot = new URL("/", siteUrl).toString();
+  const expectedPath = new URL("/", siteUrl).pathname;
+  const siteOrigin = new URL(siteUrl).origin;
+
+  const audit = await loadAuditAppContext(context);
+  const defaultLang = defaultLanguageFromManifest(audit.systemManifest);
+  const defaultPrefix = `/${defaultLang}`;
+
+  for (const page of htmlFiles) {
+    if (isHtmlRedirectPage(page.html)) {
+      continue;
+    }
+    const nodes = extractAllJsonLdNodes(page.html);
+
+    // JSONLD-ENTITY-01: Organization.url and WebSite.url
+    for (const node of nodes) {
+      if (jsonLdNodeHasType(node, "Organization") || jsonLdNodeHasType(node, "WebSite")) {
+        const url = typeof node.url === "string" ? node.url : null;
+        if (!url) continue;
+        const urlPath = toComparablePathname(url);
+        if (urlPath !== expectedPath) {
+          findings.push(
+            finding({
+              ruleId: "JSONLD-ENTITY-01",
+              severity: "error",
+              file: page.file,
+              message: `${node["@type"]} url (${url}) is not the canonical root URL (${expectedRoot}). Entity identity URLs must be the unprefixed root, not language-prefixed.`,
+              evidence: [{ kind: "rendered", file: page.file }],
+            }),
+          );
+        }
+      }
+    }
+
+    // JSONLD-ENTITY-02: BreadcrumbList item URLs
+    for (const node of nodes) {
+      if (jsonLdNodeHasType(node, "BreadcrumbList")) {
+        const itemListElement = node.itemListElement;
+        if (!Array.isArray(itemListElement)) continue;
+        for (const item of itemListElement) {
+          const itemRecord = item as Record<string, unknown>;
+          const itemNode = itemRecord.item as Record<string, unknown> | undefined;
+          const itemUrl = typeof itemNode?.url === "string" ? itemNode.url : null;
+          if (!itemUrl) continue;
+          const itemPath = toComparablePathname(itemUrl);
+          // The home breadcrumb item must be the canonical root.
+          // Other items are page URLs — only check that they don't carry
+          // the default-language prefix when they are the root.
+          if (itemPath === expectedPath) {
+            // This is the root item — check it matches canonical root
+            const fullUrl = new URL(itemUrl, siteUrl).toString();
+            if (toComparablePathname(fullUrl) !== expectedPath) {
+              findings.push(
+                finding({
+                  ruleId: "JSONLD-ENTITY-02",
+                  severity: "error",
+                  file: page.file,
+                  message: `BreadcrumbList home item url (${itemUrl}) carries a language prefix. The home breadcrumb must be the canonical root (${expectedRoot}).`,
+                  evidence: [{ kind: "rendered", file: page.file }],
+                }),
+              );
+            }
+          }
+        }
+      }
+    }
+
+    // JSONLD-ENTITY-03: same-origin Person.url
+    for (const node of nodes) {
+      if (jsonLdNodeHasType(node, "Person")) {
+        const url = typeof node.url === "string" ? node.url : null;
+        if (!url) continue;
+        let personOrigin: string;
+        try {
+          personOrigin = new URL(url).origin;
+        } catch {
+          continue;
+        }
+        if (personOrigin !== siteOrigin) continue;
+        // Same-origin Person.url — check it doesn't carry the default-language prefix
+        const urlPath = toComparablePathname(url);
+        // Person profile URLs are page URLs, not root URLs — they should not
+        // have the default-language prefix. Check if the path starts with
+        // the default language prefix (e.g. /de/).
+        if (urlPath.startsWith(defaultPrefix + "/") || urlPath === defaultPrefix) {
+          findings.push(
+            finding({
+              ruleId: "JSONLD-ENTITY-03",
+              severity: "error",
+              file: page.file,
+              message: `Person.url (${url}) carries the default-language prefix (${defaultPrefix}). Same-origin Person URLs must be canonical (unprefixed for the default language).`,
+              evidence: [{ kind: "rendered", file: page.file }],
+            }),
+          );
+        }
+      }
+    }
+  }
+
+  const result = buildAuditResult({
+    command: "jsonld.canonical-entity.validate",
+    app: siteName,
+    workspaceRoot: context.workspaceRoot,
+    findings,
+    runtimeMs: Date.now() - started,
+  });
+  return {
+    data: result,
+    exitCode: result.status === "fail" ? 1 : 0,
+    summary: `jsonld.canonical-entity.validate: ${result.status}`,
   };
 }

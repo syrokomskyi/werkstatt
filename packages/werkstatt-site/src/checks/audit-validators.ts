@@ -13,7 +13,11 @@
 
 export { runAuditAgentReadinessValidate } from "./audit/validators/agent-readiness.ts";
 export { runSeoMetaValidate } from "./audit/validators/seo-meta.ts";
-export { runJsonLdUrlValidate, runJsonLdParityValidate } from "./audit/validators/jsonld.ts";
+export {
+  runJsonLdUrlValidate,
+  runJsonLdParityValidate,
+  runJsonLdCanonicalEntityValidate,
+} from "./audit/validators/jsonld.ts";
 export { runRobotsPageValidate } from "./audit/validators/robots-page.ts";
 export { runSeoTechnicalValidate } from "./audit/validators/seo-technical.ts";
 export { runSeoStructuredDataValidate } from "./audit/validators/seo-structured-data.ts";
