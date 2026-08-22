@@ -36,7 +36,6 @@ import {
   readBordbuch,
   deriveNextMissionNumberSafe,
   validateBordbuch,
-  commitAndPushBordbuch,
   type BordbuchViolation,
 } from "../bordbuch/bordbuch-io.ts";
 import { appendAndCommitBordbuch } from "../bordbuch/bordbuch-commit-helper.ts";
@@ -173,22 +172,9 @@ export async function runMissionOpen(
             `[mission.open] bordbuch.repair ran but ${recheck.violations.length} violation(s) remain for system '${systemId}'\n${violationLines}`,
           );
         }
-        // Commit and push the repaired bordbuch to avoid dirty cache clone
-        // blocking mission.reconcile. bordbuch.repair writes the file but does
-        // not commit (by design — operator command). mission.open must commit
-        // the auto-repaired file before proceeding.
-        const repairSystemDir = await resolveCacheClonePath(workspaceRoot, systemId);
-        if (existsSync(path.join(repairSystemDir, ".git"))) {
-          const repairResult = await commitAndPushBordbuch(
-            repairSystemDir,
-            "bordbuch.repair: auto-repair orphan-mission-close (mission.open)",
-          );
-          if (!repairResult.commitSha) {
-            throw new Error(
-              `[mission.open] bordbuch.repair succeeded but commit failed for system '${systemId}'`,
-            );
-          }
-        }
+        // bordbuch.repair now auto-commits its output, so no separate
+        // commitAndPushBordbuch call is needed here. The cache clone is
+        // clean after repair, preventing git pull --rebase failures.
       } catch (repairErr) {
         throw new Error(
           `[mission.open] bordbuch for system '${systemId}' has ${bordbuchCheck.violations.length} orphan-mission-close violation(s) — auto-repair failed: ${repairErr instanceof Error ? repairErr.message : String(repairErr)}`,

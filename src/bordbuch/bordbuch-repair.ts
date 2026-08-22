@@ -3,7 +3,6 @@
   <purpose>RFC-0583: bordbuch.repair — detect orphan-mission-close violations, insert missing mission-open events, recompute hash chain and event-id sequence, write atomically.</purpose>
   <non-goals>
     <item>Do not repair duplicate-mission-id, sensitive-payload, hash-mismatch, or hash-chain-gap violations — these are unrepairable by this command.</item>
-    <item>Do not auto-commit the repaired bordbuch — the operator must commit manually in the cache clone.</item>
     <item>Do not add bordbuch.repair to any pipeline — it is an on-demand operator command.</item>
   </non-goals>
 </MODULE_CONTRACT>
@@ -14,6 +13,7 @@
 
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
+import path from "node:path";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -25,7 +25,9 @@ import {
   validateBordbuch,
   computeEntryHash,
   resolveBordbuchPath,
+  commitAndPushBordbuch,
 } from "./bordbuch-io.ts";
+import { resolveCacheClonePath } from "../sternsystem/registry-io.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 
@@ -245,6 +247,19 @@ export async function runBordbuchRepair(
       };
     }
 
+    const cacheCloneDir = await resolveCacheClonePath(workspaceRoot, systemId);
+    if (existsSync(path.join(cacheCloneDir, ".git"))) {
+      const commitResult = await commitAndPushBordbuch(
+        cacheCloneDir,
+        `bordbuch.repair: ${systemId} — auto-repair ${orphans.length} orphan-mission-close event(s)`,
+      );
+      if (!commitResult.commitSha) {
+        logger.warn(
+          `[bordbuch.repair] ${systemId}: bordbuch file written but commit failed — cache clone may have unstaged changes`,
+        );
+      }
+    }
+
     logger.success(
       `[bordbuch.repair] ${systemId}: inserted ${orphans.length} mission-open event(s), recomputed ${recomputedHashes} hashes`,
     );
@@ -258,12 +273,7 @@ export async function runBordbuchRepair(
         dryRun: false,
       },
       summary: `[bordbuch.repair] ${systemId}: inserted ${orphans.length} mission-open event(s), recomputed ${recomputedHashes} hashes`,
-      nextSteps: [
-        {
-          action: `Commit the repaired bordbuch: pnpm exec werkstatt run bordbuch.commit --site ${systemId}`,
-          kind: "optional",
-        },
-      ],
+      nextSteps: [],
     };
   } finally {
     await releaseLock(workspaceRoot, `bordbuch:${systemId}`);

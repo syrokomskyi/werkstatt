@@ -12,6 +12,7 @@ import fs from "node:fs/promises";
 import { existsSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import type { BordbuchEntry } from "@warpgogol/werkstatt/schemas";
 import { computeEntryHash } from "./bordbuch-io.ts";
@@ -289,4 +290,38 @@ test("--mission filters to only the specified mission; remaining orphans cause f
   await expect(
     runBordbuchRepair(makeInput({ system: systemId, mission: "m001" }), mockContext(tmpDir)),
   ).rejects.toThrow(/repaired bordbuch still invalid.*m002/);
+});
+
+test("auto-commits repaired bordbuch when cache clone is a git repo", async () => {
+  const entries = buildValidBordbuchWithOrphan();
+  await writeBordbuch(entries);
+
+  // Initialize a git repo in the cache clone directory
+  const cacheDir = path.join(tmpDir, "..", "systems-cache", systemId);
+  execSync("git init", { cwd: cacheDir });
+  execSync("git config user.email test@test.com", { cwd: cacheDir });
+  execSync("git config user.name Test", { cwd: cacheDir });
+  execSync("git add -A", { cwd: cacheDir });
+  execSync('git commit -m "initial"', { cwd: cacheDir });
+  execSync("git branch -M main", { cwd: cacheDir });
+
+  // Set up a bare repo as origin to allow push
+  const bareRepoDir = path.join(tmpDir, "..", "systems-git");
+  const bareRepo = path.join(bareRepoDir, systemId);
+  mkdirSync(bareRepo, { recursive: true });
+  execSync("git init --bare", { cwd: bareRepo });
+  execSync(`git remote add origin ${bareRepo}`, { cwd: cacheDir });
+  execSync("git push -u origin main", { cwd: cacheDir });
+
+  const result = await runBordbuchRepair(makeInput({ system: systemId }), mockContext(tmpDir));
+
+  expect(result.data!.insertedEvents).toBe(1);
+
+  // Verify the repair was committed
+  const logOutput = execSync("git log --oneline -1", { cwd: cacheDir }).toString().trim();
+  expect(logOutput).toContain("bordbuch.repair");
+
+  // Verify working tree is clean (no unstaged changes)
+  const status = execSync("git status --porcelain", { cwd: cacheDir }).toString().trim();
+  expect(status).toBe("");
 });
