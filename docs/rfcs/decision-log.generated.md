@@ -165,7 +165,7 @@
 - **Closed:** 2026-08-15
 - **Decision:** The engine gains a **plugin contract** (`werkstatt/plugin@1`): a typed interface that a stack plugin implements and registers, plus a **profile binding** rule: `forge.yaml` `profile` field (RFC-0643) resolves to a forge stack profile id, and the workshop's `tools/kernel.config.ts` composes the engine with the plugin whose `profileId` matches.
 
-## rejected-alternative (852)
+## rejected-alternative (892)
 
 ### RFC-0001: Introduce RFC governance process
 
@@ -9661,16 +9661,46 @@ Make `@syrokomskyi/axiom-*` peer dependencies instead of optional.
 
 ### RFC-0873: Add generic Nachweis technical-assessment ingest and immutable observation history
 
-- **Status:** accepted
+- **Status:** implemented
 - **Alternatives considered:**
 
 - **Extend `nachweis.ingest` with a `--bundle` flag:** Rejected. `nachweis.ingest` accepts a single PDF file and produces a `recordId`-keyed record. Assessment bundles are JSON with multiple artifacts and `(seriesId, observationId)` identity. Combining them would require a bifurcated code path inside one command, violating the single-responsibility principle.
 - **Provider-specific commands (`nachweis.lighthouse.ingest`, `nachweis.cloudflare.ingest`):** Rejected. Each provider would duplicate R2 path construction, hashing, PBP writes, and Bordbuch appends. The generic `AssessmentBundleV1` envelope eliminates provider-specific code in the core.
 - **Store assessments as `operational-evidence` kind:** Rejected. RFC-0872 established `technical-assessment` as a distinct PBP evidence kind with its own publication policy (`technical-assessment-v1`) that does not require consent or public derivative. Using `operational-evidence` would apply the wrong publication gate.
 
+### RFC-0874: Add reproducible Google Lighthouse assessment adapter for Nachweisregister
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+1. **Manual Lighthouse CLI + hand-crafted bundle.** Rejected — an operator running `npx lighthouse@latest` manually and hand-crafting a JSON bundle is not reproducible. The pinned dependency, fixed methodology, and five-run protocol are the reproducibility guarantees. A manual procedure cannot enforce these.
+
+2. **PageSpeed Insights API.** Rejected — PageSpeed Insights returns field data (CrUX) blended with lab data, not canonical Lighthouse LHR artifacts. The RFC's `nonGoals` explicitly exclude field data. Field data is not reproducible (it aggregates over a 28-day window and cannot be re-run).
+
+3. **Extend `nachweis.assessment.ingest` with a `--lighthouse` flag.** Rejected — Lighthouse execution (running an external tool, managing Chrome, parsing LHR) is a fundamentally different concern from bundle ingestion. RFC-0873 explicitly envisioned provider adapters as separate commands that produce bundles and call the generic ingest. Combining them would create a bifurcated code path inside one command, violating the single-responsibility principle.
+
+### RFC-0875: Add Cloudflare URL Scanner Agent Readiness assessment adapter for Nachweisregister
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Scrape `isitagentready.com` HTML.** Rejected: brittle, undocumented, breaks on UI changes, and violates the nonGoals. The official API is documented and stable.
+- **Extend `nachweis.measure.lighthouse` with a provider flag.** Rejected: each provider has distinct API mechanics (CLI subprocess vs HTTP API, 5-run median vs single provider run, different polling patterns). A separate command per provider follows the one-decision-per-RFC principle.
+- **Build the parser heuristically from field names.** Rejected: the RFC explicitly requires fixture-backed parsing with explicit field paths. Heuristic parsing would silently break on schema changes.
+
+### RFC-0876: Add technical Nachweis UI, observation history and Warpgogol Lighthouse/Cloudflare pilot
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+1. **Separate components for technical assessments** (e.g. `nachweis-technical-card.astro`): Rejected because it duplicates the semantic structure (article, dl, headings) and creates a maintenance burden. The discriminated union keeps one component with two rendering paths.
+2. **Client-side fetching for homepage projection**: Rejected because the site is SSG (Astro). Build-time resolution via `getCollection` is simpler, faster, and consistent with the existing `nachweis-routes.ts` pattern.
+3. **Storing observation history in a separate collection**: Rejected because PBP evidence-source entities already carry `assessment.seriesId` and `assessment.observationId`. A separate collection would duplicate data and create a sync problem.
+4. **Carousel for registry**: Rejected by explicit nonGoal. A linear list with semantic `<ul>` is more accessible and honest.
+
 ### RFC-0877: In-place agent-driven installation flow
 
-- **Status:** accepted
+- **Status:** implemented
 - **Alternatives considered:**
 
 - **Keep global install as primary path** — rejected. Global install requires sudo on some systems, pollutes the global namespace, and breaks the "one folder, one project" mental model. The operator wants agent-driven installation from within the project folder.
@@ -9682,4 +9712,419 @@ Make `@syrokomskyi/axiom-*` peer dependencies instead of optional.
 - **Auto-install engine and plugins from `forge create --in-place`** — rejected. The agent should control package installation to handle edge cases (network issues, specific versions, operator preferences). `forge create` is a scaffolding command, not a dependency manager.
 
 - **Make `--profile` default to `forge-shell`** — rejected. In the agent-driven flow, the operator always describes the project type. If the agent cannot determine the type, it should ask the operator, not silently create a governance-only project. A required `--profile` forces explicit choice.
+
+### RFC-0878: Require explicit --bump major for platform major version bumps
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Remove `versionBump: major` from all RFCs** — rejected. The field is useful for documenting the intended eventual bump. The problem is automatic application, not the field itself.
+- **Block `ecosystem.commit` when RFC has `versionBump: major`** — rejected. Too disruptive. Implementation commits still need to happen; the version bump just shouldn't be major.
+- **Add a confirmation prompt for major bumps** — rejected. `ecosystem.commit` is non-interactive. The `--bump` flag is the explicit signal.
+
+### RFC-0879: Extend section.shell.contract.validate to section-level components
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+1. **Scan all `components/**/*.astro` without filtering.** Rejected — would produce false positives for pure sub-components like `effect-host`, `section-header`, `section-shell` itself, `responsive-image`, etc. that are never used as page blocks.
+
+2. **Add a `shell: true` flag to archetype YAML.** Rejected — adds authoring burden. The archetype registry already distinguishes section-level blocks via `layer: component` + `sourceFile` location. This is sufficient signal.
+
+3. **Move section-level components into `sections/`.** Rejected — the `components/` vs `sections/` distinction is intentional. Components are reusable building blocks that may appear in multiple contexts. Moving them would break the composition model.
+
+4. **Create a separate check `component.shell.contract.validate`.** Rejected — the rules are identical (SHELL-01..04). Splitting into two commands adds pipeline configuration burden without semantic value.
+
+### RFC-0880: Mandate explicit slug for Nachweis evidence routes and formalize route generation contract
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Keep fallback to file path**: Rejected — the fallback produces wrong slugs when the file path contains directory segments, causing build failures that are hard to debug.
+- **Derive slug from file name only (strip directories)**: Rejected — this is a heuristic that can produce collisions (two files named `cloudflare-cf-ar-01.md` in different directories) and doesn't match the frontmatter `slug` which is the canonical identifier.
+- **Make `slug` optional and warn**: Rejected — a warning would not prevent the build failure. The slug is required for route generation to work, so it must be mandatory.
+
+### RFC-0881: Add page-level exemption pattern for image delivery validation
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Hardcode Nachweis exemption in validator**: Rejected — every new text-only page type would require a source code change. The config-based approach is more flexible.
+- **Make `IMG-DELIVERY-04` a warning instead of error**: Rejected — the rule catches real LCP regressions on content pages. A page-level exemption is more precise.
+- **Add `pagePattern` support for all rules**: Rejected — per-image rules (`IMG-DELIVERY-01`, `IMG-DELIVERY-02`) check individual `<img>` tags, not pages. A page-level exemption doesn't make sense for them.
+
+### RFC-0882: Enhance A11Y-LIN-COMP-01 to detect Record-lookup aria-label mismatches
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Full AST parser for .astro**: Rejected — `.astro` is not standard TS/JS and no production-grade AST parser exists. The regex-based approach is sufficient for the common patterns and has zero dependencies.
+- **Only check same-key Record lookups**: Rejected — even different-key lookups (e.g. `labels[id]` vs `initials[id]`) can produce mismatches. Checking different Record identifiers regardless of key is more robust.
+- **Post-build only**: Rejected — the goal is to catch violations at authoring time, before the ~4 minute build cycle.
+
+### RFC-0883: Add post-build-only validation mode for fast iterative debugging
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Extend `sites-check.postbuild` with `--mission` and `--skip-slow` flags**: `sites-check.postbuild` already runs `SITES_CHECK_POSTBUILD_PIPELINE` on existing dist/ (RFC-0085). Rejected because `sites-check.postbuild` is `scope: "app"` (requires `--site`, uses site discovery), while `--mission` is a workspace-level concept that follows the `mission.validate` pattern. Adding `--mission` to an app-scoped command would violate the scope contract. A separate workspace-scoped command keeps the resolution path clean.
+- **`--skip-build` flag on `mission.validate`**: Rejected — `mission.validate` is the authoritative validation command and should always run the full pipeline. Mixing modes creates confusion about what was actually validated.
+- **Cache dist/ and diff**: Rejected — too complex for the problem. Re-running validators on existing dist is simpler and sufficient.
+- **Run individual validators by name**: Rejected — developers would need to know which validators to run. The post-build pipeline is a curated set; running all of them (minus slow ones) is more robust.
+
+### RFC-0884: Add Engineering Checkpoint protocol for session-end visual handoff
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+1. **New `fo-engineering-checkpoint` skill.** Rejected — it would fragment the session-end pipeline. The checkpoint is the closing block, not a separate step. `fo-session-retro` already controls the session-end flow.
+
+2. **Auto-generate diagrams from session metadata.** Rejected — `session.save` extracts file paths and commands, but cannot determine architectural semantics (which components depend on which, what state machine changed). Diagram generation requires agent understanding of the session's impact, not just file lists.
+
+3. **Make diagrams mandatory for all sessions.** Rejected — the expert explicitly states "do not draw a diagram merely to satisfy the requirement." Mandatory diagrams would produce noise for typo-fix sessions.
+
+4. **Add Mermaid rendering infrastructure.** Rejected — Mermaid is textual and renders in GitHub, GitLab, IDEs, and most markdown viewers. No rendering pipeline is needed in the workshop.
+
+5. **Add a new `session.checkpoint` command.** Rejected — the checkpoint is a protocol, not a command. It is produced by the agent during `fo-session-retro` and optionally persisted in the session file by `fo-session-save`. A command would add ceremony without value.
+
+### RFC-0885: Extend PBP evidence schema with display control, granular consent, and website fields
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Per-item visibility flags in `items[]`**: Rejected because display aspects (document, screenshot, website link) are semantic concepts, not per-artifact flags. The `items[]` map is keyed by arbitrary string keys and contains technical artifacts — display visibility is a higher-level concern.
+- **Reuse `items[key].storage` for display control**: Rejected because `storage` controls R2 storage tier (private/public for verification access), not page rendering. An artifact can be stored publicly for hash verification but still hidden from the display page.
+- **Multiple consent entities (one per aspect)**: Rejected because it fragments consent management — one consent entity with per-aspect scope is simpler to manage, query, and validate.
+- **Keep `consentStatus` as overall status + `consentScope` for granular**: Rejected per operator decision — no backward compatibility is preserved in this project. The cleanest long-term design replaces the flat field entirely.
+
+### RFC-0886: Extend Nachweis kernel with granular consent commands, screenshot upload, and per-artifact publication gates
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Separate consent commands per aspect** (`nachweis.consent.grant-document`, `nachweis.consent.grant-screenshot`): Rejected — one command with `--scope` is simpler and follows the existing `nachweis.consent.update` pattern.
+- **Screenshot upload as a flag on `nachweis.public-derivative`**: Rejected — `public-derivative` handles PDF derivatives with specific gate semantics (public derivative requirement for attestation-v1). Screenshots are a different artifact type with different storage paths and no gate dependency.
+- **Display↔consent check in `pbp.content.validate` instead of the publication gate**: Rejected — `pbp.content.validate` checks schema shape, not publication readiness. The gate is the correct enforcement point because it controls the transition from draft to published.
+- **Per-artifact gate conditions** (`document-consent-granted`, `screenshot-consent-granted`, `websiteLink-consent-granted`): Rejected — a single `display-consent-consistent` condition that iterates over display aspects is cleaner and extensible. Adding new aspects does not require new gate conditions.
+
+### RFC-0887: Extend Nachweis UI components with display-gated sections for PDF, screenshot, and website link
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Single polymorphic component for all sections**: Rejected because the three sections have distinct HTML structures (`<object>` vs `<img>` vs `<a>`) and distinct conditional logic. Separate sections in `nachweis-detail` are clearer and easier to maintain.
+- **Client-side rendering with JavaScript**: Rejected because the display decision is static (determined by the `display` field on the entity). Server-side rendering is simpler, faster, and requires no client JS.
+- **Placeholder for hidden elements**: Rejected per ADR-0057 — hidden elements leave no trace to respect client privacy.
+
+### RFC-0888: Add sichtpass Bordbuch event kind for Sichtpass lifecycle audit trail
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Reuse `nachweis-record` for Sichtpass events**: Rejected — `nachweis-record` records publication status changes, not manifest generation. The Sichtpass is a composite artifact (record + signature + timestamp + manifest entry) that deserves its own event kind for audit clarity.
+- **Add `sichtpass` as a sub-kind in metadata instead of a top-level kind**: Rejected — Bordbuch kinds are top-level enum values for a reason: they enable fast filtering and projection. A sub-kind in metadata would require parsing metadata to filter events, which is slower and less ergonomic.
+- **Separate `sichtpass-issued` and `sichtpass-revoked` kinds**: Rejected — a single `sichtpass` kind with `withdrawn: true` metadata is simpler and follows the pattern of `nachweis-record` (which uses `metadata` to distinguish publish vs. update).
+- **Wait for W3C VC issuance before adding the kind**: Rejected — the Sichtpass manifest entry (hashes, signature, timestamp) is already generated by the current pipeline. The Bordbuch event records this materialization, which is independent of whether a W3C VC is issued. VC issuance is a future layer on top.
+
+### RFC-0890: Raw website screenshot ingestion and archival for Nachweis evidence
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Extend `nachweis.screenshot.upload` with a `--raw` flag**: Rejected — the two operations have different storage paths (private vs public), different metadata (raw tracks dimensions and original filename; display does not), and different downstream consumers. Separate commands are clearer.
+- **Store raw screenshots in git (LFS)**: Rejected — raw screenshots can be 5–20MB each. Git LFS adds complexity and the cache clone is already mirrored to external repos that may not support LFS. R2 private storage is the durable backup; the cache clone copy is gitignored.
+- **Skip local cache clone copy, rely only on R2**: Rejected — the operator wants local copies for fast reprocessing without an R2 download. The cache clone is the natural local storage location.
+- **Use file extension to determine mediaType**: Rejected — real-world CaptureX files have been observed with `.png` extension but JPEG content. Detecting from file content via sharp is more reliable.
+- **Make `capturedAt` a required flag instead of filename parsing**: Rejected — the CaptureX filename pattern is consistent and parsing it reduces operator burden. The `--captured-at` flag is available as an override.
+
+### RFC-0891: Website screenshot processing and 16:9 display variant generation for Nachweis
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Extend `nachweis.screenshot.upload` with processing flags**: Rejected — the upload command is simple (read file, hash, upload). Adding crop/resize/convert logic would make it a complex multi-purpose command. Separate commands are clearer.
+- **Process at build time (pipeline integration)**: Rejected — screenshot processing is a one-time operator action, not a repeatable build step. The raw screenshot is archived once, the display variant is generated once.
+- **Store display variant in cache clone (local)**: Rejected — the display variant is served from R2 public storage (CDN-backed). Storing it locally in the cache clone would require a separate serving mechanism. R2 public is the correct serving path.
+- **Use Cloudflare Image Transformations instead of sharp**: Rejected — the platform uses the `build-portable` image provider (no Cloudflare Image Transformations). Processing with sharp at ingestion time is consistent with the existing `image.variants.generate` pattern.
+- **Make crop offset interactive (visual crop selector)**: Rejected — the default top-crop is sufficient for most cases. The `--crop-offset` flag provides manual control. A visual selector would require a UI, which is out of scope for a kernel command.
+- **Generate multiple crop variants (top, middle, bottom)**: Rejected — the operator wants a single display screenshot. Multiple variants would complicate the schema and UI. The `--crop-offset` flag allows manual selection if needed.
+
+### RFC-0893: Add icon.references.validate command for build-time vendor icon existence checks
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+1. **Enhance `loadVendorIcon` to throw at build time**: Rejected because `loadVendorIcon` runs in the Astro frontmatter phase, not during a dedicated validation step. Throwing would crash the dev server for a single missing icon, making iteration painful. A dedicated validator provides better diagnostics (all violations at once) and runs only in CI/validate pipelines.
+
+2. **Add icon checking to `content.references.validate`**: Rejected because `content.references.validate` checks internal page links and content references, not UI asset existence. Icon validation has a different scanning strategy (YAML/TS object shape matching vs. pageId resolution) and belongs in its own command for clarity.
+
+3. **Zod schema validation with enum of available icons**: Rejected because the available icon set is dynamic (discovered from the filesystem at build time) and can't be hardcoded in a Zod schema. The validator must build the index at runtime from `icons/gen/`.
+
+### RFC-0894: Add werkstatt-knowledge plugin for evidence-backed knowledge systems
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+1. **Extend werkstatt-site with knowledge commands:** Rejected — knowledge systems have fundamentally different path conventions, lifecycle, and source boundary model. Mixing them into the site plugin would violate the thin-plugin principle.
+
+2. **Create a composite plugin wrapping site + knowledge:** Rejected — the spec explicitly forbids composite pseudo-plugins to bypass the one-plugin rule. Projection apps are ordinary Turborepo apps under the knowledge workshop.
+
+3. **Wait for the certification component model before creating the plugin:** Rejected — the spec requires working within the current `plugin@1` contract. The plugin is structured as a thin adapter so future migration is direct.
+
+4. **Add a new engine hook for knowledge orchestration:** Rejected — the spec explicitly confirms no new hook is needed. All knowledge lifecycle operations fit within the five existing hooks and kernel commands.
+
+### RFC-0895: Switch site rollback to native Cloudflare wrangler rollback and unify with service rollback
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+1. **Keep `leitstand.rollback` as re-deploy, add a separate `leitstand.native-rollback` command.** Rejected — two commands for the same conceptual operation is confusing. The re-deploy approach is strictly worse than native rollback (slower, requires local artifacts, doesn't scale). Replacing in-place is cleaner.
+
+2. **Map werkstatt release IDs to Cloudflare Worker version IDs for targeted rollback.** Rejected for this RFC — adds complexity (storing version IDs in effect records, lookup logic) for a use case the operator did not request. `wrangler rollback` without arguments (rollback to previous version) is sufficient. Targeted rollback to a specific version can be added in a future RFC if needed.
+
+3. **Keep `--gate-decision` for rollback, adapt `evaluateRollback` to skip artifact readiness.** Rejected — the operator explicitly stated that rollback targets an already-certified version, so re-certification is unnecessary friction. Removing the gate for rollback simplifies the emergency workflow.
+
+4. **Add fleet-level rollback (`leitstand.fleet.rollback --all --channel main`) in this RFC.** Rejected — the operator chose to defer fleet-level rollback to a separate RFC. Single-site rollback is the building block; fleet rollback composes it.
+
+5. **Keep `release.rollback` as a bookkeeping-only command.** Rejected — it creates confusion by existing alongside a real rollback command. With native `wrangler rollback` in `leitstand.rollback`, the effect record can be written there.
+
+### RFC-0896: Add custom domain DNS and www redirect management for site deployments
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Worker-level www redirect**: Check `Host` header in `src/worker.ts` and return 301 for `www.*`. Rejected because it requires modifying the Worker template for all sites and adds per-request overhead. Cloudflare Redirect Rules handle this at the edge before the Worker is invoked.
+- **DNS-only www redirect**: CNAME `www` → apex without a Redirect Rule. Rejected because DNS only resolves the name — it does not issue an HTTP 301. The browser would show `www.warpgogol.com` in the address bar without redirecting.
+- **Single command (customdomain.register for both apex + www)**: Rejected to keep commands single-responsibility. `customdomain.register` handles apex DNS + route; `redirect.register` handles www DNS + Redirect Rule. This allows sites that need only one without the other.
+- **Extending `subdomain.register` for sites**: Rejected because `subdomain.register` reads `services/registry.yaml` and is scoped to service subdomains. Sites use `system-config.yaml`, a different config source. Mixing the two would violate the site/service boundary.
+- **Hybrid (Redirect Rules with worker-level fallback)**: Rejected as over-engineering. Redirect Rules are sufficient and available on all Cloudflare plans.
+
+### RFC-0897: Language switcher shows target language instead of current language
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Show both languages (e.g. "DE → UK"):** Rejected — the user explicitly said not to change the visual style. The single-code display is the established design.
+- **Add a dropdown selector:** Rejected — the single-button cycle pattern is intentional and works well for 2-language sites. A dropdown would add complexity for no benefit at current scale.
+
+### RFC-0898: Canonical URL hardening and cross-language link validator
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Extend `canonical.url.validate` instead of new command:** Rejected — `canonical.url.validate` is scoped to sitemap/feed/llms parity (RFC-0317). Domain-origin checking of rendered HTML is a different concern with different file access patterns. A separate command keeps each validator focused.
+- **Runtime check via Cloudflare Worker:** Rejected for the canonical check — build-time is the right place. Runtime checks are addressed in RFC-0899 for access protection.
+- **Check all internal links, not just cross-language:** Rejected — broken link checking is already handled by `seo.internal-linking.validate`. This RFC focuses specifically on the cross-language link class of errors.
+
+### RFC-0899: Workshop-level access protection for dev and alt subdomains
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Cloudflare Access (Zero Trust):** Rejected — adds per-user identity management complexity. A 4-digit PIN is the right level for staging environments that just need to keep crawlers and casual visitors out. Cloudflare Access also requires per-user seats in the plan.
+- **Cloudflare Worker Rules (dashboard):** Rejected — manual dashboard configuration does not scale across many sites and is not version-controlled. The workshop must provide command-level tooling.
+- **Build-time `noindex` meta tag:** Rejected — violates the single-artifact invariant (DNA-73). The same artifact is used across dev/alt/main. A meta tag in the HTML would appear on main too.
+- **Separate `robots.txt` per channel:** Rejected — same single-artifact invariant issue. `robots.txt` is a build-time file baked into the artifact.
+- **IP-based allowlisting:** Rejected — operators work from varying locations (home, office, mobile). PIN-based auth is location-independent and simpler to manage.
+- **Session-based auth with login page:** Rejected — overkill for staging. Basic Auth with a PIN is stateless, requires no session storage, and works with all browsers and curl.
+
+### RFC-0900: Add client-testimonial PBP entity and gratitude-section for client gratitude display on Nachweise page
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+1. **Static props in page block (no PBP entity).** Rejected — testimonials stored as static YAML in `nachweise.md` would break the PBP content model where trust-domain entities are first-class content files. The operator specifically requested PBP integration for architectural consistency.
+
+2. **Extend evidence-source with kind `client-gratitude`.** Rejected — gratitude is not cryptographic evidence. It has no SHA-256 hash, no PDF, no screenshot. Mixing it into evidence-source would conflate two distinct concepts and complicate the Nachweis detail page rendering.
+
+3. **Reuse social-proof section (cosmicName: Enceladus).** Rejected — social-proof uses `bodyKind: paragraphs`, which renders free-form text blocks. It cannot render structured quote cards with author metadata, optional organization, and evidence links. A dedicated section provides the right content schema and visual treatment.
+
+### RFC-0901: Cross-locale structural parity validation for translated content
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Extend `mirroring.validate` to also check structure:** Rejected — `mirroring.validate` is focused on file presence and is already complex with RFC-0097 locale scoping. Structural parity is a distinct concern with different rules, suppression, and review workflow. Mixing them would violate single-responsibility and make both commands harder to maintain.
+
+- **Use `content.regression.check` (CREG) for this:** Rejected — CREG compares rendered route content against a golden snapshot in the cache clone. It requires a build and a baseline. Translation parity runs against authored markdown source, needs no build, and compares locales against each other (not against a golden baseline).
+
+- **LLM-based semantic comparison:** Rejected by the operator — "мы только считаем структурные единицы". Structural counting is deterministic, fast, and has zero false-positive rate for the "is the count different?" question. Semantic comparison is a separate, harder problem.
+
+- **Per-file suppression in frontmatter:** Rejected — suppressions are an operational concern, not content metadata. Mixing them into content files would pollute the content layer and make bulk management harder. A separate YAML file is the established pattern (RFC-0684).
+
+### RFC-0902: Remove TLD suffix from Sternsystem IDs — business ID only
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Automated rename script**: Rejected. The user explicitly stated that migration can ignore existing history, missions, and releases. A rename script would add complexity and need to handle edge cases (Bordbuch hash chain, release artifacts, deployment state) that are irrelevant when history is disposable.
+- **Regex change to exclude TLDs**: Rejected. A regex cannot distinguish a TLD segment from a legitimate business-name segment (e.g., `warpgogol-ai` — is `ai` a TLD or a business descriptor?). A `KNOWN_TLDS` set with explicit detection is clearer and more maintainable.
+- **External TLD list package (e.g. `tldts`)**: Rejected for now. The hardcoded set covers all TLDs in current use and common ones. If the set grows unwieldy, a package can be introduced later without an RFC.
+- **Warning-only enforcement**: Rejected. The user explicitly requested strict enforcement ("Контроль. Контроль целостности."). A warning would allow TLD-suffixed IDs to persist.
+
+### RFC-0903: Standardize kernel command output: exitCode, summary, nextSteps
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+1. **Make `nextSteps` mandatory on all return paths (including success).** Rejected — would force empty `nextSteps: []` on pure query commands (`*.list`, `*.status`) where there is no meaningful next step. Creates noise without value. The failure-only requirement targets where guidance is actually needed.
+
+2. **Runtime sampling instead of static analysis.** Rejected — running commands with test inputs to verify output shape is fragile, slow, and requires mock contexts. Static analysis of return statements is faster and catches structural issues without execution.
+
+3. **Extend `result-helpers.ts` instead of adding a validator.** Rejected — helpers only cover commands that use them. Commands that construct `KernelCommandResult` directly bypass helpers. A validator is needed to catch all return paths regardless of how they construct the result.
+
+4. **Include naming convention normalization (hyphens → dots).** Rejected — naming changes are breaking for existing pipeline definitions and `forge.yaml` bindings. Deferred to a separate RFC to keep this RFC focused on output format.
+
+5. **Add to `PACKAGES_CHECK_PIPELINE` immediately in warning mode.** Rejected — even warning mode adds noise to every `mission.validate` run. Gated adoption (register only, run manually) is cleaner — fix first, then integrate into pipeline.
+
+### RFC-0904: Pre-deploy header compatibility validators
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+**1. Extend `csp.origins.validate` (RFC-0831) instead of creating a new command.** Rejected: `csp.origins.validate` checks external origin coverage — its design assumes URLs have extractable origins. The `object-src 'none'` bug is a same-origin blocking issue where the CSP directive blocks the element entirely, regardless of origin. Extending `csp.origins.validate` would mix two different validation concerns (origin coverage vs element compatibility) in one command, violating the single-responsibility principle used throughout the workshop. A separate command keeps each validator focused.
+
+**2. One combined command `headers.compatibility.validate`.** Rejected: CSP element compatibility and `_headers` path coverage are different responsibilities — one checks HTML elements against CSP directives, the other checks file paths against header patterns. Combining them would create a command with two unrelated rule families. The workshop principle is to split when responsibilities differ.
+
+**3. Runtime probe (post-deploy) instead of post-build validator.** Rejected: `headers.runtime.probe` (HDR-05..06) already exists for runtime header verification, but it requires a deployed URL. The goal of this RFC is to catch issues before deployment. Runtime probes complement post-build validators but cannot replace them for pre-deploy detection.
+
+**4. Escape-hatch config file (like `image-delivery.config.yaml`).** Rejected for v1: false positives are impossible by design — if an HTML element is present and the CSP directive blocks it, that is always an error. If edge cases emerge in practice, a config file can be added via a follow-up RFC.
+
+### RFC-0905: Redirect effectiveness in Worker-first deployments
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+**1. Extend `redirect.map.validate` instead of creating a new command.** Rejected: `redirect.map.validate` validates the `_redirects` file in isolation (source/target/chain correctness). Shadow detection cross-references `_redirects` against `dist/client/` files and Worker route configuration — a different concern. Mixing them would create a command with two unrelated rule families. The workshop principle is to split when responsibilities differ.
+
+**2. Fix the Worker to process `_redirects` before static files.** This is the runtime fix (implementation, not validation) and will be done separately. This RFC establishes the validator that catches the problem before deployment, regardless of whether the Worker is fixed.
+
+**3. Runtime probe (post-deploy) instead of post-build validator.** Rejected: the goal is to catch issues before deployment. Runtime probes complement post-build validators but cannot replace them for pre-deploy detection.
+
+### RFC-0906: Canonical URL trailing-slash parity between HTML and sitemap
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+**1. Extend `canonical.url.validate` instead of creating a new command.** Rejected: `canonical.url.validate` checks sitemap/feed/llms URLs against the expected canonical set — it operates on generated XML/text files. The new validator operates on rendered HTML files, extracting `<link rel="canonical">` and `og:url` from each page. Different input format, different extraction logic. The workshop principle is to split when input domains differ. CANON-04 is added to `canonical.url.validate` as a cheap subset check (is the HTML canonical in the expected set?), while `canonical.html-parity.validate` does the detailed per-page comparison.
+
+**2. Fix only the runtime code, no validator.** Rejected: the runtime fix resolves the current issue, but without a validator, the same regression can reappear if someone changes `pageUrl` construction in the future. DNA-67 (pre-deploy Lighthouse parity gate) establishes that every deterministically checkable issue MUST have a build-time validator.
+
+**3. Use `seo.domain.validate` (RFC-0898) for trailing-slash checks.** Rejected: `seo.domain.validate` checks origin correctness (is the canonical URL on the right domain?). Trailing-slash parity is a path-level check, not an origin check. Extending `seo.domain.validate` would mix two different validation concerns.
+
+### RFC-0907: Sitemap integrity validators: placeholder expansion and route coverage
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+**1. Extend `canonical.url.validate` instead of creating new commands.** Rejected: `canonical.url.validate` checks sitemap/feed/llms URLs against the expected canonical set — it operates on URL parity. Placeholder detection is a different concern (URL validity, not URL parity). Coverage detection is the reverse direction (expected set vs. sitemap, not sitemap vs. expected set). Combining them would create a command with three unrelated rule families.
+
+**2. One combined command `sitemap.integrity.validate`.** Rejected: placeholder detection and coverage checking are different responsibilities — one checks URL validity, the other checks set completeness. Combining them would create a command with two unrelated rule families. The workshop principle is to split when responsibilities differ.
+
+**3. Fix only the sitemap generator, no validators.** Rejected: the generator fix resolves the current issue, but without validators, the same regression can reappear. DNA-67 (pre-deploy Lighthouse parity gate) establishes that every deterministically checkable issue MUST have a build-time validator.
+
+### RFC-0908: Host canonicalization and URL normalization validators
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+**1. One combined command `url.normalization.validate`.** Rejected: host canonicalization and trailing-slash normalization are different concerns — one checks host-level redirects, the other checks path-level redirects and build configuration. Combining them would create a command with two unrelated rule families. The workshop principle is to split when responsibilities differ.
+
+**2. Extend `redirect.map.validate` instead of creating new commands.** Rejected: `redirect.map.validate` validates existing redirect rules for correctness (source not live, target exists, no chains). This RFC checks for the presence of specific redirect rules (host canonicalization, trailing-slash normalization) — a different concern. Extending `redirect.map.validate` would mix correctness validation with completeness validation.
+
+**3. Runtime probe (post-deploy) instead of post-build validator.** Rejected: the goal is to catch issues before deployment. Runtime probes complement post-build validators but cannot replace them for pre-deploy detection.
+
+**4. Fix only the Worker / \_redirects, no validators.** Rejected: the runtime fix resolves the current issue, but without validators, the same regression can reappear (e.g., if someone removes the www redirect from `_redirects` during a future migration).
+
+### RFC-0909: Search engine verification surface and automated sitemap submission
+
+- **Status:** draft
+- **Alternatives considered:**
+
+- **Meta-tag as the only method** — rejected: stores a token in content, adds permanent markup to every page, and DNS TXT is already supported by RFC-0753. Meta-tag survives as the documented fallback for sites with externally managed DNS.
+- **Manual runbook instead of `search.sitemap.submit`** — rejected by the operator (2026-08-21): the workshop automates submission like it automated IndexNow (RFC-0311); manual steps get forgotten across a fleet.
+- **Warning-first gated adoption (RFC-0903 precedent)** — rejected by the operator: these validators are error-severity from introduction; warpgogol-com is greened inside the same rollout instead of a follow-up RFC.
+- **Bing Webmaster API submission alongside Google** — out of scope: IndexNow already covers Bing/Yandex with far less credential machinery.
+
+### RFC-0910: Canonical entity identity URLs in JSON-LD
+
+- **Status:** accepted
+- **Alternatives considered:**
+
+- **Content-side fix (edit system.md / business-profile to declare `/`)** — rejected: the `/de/` prefix is not authored content, it is synthesized by the builder from `input.lang`; fixing content would leave the builder defect for every future site.
+- **301-redirect `/de/` → `/` and keep the prefixed identity URL** — rejected: a redirect makes `/de/` tolerable for crawlers but still anchors the knowledge-graph identity to a redirecting URL; identity URLs must be final canonical destinations.
+- **Fold into RFC-0906 (trailing-slash parity)** — kept separate: RFC-0906 governs page URL byte-identity against the sitemap; entity identity URLs are a different class (not page URLs) with a different root cause and validator. Related, not merged.
+- **New DNA-87 for entity identity** — rejected by the operator (2026-08-21): the parity principle is DNA-85; a special case does not get its own invariant.
+
+### RFC-0911: SEO metadata quality gates: cross-page title and description uniqueness plus anchor-text lint
+
+- **Status:** draft
+- **Alternatives considered:**
+
+- **Author-time validation (frontmatter scan) instead of rendered HTML** — rejected: titles and descriptions can be assembled by builders (suffixes, brand appending), so only the rendered output is the truth worth comparing.
+- **Fixed stop-list in code only** — rejected (operator decision 2026-08-21): fleets span languages and domains; `system.md` extension keeps the defaults without blocking site-specific vocabulary.
+- **Warning-first gated adoption (RFC-0903 precedent)** — rejected by the operator: error from day one, with warpgogol-com greened inside the same rollout.
+- **Similarity threshold instead of exact-match uniqueness** — rejected: fuzzy matching has false positives on legitimately similar pages (de/uk legal twins); exact match after normalization is deterministic and explainable.
+
+### RFC-0912: Video structured data and video sitemap for opted-in content videos
+
+- **Status:** accepted
+- **Alternatives considered:**
+
+- **Automatic VideoObject for all non-hero videos** — rejected (operator decision 2026-08-21): required fields (`name`, `description`, `uploadDate`) would have to be synthesized, and exclusion of individual videos would be impossible. Explicit opt-in keeps markup intentional.
+- **Dedicated video page type only** — rejected: too narrow; content videos live inside regular pages (Ratgeber articles, service dossiers), not only on standalone watch pages.
+- **Defer until a site actually has video content** — rejected: the workshop's goal is that no site can ever ship an unmarked content video; the contract must exist before the content does.
+- **Warning-first adoption** — rejected by the operator with the rest of the batch: error from day one; with zero opted-in videos the gate is green by construction.
+
+### RFC-0913: Mission close reconcile-freshness guard and cache-clone .gitignore preservation
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+- **Auto-reconcile inside `mission.close`** — rejected: reconcile is a significant operation (git merge, push, mirror sync) that can fail and requires operator awareness. Blocking with a clear message is safer and keeps the operator in control. The operator can fix merge conflicts in the workpiece before re-running reconcile, rather than discovering them inside a close that has already started validation.
+
+- **Compare timestamps instead of SHAs** — rejected: timestamps are imprecise (second granularity, clock skew) and do not prove that the specific commits were transferred. SHA comparison is exact and deterministic.
+
+- **Store reconciled SHA in `mission.yaml` instead of `reconciliation-report.json`** — rejected: `reconciliation-report.json` is the authoritative evidence artifact for reconcile (RFC-0568). Duplicating the SHA in `mission.yaml` creates a second source of truth that can drift.
+
+- **Use `git merge -X ours` for `.gitignore` only** — rejected: `git merge -X ours` applies to the entire merge, not individual files. It would suppress all workpiece changes, not just `.gitignore`. A `.gitattributes` merge strategy (`merge=ours` for `.gitignore`) is git-native but requires per-repo configuration and is fragile across materialization resets.
+
+- **Generate the cache-clone `.gitignore` from a template instead of preserving it** — rejected: the cache-clone-only patterns are a platform concern (which files are forbidden/generated), not a site concern. Embedding them in a template would require the template to know about the cache clone's forbidden file list, which is owned by the engine, not the site.
+
+- **Remove `.gitignore` from the workpiece entirely** — rejected: the workpiece needs its own `.gitignore` for `node_modules/`, `dist/`, `.env`, etc. The workpiece `.gitignore` is correct for the workpiece context; the problem is that it is incorrect for the cache clone context.
+
+### RFC-0914: Mandatory semantic block IDs for all content sections
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+1. **Keep RFC-0048 anchor registry, make block ids mandatory alongside it.** Rejected — the anchor registry becomes redundant when block ids are mandatory and language-neutral. Keeping it adds complexity without value. The operator confirmed: no legacy structures, full migration.
+
+2. **Auto-generate ids at build time instead of requiring authored ids.** Rejected — build-time generation produces non-deterministic ids when headings change, breaking anchor links in previously shared URLs. Authored ids are stable and survive heading rewording.
+
+3. **Use `block-type + index` as id format (e.g., `hero-0`, `markdown-1`).** Rejected — not human-readable, breaks when blocks are reordered, and doesn't serve as a meaningful anchor fragment in URLs.
+
+4. **Make block ids mandatory only for pages with `semanticType` (semantic pages).** Rejected — the operator confirmed all content types should have mandatory block ids, not just semantic pages. This ensures consistent anchor link behavior across the entire site.
+
+### RFC-0915: Consolidate slug generation into werkstatt-shared as canonical utility
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+1. **Create a separate `@warpgogol/slug` package** — rejected. The module is ~80 lines wrapping three external packages. A separate package adds `package.json`, `tsconfig.json`, `AGENTS.md`, CI matrix, and subpath exports overhead for minimal logic. `werkstatt-shared` is the existing shared-utility package and already contains `slugify()`.
+
+2. **Replace all three packages with `@sindresorhus/slugify` only** — rejected. `github-slugger` provides stateful deduplication for heading anchors (first "Fazit" → `fazit`, second → `fazit-1`) that `@sindresorhus/slugify` cannot replicate without a custom wrapper class. `cyrillic-to-translit-js` is required for Ukrainian Cyrillic → Latin transliteration before slugification; `@sindresorhus/slugify` strips Cyrillic characters entirely, producing empty slugs.
+
+3. **Remove duplicates without a DNA invariant** — rejected. Without a DNA invariant and enforcement (RFC-0916), agents will recreate ad hoc `slugify()` functions. The duplicate in `person-create.ts` is direct evidence of this pattern.
+
+### RFC-0916: Utility provenance validator for canonical shared utilities
+
+- **Status:** implemented
+- **Alternatives considered:**
+
+1. **Extend `fingerprint.usage.lint` to cover slugs** — rejected. `fingerprint.usage.lint` is domain-specific (hash patterns) with a hardcoded pattern list. Slugs need different detection strategies (function names, import checks). Mixing domains in one command makes the allowlist and pattern list unmanageable.
+
+2. **Create a separate `slug.provenance.lint` command** — rejected. The platform will accumulate more canonical utilities over time. A registry-driven `utility.provenance.validate` handles all current and future utilities without creating a new command per utility. Adding a new utility only requires a registry entry, not a new command, command-table entry, and pipeline step.
+
+3. **Rely on ESLint no-restricted-imports rule** — rejected. ESLint rules are project-level config, not integrated into the Site OS pipeline. They cannot emit Diagnostic[] output, cannot be run via `pnpm exec werkstatt run`, and do not support the registry-driven pattern. The Site OS check pipeline is the canonical enforcement mechanism for DNA invariants.
 

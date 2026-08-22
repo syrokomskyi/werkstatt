@@ -2,7 +2,7 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 56b03c402d7297cc72ab494ec3afe35718031378d4479ae0cc1f47648723d026
+  contentHash: 61ccdff03c7e6d030e981cd4f03da31e42de2ea120f844219075c1ea362a2b12
   sources:
     - path: docs/architecture-dna.md
       hash: ed18e612746c743d35593340e52b0e9b570c1219bc2fdda207c43c3bc76b8320
@@ -25,7 +25,7 @@ meta:
     - path: missions/warpgogol-m000085/workpiece/package.json
       hash: 995612e10f74f95234a1f204de742fa931feb66a2786b246d7e82b56a9cda026
     - path: package.json
-      hash: 7938d0445ef903aa3e29a755567894e0bbff9cb5fc8a769d46e6b7a18b3154e4
+      hash: 062686c6c8968d653d6abf8fb3034e75067b2de7424fe4a758089e408b77d733
     - path: packages/forge/package.json
       hash: d32fd7697f7670965f284278b3d26bb3773e052e9aba775834541f5485d35e34
     - path: packages/werkstatt-godot-game/package.json
@@ -64,7 +64,7 @@ meta:
       hash: 65a269b1b89b9fd3ae4af2c9e5c05e06f869a11d8e2bbbba56b86b24f41212a0
 workspace:
   name: warpgogol-platform
-  version: 6.73.0
+  version: 6.77.0
   packageManager: pnpm@11.10.0
   packageGlobs:
     - missions/*/workpiece
@@ -2932,6 +2932,13 @@ commands:
     providers:
       - site
       - workspace
+  - name: host.canonical.config.validate
+    scope: app
+    mutatesState: false
+    supportsAllSites: true
+    providers:
+      - site
+      - workspace
   - name: humans.generate
     scope: app
     mutatesState: true
@@ -5169,9 +5176,23 @@ commands:
     supportsAllSites: false
     providers:
       - workspace
+  - name: sitemap.coverage.validate
+    scope: app
+    mutatesState: false
+    supportsAllSites: true
+    providers:
+      - site
+      - workspace
   - name: sitemap.generate
     scope: app
     mutatesState: true
+    supportsAllSites: true
+    providers:
+      - site
+      - workspace
+  - name: sitemap.placeholder.validate
+    scope: app
+    mutatesState: false
     supportsAllSites: true
     providers:
       - site
@@ -5838,6 +5859,13 @@ commands:
     providers:
       - site
       - workspace
+  - name: trailing.slash.config.validate
+    scope: app
+    mutatesState: false
+    supportsAllSites: true
+    providers:
+      - site
+      - workspace
   - name: translation.parity.review
     scope: app
     mutatesState: false
@@ -6167,27 +6195,9 @@ commands:
       - site
       - workspace
 commandProvenance:
-  - command: canonical.html-parity.validate
+  - command: host.canonical.config.validate
     proposedBy:
-      - RFC-0906
-    addedBy: []
-    changedBy: []
-    removedBy: []
-  - command: canonical.url.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0906
-    removedBy: []
-  - command: csp.elements.validate
-    proposedBy:
-      - RFC-0904
-    addedBy: []
-    changedBy: []
-    removedBy: []
-  - command: headers.coverage.validate
-    proposedBy:
-      - RFC-0904
+      - RFC-0908
     addedBy: []
     changedBy: []
     removedBy: []
@@ -6196,30 +6206,6 @@ commandProvenance:
     addedBy: []
     changedBy:
       - RFC-0179
-    removedBy: []
-  - command: mission.close
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0913
-    removedBy: []
-  - command: mission.reconcile
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0913
-    removedBy: []
-  - command: redirect.map.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0905
-    removedBy: []
-  - command: redirect.shadow.validate
-    proposedBy:
-      - RFC-0905
-    addedBy: []
-    changedBy: []
     removedBy: []
   - command: sitemap.generate
     proposedBy: []
@@ -6232,6 +6218,12 @@ commandProvenance:
     addedBy: []
     changedBy:
       - RFC-0384
+    removedBy: []
+  - command: trailing.slash.config.validate
+    proposedBy:
+      - RFC-0908
+    addedBy: []
+    changedBy: []
     removedBy: []
 pipelines:
   - name: build.check
@@ -6472,6 +6464,8 @@ pipelines:
       - public.orphans.validate
       - redirect.map.validate
       - redirect.shadow.validate
+      - host.canonical.config.validate
+      - trailing.slash.config.validate
       - robots.page.validate
       - feed.validate
       - canonical.url.validate
@@ -6479,6 +6473,8 @@ pipelines:
       - seo.domain.validate
       - seo.cross-lang-links.validate
       - dist.sitemap.images.validate
+      - sitemap.placeholder.validate
+      - sitemap.coverage.validate
       - passport.verify
       - lighthouse.budget.check
       - mobile.layout.check
@@ -7079,6 +7075,8 @@ pipelines:
       - public.orphans.validate
       - redirect.map.validate
       - redirect.shadow.validate
+      - host.canonical.config.validate
+      - trailing.slash.config.validate
       - robots.page.validate
       - feed.validate
       - canonical.url.validate
@@ -7086,6 +7084,8 @@ pipelines:
       - seo.domain.validate
       - seo.cross-lang-links.validate
       - dist.sitemap.images.validate
+      - sitemap.placeholder.validate
+      - sitemap.coverage.validate
       - passport.verify
       - lighthouse.budget.check
       - mobile.layout.check
@@ -7317,6 +7317,8 @@ pipelines:
       - public.orphans.validate
       - redirect.map.validate
       - redirect.shadow.validate
+      - host.canonical.config.validate
+      - trailing.slash.config.validate
       - robots.page.validate
       - feed.validate
       - canonical.url.validate
@@ -7324,6 +7326,8 @@ pipelines:
       - seo.domain.validate
       - seo.cross-lang-links.validate
       - dist.sitemap.images.validate
+      - sitemap.placeholder.validate
+      - sitemap.coverage.validate
       - passport.verify
       - lighthouse.budget.check
       - mobile.layout.check
@@ -7785,42 +7789,31 @@ generatedOwnership:
     module: packages/werkstatt/src/bordbuch/bordbuch-generate.ts
     conditional: true
 rfcs:
-  accepted: 4
-  implemented: 2
-  draft: 9
+  accepted: 3
+  implemented: 1
+  draft: 6
   reviewing: 0
 baseline:
   implementedRfcs:
-    - id: RFC-0904
-      implementedAt: 2026-08-21
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-67
-        - DNA-83
-    - id: RFC-0905
+    - id: RFC-0908
       implementedAt: 2026-08-22
       kind: architecture
       scope: workspace
       dnaRefs:
         - DNA-73
-        - DNA-84
+        - DNA-86
   nonImplementedRfcs:
     accepted:
       - RFC-0179
-      - RFC-0906
-      - RFC-0907
-      - RFC-0908
+      - RFC-0910
+      - RFC-0912
     draft:
       - RFC-0000
       - RFC-0383
       - RFC-0384
       - RFC-0387
       - RFC-0909
-      - RFC-0910
       - RFC-0911
-      - RFC-0912
-      - RFC-0913
     reviewing: []
     superseded: []
     rejected: []

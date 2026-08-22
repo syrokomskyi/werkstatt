@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec werkstatt run command.manifest.generate` then
 `pnpm exec werkstatt run docs.commands.generate`.
 
-Generated command rows: 824. Raw manifest entries: 1457.
+Generated command rows: 826. Raw manifest entries: 1461.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -368,6 +368,7 @@ Generated command rows: 824. Raw manifest entries: 1457.
 | `headers.coverage.validate` | site:warpgogol, workspace | app | no | no | Cross-reference _headers path patterns against files in dist/client/ for orphan patterns and uncovered typed files (RFC-0904). |
 | `headers.security.generate` | site:warpgogol, workspace | app | no | no | Security header generation boundary; baseline is emitted by public.infrastructure.generate (RFC-0315). |
 | `headers.security.validate` | site:warpgogol, workspace | app | no | no | Validate active baseline HTTP security headers in public/_headers (RFC-0315). |
+| `host.canonical.config.validate` | site:warpgogol, workspace | app | no | no | Check that host canonicalization (www↔apex redirect) is configured in wrangler config or Worker source code (RFC-0908). |
 | `humans.generate` | site:warpgogol, workspace | app | yes | no | Generate public/humans.txt from site identity, team, credits, and stack metadata (RFC-0312). |
 | `humans.validate` | site:warpgogol, workspace | app | no | no | Validate generated humans.txt sections and absence of placeholders (RFC-0312). |
 | `i18n.config.validate` | site:warpgogol, workspace | workspace | no | no | Validate i18n configuration in src/content/assets/system.md. Checks default language, supported languages, and orphan content files (RFC-0038). |
@@ -792,6 +793,7 @@ Generated command rows: 824. Raw manifest entries: 1457.
 | `tokens.colors.section-shell.lint` | site:warpgogol, workspace | workspace | no | no | Lint CSS under packages/werkstatt-site/src/domain/ui/components/{section-shell,section-header,section-body,section-cta,section-cta-group,section-image,site-background}: raw #hex, rgb()/rgba(), and hsl()/hsla() are forbidden (RFC-0098 + RFC-0108 + RFC-0122). |
 | `tokens.ds.lint` | site:warpgogol, workspace | app | no | no | Lint CSS custom properties against design-system token rules. |
 | `tokens.section-shell.contract.validate` | site:warpgogol, workspace | workspace | no | no | Verify every --ds-* token referenced under the eight section-framework component directories exists in @warpgogol/werkstatt-site/tokens TOKEN_NAME_SET (RFC-0108 + RFC-0124). |
+| `trailing.slash.config.validate` | site:warpgogol, workspace | app | no | no | Check trailing-slash normalization: build.format consistency with trailingSlash: always policy and presence of normalization redirects in _redirects (RFC-0908). |
 | `translation.parity.review` | site:warpgogol, workspace | app | no | no | Generate a review manifest of unsuppressed parity findings for agent/human review (RFC-0901). |
 | `translation.parity.suppress` | site:warpgogol, workspace | app | yes | no | Add a suppression record to translation-parity.suppressions.yaml for an intentional structural difference (RFC-0901). |
 | `translation.parity.validate` | site:warpgogol, workspace | app | no | no | Validate cross-locale structural parity (section/paragraph/sentence counts) for translated content (RFC-0901). |

@@ -17433,10 +17433,10 @@ entries:
     file: docs/rfcs/archive/implemented/rfc-0907-sitemap-integrity-validators.md
   - id: RFC-0908
     title: Host canonicalization and URL normalization validators
-    status: accepted
+    status: implemented
     kind: architecture
     createdAt: 2026-08-21
-    implementedAt: ""
+    implementedAt: 2026-08-22
     closedAt: ""
     supersedes: []
     supersededBy: ""
