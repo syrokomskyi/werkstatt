@@ -43,6 +43,8 @@ import { runHeadersCoverageValidate } from "../headers-coverage.ts";
 import { runIconReferencesValidate } from "../icon-references.ts";
 import { runHostCanonicalConfigValidate } from "../host-canonical.ts";
 import { runTrailingSlashConfigValidate } from "../trailing-slash.ts";
+import { runSearchVerificationValidate } from "../public-surface/search-verification.ts";
+import { runSearchSitemapSubmit } from "../public-surface/search-sitemap-submit.ts";
 
 export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
   {
@@ -445,5 +447,45 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     reads: ["<app>/astro.config.mjs", "<app>/public/_redirects"],
     modulePaths: ["trailing-slash.ts"],
     execute: runTrailingSlashConfigValidate,
+  },
+  {
+    name: "search.verification.validate",
+    description:
+      "Validate search engine verification config in system.md. Offline mode checks presence and shape; --live mode performs DNS TXT lookup or rendered-head meta tag check (RFC-0909).",
+    scope: "app",
+    flags: {
+      live: {
+        kind: "boolean",
+        description:
+          "Perform live DNS TXT lookup or HTTP meta tag check against the deployed site.",
+      },
+    },
+    supportsAllSites: true,
+    requiresNetwork: true,
+    reads: ["<app>/src/content/system.md"],
+    modulePaths: [
+      "public-surface/search-verification.ts",
+      "public-surface/shared.ts",
+      "result-helpers.ts",
+    ],
+    execute: runSearchVerificationValidate,
+  },
+  {
+    name: "search.sitemap.submit",
+    description:
+      "Submit sitemap index URL to Google Search Console API using service-account JWT auth from GSC_SERVICE_ACCOUNT_JSON env var (RFC-0909).",
+    scope: "app",
+    flags: {
+      "dry-run": {
+        kind: "boolean",
+        description: "Print the API request without sending it.",
+      },
+    },
+    supportsAllSites: true,
+    requiresNetwork: true,
+    cacheable: false,
+    reads: ["<app>/src/content/system.md"],
+    modulePaths: ["public-surface/search-sitemap-submit.ts", "public-surface/shared.ts"],
+    execute: runSearchSitemapSubmit,
   },
 ];
