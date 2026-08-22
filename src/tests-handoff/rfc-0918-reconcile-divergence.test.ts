@@ -223,8 +223,16 @@ test("reconcile sets divergenceWarning with diverged=true when cache clone HEAD 
   execSync('git commit --amend -m "amended commit"', { cwd: cacheDir, stdio: "pipe" });
 
   // Now cache clone HEAD != origin/main (which still points to pre-amend SHA)
-  const localHead = execSync("git rev-parse HEAD", { cwd: cacheDir, stdio: "pipe", encoding: "utf-8" }).trim();
-  const originHead = execSync("git rev-parse origin/main", { cwd: cacheDir, stdio: "pipe", encoding: "utf-8" }).trim();
+  const localHead = execSync("git rev-parse HEAD", {
+    cwd: cacheDir,
+    stdio: "pipe",
+    encoding: "utf-8",
+  }).trim();
+  const originHead = execSync("git rev-parse origin/main", {
+    cwd: cacheDir,
+    stdio: "pipe",
+    encoding: "utf-8",
+  }).trim();
   expect(localHead).not.toBe(originHead);
 
   // Run reconcile — push will fail (non-fast-forward), divergence will be detected
@@ -238,7 +246,7 @@ test("reconcile sets divergenceWarning with diverged=true when cache clone HEAD 
 
   // Reconcile will try to push and fail (non-fatal), then check divergence
   const result = await runMissionReconcile(input, context);
-  const data = expectData(result);
+  expectData(result);
 
   // divergenceWarning should be set with diverged=true
   // Note: after reconcile's merge, HEAD will be a merge commit that includes

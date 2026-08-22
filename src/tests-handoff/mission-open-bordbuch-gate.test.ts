@@ -142,7 +142,7 @@ test("mission.open refuses when bordbuch has orphan-mission-close violation", as
   const context = { workspaceRoot: tmpWorkspace } as unknown as KernelRuntimeContext;
 
   await expect(runMissionOpen(input, context)).rejects.toThrow(
-    /bordbuch for system 'test-system' has 1 orphan-mission-close violation\(s\)/,
+    /bordbuch for system 'test-system' has 1 orphan-mission-close violation/,
   );
 
   // Verify no side effects — no mission directory created

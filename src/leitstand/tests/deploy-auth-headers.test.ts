@@ -67,9 +67,7 @@ test("verifyFreshness: defaults to empty headers when no authHeaders provided", 
 });
 
 test("verifyFreshness: 401 response causes freshness failure (not crash)", async () => {
-  const fetchSpy = vi
-    .spyOn(globalThis, "fetch")
-    .mockResolvedValue(new Response("Unauthorized", { status: 401 }));
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("Unauthorized", { status: 401 }));
 
   const promise = verifyFreshness("https://dev.example.com", "abc123", noopLogger, {
     Authorization: "Basic dGVzdDp0ZXN0",
@@ -84,7 +82,7 @@ test("verifyFreshness: 401 response causes freshness failure (not crash)", async
 });
 
 test("verifyFreshness: error messages do not contain auth header values", async () => {
-  const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("Network error"));
+  vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("Network error"));
 
   const promise = verifyFreshness("https://dev.example.com", "abc123", noopLogger, {
     Authorization: "Basic c2VjcmV0MTIzNA==",

@@ -1622,7 +1622,7 @@ async function runServiceRollback(
   operationId: string,
   startedAt: string,
   logger: { info: (msg: string) => void },
-  toRelease?: string,
+  _toRelease?: string,
 ): Promise<KernelCommandResult<LeitstandRollbackData>> {
   const { readServicesRegistry, findServiceEntry } = await import("../sternsystem/registry-io.ts");
   const {

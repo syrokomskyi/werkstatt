@@ -7,7 +7,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { test, expect, vi, beforeEach, afterEach } from "vitest";
+import { test, expect, vi } from "vitest";
 import { createCloudflareWorkersAdapter } from "./cloudflare-workers.ts";
 import type { HealthInput } from "../adapter.ts";
 import { writeFileSync, mkdtempSync, rmSync, mkdirSync } from "node:fs";
