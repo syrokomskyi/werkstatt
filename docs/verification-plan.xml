@@ -562,5 +562,9 @@
       <change-type>RFC-0904 Pre-deploy header compatibility validators</change-type>
       <expectation>Run `pnpm --filter @warpgogol/werkstatt-site build:check` and `pnpm --filter @warpgogol/werkstatt-site exec vitest run src/checks/tests/csp-elements.test.ts src/checks/tests/headers-coverage.test.ts`; verify `csp.elements.validate` and `headers.coverage.validate` are registered via `pnpm exec werkstatt run csp.elements.validate --site <id> --json` and `pnpm exec werkstatt run headers.coverage.validate --site <id> --json`; verify CSP-EL-01 (object-src blocking object/embed), CSP-EL-02 (frame-src blocking iframe), CSP-EL-03 (media-src blocking audio/video/source), HDR-COV-01 (orphan path pattern, warning), HDR-COV-02 (uncovered typed file .pdf/.mp4/.webm/.svg, error); verify both validators run in `SITES_CHECK_POSTBUILD_PIPELINE` after `csp.origins.validate` and before `dist.generated-marker.validate`.</expectation>
     </entry>
+    <entry id="vm-46">
+      <change-type>RFC-0910 Canonical entity identity URLs in JSON-LD</change-type>
+      <expectation>Run `pnpm --filter @warpgogol/werkstatt-shared build:check` and `pnpm --filter @warpgogol/werkstatt-site build:check` and `pnpm --filter @warpgogol/werkstatt-site exec vitest run src/checks/tests/jsonld-canonical-entity.test.ts`; verify `jsonld.canonical-entity.validate` is registered via `pnpm exec werkstatt run jsonld.canonical-entity.validate --site <id> --json`; verify JSONLD-ENTITY-01 (Organization/WebSite url not canonical root), JSONLD-ENTITY-02 (BreadcrumbList home item carries language prefix), JSONLD-ENTITY-03 (same-origin Person.url carries default-language prefix); verify validator runs in `SITES_CHECK_POSTBUILD_PIPELINE` after `jsonld.url.validate` and before `jsonld.parity`.</expectation>
+    </entry>
   </change-validation-matrix>
 </verification-plan>
