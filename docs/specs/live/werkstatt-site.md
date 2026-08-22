@@ -17,6 +17,9 @@ history:
   - rfc: RFC-0904
     mergedAt: 2026-08-22
     operation: modified
+  - rfc: RFC-0904
+    mergedAt: 2026-08-22
+    operation: modified
 ---
 
 <!--
@@ -35,6 +38,7 @@ history:
 
 
 
+
 ```sh
 # CSP element compatibility — post-build, scans dist/client/ HTML
 pnpm exec werkstatt run csp.elements.validate --app warpgogol-com
@@ -47,6 +51,7 @@ pnpm exec werkstatt run headers.coverage.validate --app warpgogol-com --json
 
 Both commands accept `--app <id>` (optional, single-site scope) and `--json` (machine-readable output). Both commands set `supportsAllSites: true` — `--all` runs across all sites, same convention as `csp.origins.validate`. No additional flags.
 ### TypeScript contracts
+
 
 
 
@@ -126,6 +131,7 @@ interface HeadersCoverageResult {
 
 
 
+
 | Path | Role |
 | --- | --- |
 | `packages/werkstatt-site/src/checks/csp-elements.ts` | New file: `csp.elements.validate` command implementation |
@@ -141,6 +147,7 @@ interface HeadersCoverageResult {
 | `packages/werkstatt-site/AGENTS.md` | Modified: document both new commands in Check commands section |
 | `docs/verification-plan.xml` | Modified: add CSP-EL-01..03 and HDR-COV-01..02 rule IDs to verification plan |
 ### Output format
+
 
 
 
@@ -202,6 +209,7 @@ Both commands use `diagnosticsResult` from `@warpgogol/werkstatt-shared/checks/r
 }
 ```
 ### Failure modes
+
 
 
 

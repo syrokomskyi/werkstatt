@@ -17452,10 +17452,10 @@ entries:
     file: docs/rfcs/archive/implemented/rfc-0908-host-canonicalization-and-url-normalization-validators.md
   - id: RFC-0909
     title: Search engine verification surface and automated sitemap submission
-    status: draft
+    status: implemented
     kind: command
     createdAt: 2026-08-21
-    implementedAt: ""
+    implementedAt: 2026-08-22
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -17474,13 +17474,13 @@ entries:
       - RFC-0910
       - RFC-0911
       - RFC-0912
-    file: docs/rfcs/rfc-0909-search-engine-verification-surface-and-automated-sitemap-submission.md
+    file: docs/rfcs/archive/implemented/rfc-0909-search-engine-verification-surface-and-automated-sitemap-submission.md
   - id: RFC-0910
     title: Canonical entity identity URLs in JSON-LD
-    status: accepted
+    status: implemented
     kind: architecture
     createdAt: 2026-08-21
-    implementedAt: ""
+    implementedAt: 2026-08-22
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -17498,7 +17498,7 @@ entries:
       - RFC-0909
       - RFC-0911
       - RFC-0912
-    file: docs/rfcs/rfc-0910-canonical-entity-identity-urls-in-json-ld.md
+    file: docs/rfcs/archive/implemented/rfc-0910-canonical-entity-identity-urls-in-json-ld.md
   - id: RFC-0911
     title: "SEO metadata quality gates: cross-page title and description uniqueness
       plus anchor-text lint"
