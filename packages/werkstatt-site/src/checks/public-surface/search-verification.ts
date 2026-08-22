@@ -29,11 +29,16 @@ import { asRecord, asString, loadPublicContext, workspaceRel } from "./shared.ts
 const GOOGLE_TOKEN_PREFIX = "google-site-verification=";
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]+$/;
 
-function normalizeTxtValue(value: string): string {
+export function normalizeTxtValue(value: string): string {
   return value
     .trim()
     .replace(/^["']|["']$/g, "")
     .trim();
+}
+
+export function isGoogleTokenValid(token: string): boolean {
+  if (!token.startsWith(GOOGLE_TOKEN_PREFIX)) return false;
+  return TOKEN_PATTERN.test(token.slice(GOOGLE_TOKEN_PREFIX.length));
 }
 
 function buildDiagnostic(
@@ -181,7 +186,8 @@ export async function runSearchVerificationValidate(
         );
       } else {
         const html = await response.text();
-        const metaPattern = /<meta\s+name=["']google-site-verification["']\s+content=["']([^"']+)["']/i;
+        const metaPattern =
+          /<meta\s+name=["']google-site-verification["']\s+content=["']([^"']+)["']/i;
         const match = html.match(metaPattern);
         const foundToken = match?.[1];
 

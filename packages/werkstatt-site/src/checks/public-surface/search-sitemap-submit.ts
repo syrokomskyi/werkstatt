@@ -61,6 +61,12 @@ function parseServiceAccount(raw: string): ServiceAccount {
   return { client_email: email, private_key: key, token_uri: tokenUri };
 }
 
+export function buildSitemapSubmitUrl(siteUrl: string, sitemapUrl: string): string {
+  const encodedSite = encodeURIComponent(siteUrl);
+  const encodedSitemap = encodeURIComponent(sitemapUrl);
+  return `${GSC_API_BASE}/sites/${encodedSite}/sitemaps/${encodedSitemap}`;
+}
+
 function base64UrlEncode(input: Buffer | string): string {
   const buf = typeof input === "string" ? Buffer.from(input) : input;
   return buf.toString("base64url");
@@ -112,12 +118,6 @@ async function exchangeJwtForAccessToken(
     throw new Error("Token exchange response missing access_token field.");
   }
   return accessToken;
-}
-
-function buildSitemapSubmitUrl(siteUrl: string, sitemapUrl: string): string {
-  const encodedSite = encodeURIComponent(siteUrl);
-  const encodedSitemap = encodeURIComponent(sitemapUrl);
-  return `${GSC_API_BASE}/sites/${encodedSite}/sitemaps/${encodedSitemap}`;
 }
 
 export async function runSearchSitemapSubmit(
@@ -284,7 +284,8 @@ export async function runSearchSitemapSubmit(
       summary: `[${command}] error: ${error instanceof Error ? error.message : String(error)}`,
       nextSteps: [
         {
-          action: "Check network connectivity and service account credentials. See docs/runbooks/search-console-setup.md for troubleshooting.",
+          action:
+            "Check network connectivity and service account credentials. See docs/runbooks/search-console-setup.md for troubleshooting.",
           kind: "required" as const,
         },
       ],
