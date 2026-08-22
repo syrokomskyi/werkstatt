@@ -17,6 +17,7 @@ import { systemSharedContextSchema, systemGrowthSchema } from "./growth.ts";
 import { systemReleaseSchema } from "./release.ts";
 import { systemTextSchema } from "./text.ts";
 import { systemIntegrationsSchema } from "./integrations.ts";
+import { systemVerificationSchema } from "./verification.ts";
 import { semanticPageTypeSchema, articleMetadataSchema, pageOutputSchema } from "./page-output.ts";
 
 /**
@@ -482,6 +483,13 @@ export const systemManifestSchema = z.object({
         .optional(),
     })
     .optional(),
+
+  /**
+   * Search engine verification config (RFC-0909).
+   * Declares per-engine verification method and token.
+   * When absent, search.verification.validate emits SEARCH-VERIFY-01.
+   */
+  verification: systemVerificationSchema.optional(),
 });
 
 export type SystemManifest = z.infer<typeof systemManifestSchema>;
