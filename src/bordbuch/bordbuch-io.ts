@@ -185,6 +185,20 @@ export async function appendBordbuchEntry(
   }
 
   const entries = await readBordbuch(workspaceRoot, systemId);
+
+  if ((kind === "mission-close" || kind === "mission-abort") && options?.missionId) {
+    const existing = entries.find(
+      (e) =>
+        e.missionId === options.missionId &&
+        (e.kind === "mission-close" || e.kind === "mission-abort"),
+    );
+    if (existing) {
+      throw new Error(
+        `[bordbuch.append] ${kind} already exists for mission '${options.missionId}' (event ${existing.id}) — duplicate mission lifecycle close is not allowed`,
+      );
+    }
+  }
+
   const previousHash = entries.length > 0 ? entries[entries.length - 1].hash : null;
   const id = nextEventId(entries);
 
