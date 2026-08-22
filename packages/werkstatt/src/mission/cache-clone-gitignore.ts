@@ -35,19 +35,17 @@ export const CACHE_CLONE_GENERATED_PATTERNS: readonly string[] = [
 ];
 
 export const CACHE_CLONE_ONLY_PATTERNS: readonly string[] = [
-  ...FORBIDDEN_PATTERNS.filter(
-    (p) => p !== "dist" && p !== "node_modules" && p !== "packages",
-  ),
+  ...FORBIDDEN_PATTERNS.filter((p) => p !== "dist" && p !== "node_modules" && p !== "packages"),
   ...CACHE_CLONE_GENERATED_PATTERNS,
 ];
 
-export function restoreCacheCloneGitignore(systemDir: string): boolean {
+export async function restoreCacheCloneGitignore(systemDir: string): Promise<boolean> {
   const gitignorePath = path.join(systemDir, ".gitignore");
 
   if (!existsSync(gitignorePath)) {
     const newContent =
       CACHE_CLONE_GITIGNORE_SENTINEL + "\n" + CACHE_CLONE_ONLY_PATTERNS.join("\n") + "\n";
-    writeFileIfChanged(gitignorePath, newContent);
+    await writeFileIfChanged(gitignorePath, newContent);
     return true;
   }
 
@@ -64,7 +62,7 @@ export function restoreCacheCloneGitignore(systemDir: string): boolean {
     "\n" +
     CACHE_CLONE_ONLY_PATTERNS.join("\n") +
     "\n";
-  writeFileIfChanged(gitignorePath, newContent);
+  await writeFileIfChanged(gitignorePath, newContent);
   return true;
 }
 
