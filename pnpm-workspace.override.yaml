@@ -1,0 +1,3 @@
+overrides:
+  '@warpgogol/werkstatt': '1.4.4'
+  '@warpgogol/werkstatt-shared': '0.8.1'
