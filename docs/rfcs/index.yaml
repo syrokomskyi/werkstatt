@@ -17521,10 +17521,10 @@ entries:
     file: docs/rfcs/archive/implemented/rfc-0911-seo-metadata-quality-gates-cross-page-title-and-description-uniqueness-plus-anchor-text-lint.md
   - id: RFC-0912
     title: Video structured data and video sitemap for opted-in content videos
-    status: accepted
+    status: implemented
     kind: command
     createdAt: 2026-08-21
-    implementedAt: ""
+    implementedAt: 2026-08-22
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -17539,7 +17539,7 @@ entries:
       - RFC-0909
       - RFC-0910
       - RFC-0911
-    file: docs/rfcs/rfc-0912-video-structured-data-and-video-sitemap-for-opted-in-content-videos.md
+    file: docs/rfcs/archive/implemented/rfc-0912-video-structured-data-and-video-sitemap-for-opted-in-content-videos.md
   - id: RFC-0913
     title: Mission close reconcile-freshness guard and cache-clone .gitignore
       preservation
