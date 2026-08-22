@@ -1,7 +1,7 @@
 ---
 id: RFC-0910
 title: "Canonical entity identity URLs in JSON-LD"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-21
 updatedAt: 2026-08-22
 enhancedAt: 2026-08-22
-implementedAt:
+implementedAt: 2026-08-22
 closedAt:
 supersedes: []
 supersededBy:
