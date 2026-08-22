@@ -123,6 +123,11 @@ export function createMissionModule(): KernelModule {
             description:
               "RFC-0820: Override zero-commit guard. Allow closing a mission with no operator commits (e.g., platform-only update, config sync).",
           },
+          "skip-reconcile-check": {
+            kind: "boolean",
+            description:
+              "RFC-0913: Skip reconcile-freshness gate. Escape hatch for edge cases — writes bordbuch audit entry.",
+          },
         },
         writes: [
           "missions/{mission}/mission.yaml",
