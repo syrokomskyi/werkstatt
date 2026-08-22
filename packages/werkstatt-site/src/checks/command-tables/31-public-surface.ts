@@ -41,6 +41,8 @@ import { runCspOriginsValidate } from "../csp-origins.ts";
 import { runCspElementsValidate } from "../csp-elements.ts";
 import { runHeadersCoverageValidate } from "../headers-coverage.ts";
 import { runIconReferencesValidate } from "../icon-references.ts";
+import { runHostCanonicalConfigValidate } from "../host-canonical.ts";
+import { runTrailingSlashConfigValidate } from "../trailing-slash.ts";
 
 export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
   {
@@ -414,5 +416,34 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     reads: ["<app>/public/_headers", "<app>/dist/client/**/*"],
     modulePaths: ["headers-coverage.ts"],
     execute: runHeadersCoverageValidate,
+  },
+  {
+    name: "host.canonical.config.validate",
+    description:
+      "Check that host canonicalization (www↔apex redirect) is configured in wrangler config or Worker source code (RFC-0908).",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: [
+      "<app>/astro.config.mjs",
+      "<app>/wrangler.toml",
+      "<app>/wrangler.jsonc",
+      "<app>/wrangler.json",
+      "<app>/src/middleware.ts",
+      "<app>/src/middleware/**/*.ts",
+    ],
+    modulePaths: ["host-canonical.ts"],
+    execute: runHostCanonicalConfigValidate,
+  },
+  {
+    name: "trailing.slash.config.validate",
+    description:
+      "Check trailing-slash normalization: build.format consistency with trailingSlash: always policy and presence of normalization redirects in _redirects (RFC-0908).",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/astro.config.mjs", "<app>/public/_redirects"],
+    modulePaths: ["trailing-slash.ts"],
+    execute: runTrailingSlashConfigValidate,
   },
 ];

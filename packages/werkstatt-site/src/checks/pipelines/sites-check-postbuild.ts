@@ -40,6 +40,12 @@ export const SITES_CHECK_POSTBUILD_PIPELINE: KernelPipelineStep[] = [
   // RFC-0905: redirect shadow detection — cross-reference _redirects against
   // dist/client/ static files and Worker route patterns.
   { command: "redirect.shadow.validate" },
+  // RFC-0908: host canonicalization — check wrangler config and Worker source
+  // for www↔apex redirect configuration.
+  { command: "host.canonical.config.validate" },
+  // RFC-0908: trailing-slash normalization — check build.format consistency
+  // and _redirects for normalization rules.
+  { command: "trailing.slash.config.validate" },
   // RFC-0165: a noindex page must never appear in the sitemap.
   { command: "robots.page.validate" },
   // RFC-0165: the RSS feed is well-formed.
