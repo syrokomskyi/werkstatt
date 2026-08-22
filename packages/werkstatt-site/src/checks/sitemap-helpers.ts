@@ -92,6 +92,14 @@ export async function buildClustersFromSystemMd(
     if (!page.pageId || !page.routes) continue;
     if (blogGated && page.semanticType === "article") continue;
 
+    // Skip route template entries (e.g. nachweis-detail with [slug], nachweis-verify
+    // with [version]). These are patterns expanded by dedicated route generators,
+    // not actual pages.
+    const hasPlaceholder = Object.values(page.routes as Record<string, string>).some(
+      (slug) => typeof slug === "string" && (slug.includes("[") || slug.includes("]")),
+    );
+    if (hasPlaceholder) continue;
+
     const projection = resolvePageOutput(page.output, {
       semanticType: page.semanticType,
     });
