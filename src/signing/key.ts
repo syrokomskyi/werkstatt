@@ -26,8 +26,12 @@ import type { KeyEncoding, SigningKeyPair } from "./types.ts";
 
 export async function generateKeyPair(): Promise<SigningKeyPair> {
   const privateKey = ed.utils.randomSecretKey();
-  const publicKey = await ed.getPublicKeyAsync(privateKey);
+  const publicKey = await getPublicKey(privateKey);
   return { privateKey, publicKey };
+}
+
+export async function getPublicKey(privateKey: Uint8Array): Promise<Uint8Array> {
+  return ed.getPublicKeyAsync(privateKey);
 }
 
 export async function loadPrivateKey(

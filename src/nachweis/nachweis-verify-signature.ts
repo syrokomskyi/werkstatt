@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0715/RFC-0871: nachweis.verify-signature command handler — verifies the Ed25519 operator signature and RFC 3161 timestamp for a Nachweis record, reporting timestamp assurance metadata.</purpose>
+<purpose>RFC-0715/RFC-0871/RFC-0921: nachweis.verify-signature command handler — verifies the Ed25519 operator signature and RFC 3161 timestamp for a Nachweis record, reporting timestamp assurance metadata via shared signing core.</purpose>
 <keywords>nachweis, verify, signature, ed25519, timestamp, rfc3161</keywords>
 <responsibilities>
   <item>Reads the nachweis-signed and nachweis-timestamped Bordbuch entries for the slug.</item>
@@ -19,13 +19,14 @@
   <item>RFC-0715: initial nachweis.verify-signature command handler.</item>
   <item>RFC-0715 review fix: import flagString from nachweis-n3-types.ts.</item>
   <item>RFC-0871: report timestampAssurance and qualificationEvidenceRef from Bordbuch metadata, default rfc3161 for legacy entries.</item>
+  <item>RFC-0921: delegate verification to shared signing core (verify, canonicalBytes, fromHex). Remove @noble/ed25519 import. Remove canonicalRecordPayload import.</item>
 </CHANGE_SUMMARY>
 */
 
 import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
-import * as ed from "@noble/ed25519";
+import { verify as signingVerify, fromHex } from "@warpgogol/werkstatt/signing";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -43,7 +44,7 @@ import {
   type NachweisVerifySignatureResult,
   type TimestampAssurance,
 } from "./nachweis-n3-types.ts";
-import { canonicalRecordPayload, type NachweisRecordPayload } from "./nachweis-sign.ts";
+import type { NachweisRecordPayload } from "./nachweis-sign.ts";
 
 export async function runNachweisVerifySignature(
   input: KernelCommandInput,
@@ -85,8 +86,6 @@ export async function runNachweisVerifySignature(
     name: (evidenceData.name as string | undefined) ?? slug,
     items: (evidenceData.items as Record<string, unknown> | undefined) ?? {},
   };
-
-  const canonicalBytes = canonicalRecordPayload(payload);
 
   const bordbuchEntries = await readBordbuch(workspaceRoot, systemId);
   const signedEntry = bordbuchEntries.find(
@@ -143,12 +142,16 @@ export async function runNachweisVerifySignature(
     };
   }
 
-  const signatureBytes = new Uint8Array(Buffer.from(signatureHex, "hex"));
-  const publicKeyBytes = new Uint8Array(Buffer.from(publicKeyHex, "hex"));
+  const signatureBytes = fromHex(signatureHex);
+  const publicKeyBytes = fromHex(publicKeyHex);
 
   let signatureValid = false;
   try {
-    signatureValid = await ed.verifyAsync(signatureBytes, canonicalBytes, publicKeyBytes);
+    signatureValid = await signingVerify(
+      publicKeyBytes,
+      payload as unknown as Record<string, unknown>,
+      signatureBytes,
+    );
   } catch {
     signatureValid = false;
   }

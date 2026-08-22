@@ -1,11 +1,11 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0715: nachweis.sign command handler — signs the core evidence fields of a Nachweis record with an Ed25519 operator key.</purpose>
+<purpose>RFC-0715/RFC-0921: nachweis.sign command handler — signs the core evidence fields of a Nachweis record with an Ed25519 operator key via shared signing core.</purpose>
 <keywords>nachweis, sign, ed25519, operator, signature, bordbuch</keywords>
 <responsibilities>
   <item>Reads the EvidenceSource entity and extracts core evidence fields {recordId, slug, kind, name, items}.</item>
-  <item>Canonicalizes the payload via stable JSON stringify (sorted keys, no whitespace).</item>
-  <item>Signs the canonical bytes with @noble/ed25519 using the operator private key.</item>
+  <item>Canonicalizes the payload via the shared signing core (CanonicalJsonObjectV1, RFC-0849 / DNA-53).</item>
+  <item>Signs the canonical bytes with the shared signing core using the operator private key.</item>
   <item>Appends nachweis-signed Bordbuch entry with signature metadata.</item>
   <item>Idempotent: if a nachweis-signed entry already exists for the slug, returns the existing signature.</item>
   <item>Skips silently when nachweis entitlement is not resolved.</item>
@@ -18,14 +18,21 @@
 <CHANGE_SUMMARY>
   <item>RFC-0715: initial nachweis.sign command handler.</item>
   <item>RFC-0715 review fix: use byteHash from @warpgogol/fingerprint for payloadHash (DNA-53). Import flagString/flagBool from nachweis-n3-types.ts.</item>
+  <item>RFC-0921: delegate signing to shared signing core (sign, canonicalBytes, fromHex). Remove @noble/ed25519 and stableStringify imports. Remove canonicalRecordPayload function.</item>
 </CHANGE_SUMMARY>
 */
 
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import * as ed from "@noble/ed25519";
-import { stableStringify, byteHash } from "@warpgogol/werkstatt/fingerprint";
+import { byteHash } from "@warpgogol/werkstatt/fingerprint";
+import {
+  sign as signingSign,
+  canonicalBytes as signingCanonicalBytes,
+  fromHex,
+  toHex,
+  getPublicKey,
+} from "@warpgogol/werkstatt/signing";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -52,17 +59,6 @@ export interface NachweisRecordPayload {
   kind: string;
   name: string;
   items: Record<string, unknown>;
-}
-
-export function canonicalRecordPayload(payload: NachweisRecordPayload): Uint8Array {
-  const canonical = stableStringify({
-    recordId: payload.recordId,
-    slug: payload.slug,
-    kind: payload.kind,
-    name: payload.name,
-    items: payload.items,
-  });
-  return new TextEncoder().encode(canonical);
 }
 
 export async function runNachweisSign(
@@ -94,7 +90,7 @@ export async function runNachweisSign(
   }
 
   const privateKeyHex = (await fs.readFile(keyFilePath, "utf8")).trim();
-  const privateKeyBytes = new Uint8Array(Buffer.from(privateKeyHex, "hex"));
+  const privateKeyBytes = fromHex(privateKeyHex);
 
   const cachePath = await resolveNachweisCachePath(workspaceRoot, systemId);
   const lang = await resolveDefaultLang(cachePath);
@@ -118,12 +114,15 @@ export async function runNachweisSign(
     items: (evidenceData.items as Record<string, unknown> | undefined) ?? {},
   };
 
-  const canonicalBytes = canonicalRecordPayload(payload);
-  const signatureBytes = await ed.signAsync(canonicalBytes, privateKeyBytes);
-  const signatureHex = Buffer.from(signatureBytes).toString("hex");
+  const canonicalBytes = signingCanonicalBytes(payload as unknown as Record<string, unknown>);
+  const signatureBytes = await signingSign(
+    privateKeyBytes,
+    payload as unknown as Record<string, unknown>,
+  );
+  const signatureHex = toHex(signatureBytes);
 
-  const publicKeyBytes = await ed.getPublicKeyAsync(privateKeyBytes);
-  const publicKeyHex = Buffer.from(publicKeyBytes).toString("hex");
+  const publicKeyBytes = await getPublicKey(privateKeyBytes);
+  const publicKeyHex = toHex(publicKeyBytes);
 
   // Idempotency: check for existing nachweis-signed entry
   const bordbuchEntries = await readBordbuch(workspaceRoot, systemId);

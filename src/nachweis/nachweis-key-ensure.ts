@@ -1,9 +1,9 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0715: nachweis.key.ensure command handler — generates an Ed25519 keypair for Nachweis operator signatures.</purpose>
+<purpose>RFC-0715/RFC-0921: nachweis.key.ensure command handler — generates an Ed25519 keypair for Nachweis operator signatures via shared signing core.</purpose>
 <keywords>nachweis, key, ed25519, signing, crypto</keywords>
 <responsibilities>
-  <item>Generates a new Ed25519 keypair using @noble/ed25519.</item>
+  <item>Generates a new Ed25519 keypair using the shared signing core (RFC-0921).</item>
   <item>Writes private key as hex to the specified key file path (outside repo).</item>
   <item>Writes public key as hex to <path>.pub.</item>
   <item>Computes keyId as SHA-256 of the public key bytes.</item>
@@ -18,15 +18,16 @@
 <CHANGE_SUMMARY>
   <item>RFC-0715: initial nachweis.key.ensure command handler.</item>
   <item>RFC-0715 review fix: import flagString/flagBool from nachweis-n3-types.ts.</item>
+  <item>RFC-0921: delegate key generation to shared signing core (generateKeyPair, toHex). Remove @noble/ed25519 import.</item>
 </CHANGE_SUMMARY>
 */
 
 import fs from "node:fs/promises";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import * as ed from "@noble/ed25519";
 import { byteHash } from "@warpgogol/werkstatt/fingerprint";
 import { writeFileIfChanged } from "@warpgogol/werkstatt/kernel";
+import { generateKeyPair, toHex } from "@warpgogol/werkstatt/signing";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -58,11 +59,12 @@ export async function ensureNachweisKey(
     );
   }
 
-  const privateKeyBytes = ed.utils.randomSecretKey();
-  const publicKeyBytes = await ed.getPublicKeyAsync(privateKeyBytes);
+  const keyPair = await generateKeyPair();
+  const privateKeyBytes = keyPair.privateKey;
+  const publicKeyBytes = keyPair.publicKey;
 
-  const privateKeyHex = Buffer.from(privateKeyBytes).toString("hex");
-  const publicKeyHex = Buffer.from(publicKeyBytes).toString("hex");
+  const privateKeyHex = toHex(privateKeyBytes);
+  const publicKeyHex = toHex(publicKeyBytes);
 
   const keyId = byteHash(Buffer.from(publicKeyHex, "hex")).replace("sha256:", "");
 

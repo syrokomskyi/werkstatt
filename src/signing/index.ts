@@ -17,6 +17,7 @@
 export type { KeyEncoding, SigningKeyPair, SignablePayload } from "./types.ts";
 export {
   generateKeyPair,
+  getPublicKey,
   loadPrivateKey,
   loadPublicKey,
   saveKeyPair,
@@ -26,10 +27,4 @@ export {
   fromPem,
   keyExists,
 } from "./key.ts";
-export {
-  canonicalBytes,
-  signBytes,
-  verifyBytes,
-  sign,
-  verify,
-} from "./sign.ts";
+export { canonicalBytes, signBytes, verifyBytes, sign, verify } from "./sign.ts";

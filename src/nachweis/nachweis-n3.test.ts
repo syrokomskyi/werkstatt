@@ -13,12 +13,13 @@ import fs from "node:fs/promises";
 import { existsSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
-import * as ed from "@noble/ed25519";
+import { canonicalBytes } from "@warpgogol/werkstatt/signing";
+import { getPublicKey } from "@warpgogol/werkstatt/signing";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
 import type { BordbuchEntry } from "@warpgogol/werkstatt/schemas";
 import { computeEntryHash } from "../bordbuch/bordbuch-io.ts";
 import { runNachweisKeyEnsure, ensureNachweisKey } from "./nachweis-key-ensure.ts";
-import { runNachweisSign, canonicalRecordPayload } from "./nachweis-sign.ts";
+import { runNachweisSign } from "./nachweis-sign.ts";
 import { runNachweisTimestamp } from "./nachweis-timestamp.ts";
 import { runNachweisVerifySignature } from "./nachweis-verify-signature.ts";
 import { runNachweisApprove } from "./nachweis-approve.ts";
@@ -205,7 +206,7 @@ test("ensureNachweisKey produces a valid Ed25519 keypair", async () => {
 
   const privKeyHex = (await fs.readFile(keyFile, "utf8")).trim();
   const privKeyBytes = new Uint8Array(Buffer.from(privKeyHex, "hex"));
-  const pubKeyBytes = await ed.getPublicKeyAsync(privKeyBytes);
+  const pubKeyBytes = await getPublicKey(privKeyBytes);
   const pubKeyHex = Buffer.from(pubKeyBytes).toString("hex");
   expect(pubKeyHex).toBe(result.publicKeyHex);
 });
@@ -279,7 +280,7 @@ test("nachweis.sign fails when evidence-source not found", async () => {
   ).rejects.toThrow("NOT_FOUND");
 });
 
-test("canonicalRecordPayload is deterministic", () => {
+test("canonicalBytes is deterministic", () => {
   const payload = {
     recordId: "nr_test_20260101",
     slug: "test",
@@ -287,8 +288,8 @@ test("canonicalRecordPayload is deterministic", () => {
     name: "Test",
     items: { a: 1, b: 2 },
   };
-  const bytes1 = canonicalRecordPayload(payload);
-  const bytes2 = canonicalRecordPayload({ ...payload, items: { b: 2, a: 1 } });
+  const bytes1 = canonicalBytes(payload);
+  const bytes2 = canonicalBytes({ ...payload, items: { b: 2, a: 1 } });
   expect(Buffer.from(bytes1).toString("hex")).toBe(Buffer.from(bytes2).toString("hex"));
 });
 
