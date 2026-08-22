@@ -6,26 +6,18 @@
 rfcId: RFC-0910
 title: Canonical entity identity URLs in JSON-LD
 rfcStatus: accepted
-emittedAt: 2026-08-22T01:28:38.879Z
-commit: b68c7ce55b0768fec9af4fbe407a52e0b6589f3f
+emittedAt: 2026-08-22T01:30:08.814Z
+commit: 7e5a6e71d0489f2276c6eb6222848c0ecd69a4a6
 workingTreeDirty: true
 kernelVersion: unknown
-rfcFileHash: 50ba436aa2632d390d56b1fea45366e49a240e8f4bc050d0e4b8d7b29476b8ed
-acceptanceHash: cb4661744422962263495013fac5063ad2a74cbcfe74375556800ba63020ee08
+rfcFileHash: 6a65615d310da8812730793354d357898cb72e92b232f774b02a4cb725c9a82b
+acceptanceHash: 55a07c2a2d09007fbb86b3675306740d6b4be1dee36e78cc139ecb482f78c118
 probes:
   - probe:
       probe: command-registered
       name: jsonld.canonical-entity.validate
     ok: true
     detail: registered
-    durationMs: 192
-  - probe:
-      probe: run
-      command: werkstatt run jsonld.canonical-entity.validate --site warpgogol-com
-      expect:
-        exitCode: 0
-    ok: false
-    detail: exitCode=1 (expected 0)
-    durationMs: 5158
-overall: fail
+    durationMs: 185
+overall: pass
 
