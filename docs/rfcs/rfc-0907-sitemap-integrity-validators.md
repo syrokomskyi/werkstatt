@@ -25,10 +25,9 @@ related:
   - RFC-0906
 versionBump: minor
 commands:
-  proposed:
+  added:
     - sitemap.placeholder.validate
     - sitemap.coverage.validate
-  added: []
   changed: []
   removed: []
 appsImpacted: []
