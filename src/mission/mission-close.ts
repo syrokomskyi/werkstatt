@@ -310,6 +310,21 @@ export async function runMissionClose(
       logger.info(
         `  Auto-committed dirty workpiece (${workpieceCommit.commitSha?.slice(0, 8)}) before close`,
       );
+      // RFC-0916: Update reconciliation report's workpieceHeadAtReconcile to the
+      // new HEAD. The auto-commit only contains build-generated files (behavior
+      // snapshots, PDFs, etc.) from the inline validate build — not operator
+      // changes. Without this update, the reconcile-freshness gate below fails
+      // because workpiece HEAD has moved past the recorded reconcile SHA.
+      try {
+        const reconcileReportPath = path.join(evidenceDir, "reconciliation-report.json");
+        if (existsSync(reconcileReportPath)) {
+          const report = JSON.parse(readFileSync(reconcileReportPath, "utf8"));
+          report.workpieceHeadAtReconcile = workpieceCommit.commitSha;
+          await atomicWriteFile(reconcileReportPath, JSON.stringify(report, null, 2) + "\n");
+        }
+      } catch {
+        // Non-fatal — freshness check will catch if report is missing
+      }
     }
 
     // RFC-0820 Level 2: Zero operator commit guard.
