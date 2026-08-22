@@ -216,6 +216,7 @@ All `.github/workflows/*.yml` in this monorepo MUST include these baseline relia
 - Agents MUST use `ecosystem.commit` for all commits. It auto-detects scope: platform-only commits get version bump + trailers, non-platform-only commits delegate to `git commit` without bump, mixed-scope commits split into two sequential commits (platform + non-platform). Direct `git commit` for `packages/**`, `integrations/**`, `services/**` is blocked by the pre-commit hook (`hooks/pre-commit`) and the CI gate (`platform.commit.discipline.validate`).
 - The pre-commit hook is activated via `git config core.hooksPath hooks` (one-time per clone). New clones need this activation.
 - `ecosystem.commit` sets `ECOSYSTEM_COMMIT=1` env var to bypass the hook — this is the only sanctioned bypass.
+- `ecosystem.commit` blocks with EC-01 if no files are staged — it does not auto-stage. Run `git add <files>` before `ecosystem.commit --message "..."`. The command does not accept a `--files` flag; all file selection is via `git add`.
 - `ecosystem.commit` blocks with EC-02 if `package.json` is already staged by the operator — it manages `package.json` exclusively. Before running `ecosystem.commit`, unstage `package.json` with `git reset HEAD package.json` and let the command stage it itself.
 - **Major version bumps require explicit `--bump major`** (RFC-0878). `ecosystem.commit` treats `versionBump: major` in RFC frontmatter as advisory only — without `--bump major`, it automatically downgrades to `patch`. Agents SHOULD pass `--bump patch` (or `--bump minor` if appropriate) when committing implementation steps, reserving `--bump major` for the final release commit only. The `--bump` flag always takes precedence over the RFC's `versionBump` field.
 - `mission.close` auto-pins the platform version by calling `sternsystem.pin` after successful close (RFC-0703).
@@ -498,7 +499,13 @@ This rule is complementary to RFC-0480's per-response `git status` verification,
 **RFC implementation is not complete until stamped (NON-NEGOTIABLE):** When a session implements an RFC (writes code, adds tests, updates docs), the session MUST NOT end without completing all of the following:
 
 1. **Mark acceptance criteria** — every `[ ]` must be `[x]` with inline `(evidence: <file:line>)` annotations (V-26/V-27).
-2. **Regenerate command manifest** — if the RFC added or changed commands, run `rtk pnpm exec werkstatt run command.manifest.generate` and commit `docs/command-manifest.generated.yaml`. A stale manifest causes `RFC-CMD-02` violations on the next `rfc.validate`.
+2. **Regenerate generated artifacts** — if the RFC added or changed commands, run the full set of generators and commit the output:
+   - `rtk pnpm exec werkstatt run command.manifest.generate` → `docs/command-manifest.generated.yaml` (stale manifest causes `RFC-CMD-02` violations on the next `rfc.validate`)
+   - `rtk pnpm exec werkstatt run docs.commands.generate` → `docs/COMMANDS.md`
+   - `rtk pnpm exec werkstatt run ecosystem.manifest.generate` → `docs/ecosystem.generated.yaml`
+   - `rtk pnpm exec werkstatt run rfc.index.generate` → `docs/rfcs/index.yaml` (updates RFC status from `accepted` to `implemented`)
+   - `rtk pnpm exec werkstatt run rfc.decision-log.generate` → `docs/rfcs/decision-log.generated.yaml` and `docs/rfcs/decision-log.generated.md`
+   - Verify with `rtk pnpm exec werkstatt run ecosystem.manifest.validate` (0 errors expected).
 3. **Stamp implemented** — run `rfc.implement.stamp --id RFC-XXXX` (auto-detects the implementation commit via `git log --grep`, RFC-0756; pass `--implementation-commit <sha>` to override) and commit the stamped RFC file.
 4. **Validate** — run `rfc.validate --id RFC-XXXX` and confirm zero errors.
 5. **Commit** — all changes must be committed before session end.
