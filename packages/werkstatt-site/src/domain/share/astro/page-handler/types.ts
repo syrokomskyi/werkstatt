@@ -72,6 +72,8 @@ export interface PageRouteData {
   printMode: boolean;
   /** RFC-0257: root-relative URL to the generated PDF, when output.printPdf is enabled. */
   pdfUrl?: string;
+  /** RFC-0909: Google site verification token for meta-tag method. */
+  googleVerificationToken?: string;
 }
 
 export interface ResolvePageRouteOptions {

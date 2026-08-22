@@ -17,6 +17,7 @@
   <item>RFC-0312: expose generated humans.txt via the shared head author link for every site.</item>
   <item>RFC-0309: expose generated installable icon and webmanifest links in the shared head.</item>
   <item>RFC-0485: remove stale font preload for /fonts/inter-400.woff2 (404 fix).</item>
+  <item>RFC-0909: emit google-site-verification meta tag when verification.google.method is meta-tag.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -61,6 +62,8 @@ interface Props {
     actions?: Array<{ id: string; description?: string; inputSchema?: Record<string, unknown> }>;
     knowledge?: Array<{ domain: string; url?: string }>;
   } | null;
+  /** RFC-0909: Google site verification token for meta-tag method. */
+  googleVerificationToken?: string;
 }
 
 const {
@@ -79,6 +82,7 @@ const {
   pdfUrl,
   printStylesheetUrl,
   agentSurfaceManifest,
+  googleVerificationToken,
 } = Astro.props;
 
 const canonicalUrl = canonicalUrlOverride ?? Astro.url.toString();
@@ -174,6 +178,11 @@ const robotsContent = robots ?? robotsFromOutput;
     <noscript><link rel="stylesheet" href={globalStylesheetUrl} /></noscript>
     {description && <meta name="description" content={description} />}
     {robotsContent && <meta name="robots" content={robotsContent} />}
+    {
+      googleVerificationToken && (
+        <meta name="google-site-verification" content={googleVerificationToken} />
+      )
+    }
     <link rel="canonical" href={canonicalUrl} />
     {
       alternateLinks?.map(({ lang: hrefLang, href }) => (

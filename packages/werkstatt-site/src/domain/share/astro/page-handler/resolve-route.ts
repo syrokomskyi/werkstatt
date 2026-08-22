@@ -1034,6 +1034,11 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
 
   const alternateLinks = await getAlternateLinks(pageId, siteUrl);
   const growthConfig = systemData?.growth as SystemGrowthBlock | undefined;
+  const googleVerificationToken =
+    (systemData?.verification as { google?: { method?: string; token?: string } } | undefined)
+      ?.google?.method === "meta-tag"
+      ? (systemData?.verification as { google?: { token?: string } }).google?.token
+      : undefined;
   const appId = (systemData?.app as string) ?? "app";
   const supportedLangs = registry.supportedLanguages;
 
@@ -1311,6 +1316,7 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
     page,
     alternateLinks,
     growthConfig,
+    ...(googleVerificationToken ? { googleVerificationToken } : {}),
     appId,
     defaultLanguageCode: defaultLang,
     supportedLangs,
