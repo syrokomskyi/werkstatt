@@ -21,17 +21,17 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-test("auth header encoding: base64 format matches middleware format (access:PIN)", () => {
+test("auth header encoding: base64 format matches middleware format (warp:PIN)", () => {
   const pin = "1234";
-  const encoded = btoa(`access:${pin}`);
-  expect(encoded).toBe(btoa("access:1234"));
-  expect(atob(encoded)).toBe("access:1234");
+  const encoded = btoa(`warp:${pin}`);
+  expect(encoded).toBe(btoa("warp:1234"));
+  expect(atob(encoded)).toBe("warp:1234");
 });
 
 test("auth header encoding: base64 format for another PIN", () => {
   const pin = "9999";
-  const encoded = btoa(`access:${pin}`);
-  expect(atob(encoded)).toBe("access:9999");
+  const encoded = btoa(`warp:${pin}`);
+  expect(atob(encoded)).toBe("warp:9999");
 });
 
 test("verifyFreshness: passes authHeaders to fetch", async () => {

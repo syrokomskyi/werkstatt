@@ -56,7 +56,7 @@ function sleep(ms: number): Promise<void> {
 
 function buildAuthHeader(pin: string | null | undefined): Record<string, string> {
   if (!pin) return {};
-  const credentials = btoa(`access:${pin}`);
+  const credentials = btoa(`warp:${pin}`);
   return { Authorization: `Basic ${credentials}` };
 }
 
