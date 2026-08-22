@@ -33,6 +33,7 @@
   <item>RFC-0796: add validateNoStaleMissionEntries workspace-level advisory check — warns about stale symlinks or terminal-state dirs in missions/ root (non-blocking).</item>
   <item>RFC-0797: add commitCacheCloneIfDirty auto-commit before dirty cache clone guard in mission.reconcile; replace commitBordbuchProjections with commitCacheCloneIfDirty in post-validate cleanup.</item>
   <item>RFC-0820: add zero-transfer warning in mission.reconcile when transferredCommits is zero; add zeroTransferWarning field to reconciliation report.</item>
+  <item>RFC-0913: add post-merge .gitignore restoration and untrackForbiddenGeneratedFiles call; add workpieceHeadAtReconcile, gitignoreRestored, forbiddenFilesUntracked to reconciliation report.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -72,6 +73,10 @@ import { resolveCacheClonePath, readSystemConfig } from "../sternsystem/registry
 import { orchestrateSnap01Recovery } from "./snapshot-auto-regen.ts";
 import { commitBordbuchProjections } from "../bordbuch/bordbuch-commit.ts";
 import type { WorkpieceConfigPresenceResult } from "./workpiece-config-presence-check.ts";
+import {
+  restoreCacheCloneGitignore,
+  untrackForbiddenGeneratedFiles,
+} from "./cache-clone-gitignore.ts";
 
 const STERNSYSTEM_DATA_PATHS = [
   "src/content",
@@ -1231,6 +1236,10 @@ export async function runMissionReconcile(
     let transferredCommits = 0;
     const copiedPaths: string[] = [];
     let autoResolvedPaths: string[] = [];
+    // RFC-0913: workpiece HEAD at reconcile time, .gitignore restoration results
+    let workpieceHeadAtReconcile: string | null = null;
+    let gitignoreRestored = false;
+    let forbiddenFilesUntracked: string[] = [];
     // RFC-0705: mirror sync status — populated inside the git branch, used in report and return data
     const mirrorSync: { attempted: boolean; succeeded: boolean; error: string | null } = {
       attempted: false,
@@ -1437,6 +1446,17 @@ export async function runMissionReconcile(
         }
       }
 
+      // RFC-0913: Capture workpiece HEAD at reconcile time for freshness gate in mission.close
+      try {
+        workpieceHeadAtReconcile = execSync("git rev-parse HEAD", {
+          cwd: workpieceDir,
+          stdio: ["pipe", "pipe", "pipe"],
+          encoding: "utf-8",
+        }).trim();
+      } catch {
+        workpieceHeadAtReconcile = null;
+      }
+
       commitSha = execSync("git rev-parse HEAD", {
         cwd: systemDir,
         stdio: "pipe",
@@ -1473,6 +1493,35 @@ export async function runMissionReconcile(
         });
         cacheCloneCommit(systemDir, "restore critical config files after merge");
         logger.info(`  Committed ${restoredFiles.length} restored config file(s)`);
+      }
+
+      // RFC-0913: Restore cache-clone-only .gitignore patterns after merge.
+      // The merge may overwrite .gitignore with the workpiece version, removing
+      // cache-clone-only entries that exclude forbidden/generated files.
+      try {
+        gitignoreRestored = restoreCacheCloneGitignore(systemDir);
+        if (gitignoreRestored) {
+          logger.info(`  Restored cache-clone-only .gitignore patterns after merge`);
+          execSync("git add .gitignore", {
+            cwd: systemDir,
+            stdio: "pipe",
+            encoding: "utf-8",
+          });
+        }
+        forbiddenFilesUntracked = untrackForbiddenGeneratedFiles(systemDir);
+        if (forbiddenFilesUntracked.length > 0) {
+          logger.info(`  Untracked ${forbiddenFilesUntracked.length} forbidden/generated file(s)`);
+        }
+        if (gitignoreRestored || forbiddenFilesUntracked.length > 0) {
+          cacheCloneCommit(
+            systemDir,
+            "restore cache-clone .gitignore and untrack forbidden files (RFC-0913)",
+          );
+        }
+      } catch (restoreErr) {
+        logger.warn(
+          `  .gitignore restoration failed (non-fatal): ${restoreErr instanceof Error ? restoreErr.message : String(restoreErr)}`,
+        );
       }
 
       mergeCommitSha = execSync("git rev-parse HEAD^1", {
@@ -1608,6 +1657,11 @@ export async function runMissionReconcile(
       message,
       copiedPaths,
       autoResolvedPaths,
+      // RFC-0913: workpiece HEAD at reconcile time for freshness gate in mission.close
+      workpieceHeadAtReconcile,
+      // RFC-0913: .gitignore restoration and forbidden file untracking results
+      gitignoreRestored,
+      forbiddenFilesUntracked,
       mirrorSync: mirrorSync.attempted ? mirrorSync : undefined,
     };
 
