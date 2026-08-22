@@ -35,17 +35,18 @@ scope:
 | Artifact | Change |
 | --- | --- |
 | `packages/werkstatt-site/src/domain/ontology/archetypes/sections/video-section.yaml` | Add `seo` opt-in to `propsSchema.shape` |
+| `packages/werkstatt-shared/src/share/semantic/models.ts` | `SemanticBlock` extended with optional `video?: VideoSeoData` field |
+| `packages/werkstatt-shared/src/share/semantic/build-page.ts` | `buildSemanticPageModelWith` reads variant manifest and populates `video` for opted-in blocks |
 | `packages/werkstatt-shared/src/share/semantic/jsonld/video.ts` | New `buildVideoObjectNode` builder |
 | `packages/werkstatt-shared/src/share/semantic/jsonld.ts` | `buildJsonLd` composition: include video nodes when opted-in |
 | `packages/werkstatt-shared/src/share/semantic/jsonld/types.ts` | Add `VideoObjectNode` type if not inline |
-| `packages/werkstatt-shared/src/share/semantic/models.ts` | Add video fields to `SemanticPageModel` if needed |
 | `packages/werkstatt-site/src/checks/sitemap.ts` | `sitemap.generate` extended to emit `sitemap-video.xml` + index entry |
 | `packages/werkstatt-site/src/checks/sitemap-helpers.ts` | Add `VIDEO_SITEMAP_FILENAME` and video sitemap XML formatter |
 | `packages/werkstatt-site/src/checks/generator-ownership.ts` | Register `public/sitemap-video.xml` under `sitemap.generate` |
 | `packages/werkstatt-site/src/checks/audit/validators/video-structured-data.ts` | New `video.structured-data.validate` handler |
 | `packages/werkstatt-site/src/checks/command-tables/05-seo-audit.ts` | Register `video.structured-data.validate` command |
 | `packages/werkstatt-site/src/checks/pipelines/sites-check-postbuild.ts` | Add `video.structured-data.validate` to `SITES_CHECK_POSTBUILD_PIPELINE` |
-| `packages/werkstatt-site/src/checks/pipelines/build-prepare.ts` | Reorder `sitemap.generate` after `video.variants.generate` |
+| `packages/werkstatt-site/src/checks/pipelines/build-prepare.ts` | `video.variants.generate` reordered to run before `sitemap.generate` |
 
 ### 2.2 Configuration and data
 
@@ -62,10 +63,10 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-| Pipeline | Change |
-| --- | --- |
-| `SITES_BUILD_PREPARE_PIPELINE` | `sitemap.generate` moved after `video.variants.generate` |
-| `SITES_CHECK_POSTBUILD_PIPELINE` | `video.structured-data.validate` added as error |
+| Pipeline                         | Change                                                    |
+| -------------------------------- | --------------------------------------------------------- |
+| `SITES_BUILD_PREPARE_PIPELINE`   | `video.variants.generate` moved before `sitemap.generate` |
+| `SITES_CHECK_POSTBUILD_PIPELINE` | `video.structured-data.validate` added as error           |
 
 ## 3. Step sequence
 
@@ -97,49 +98,54 @@ scope:
 
 ---
 
-### Step 2. Create `VideoObject` JSON-LD builder
+### Step 2. Create `VideoObject` JSON-LD builder and extend `SemanticBlock`
 
-**Goal:** Add the `video.ts` node builder in `werkstatt-shared` and wire it into `buildJsonLd`.
+**Goal:** Add the `video.ts` node builder in `werkstatt-shared`, extend `SemanticBlock` with video data, and wire it into `buildJsonLd`.
 
 **Agent actions:**
 
+- Edit `packages/werkstatt-shared/src/share/semantic/models.ts`:
+  - Add `VideoSeoData` interface: `{ seo: { name, description, uploadDate }, manifest: { posterUrl, durationSec?, contentUrl } }`
+  - Add optional `video?: VideoSeoData` field to `SemanticBlock`
+- Edit `packages/werkstatt-shared/src/share/semantic/build-page.ts`:
+  - In `buildSemanticPageModelWith`, after extracting blocks, read the variant manifest (`src/video-manifest.generated.yaml`)
+  - For each block with `seo.videoObject: true`, match the block's video source to the manifest entry and populate `block.video`
+  - Skip blocks without the opt-in (hero/background blocks never get `video` data)
 - Create `packages/werkstatt-shared/src/share/semantic/jsonld/video.ts` with `buildVideoObjectNode(context)`:
-  - Reads opted-in video block props (`seo.name`, `seo.description`, `seo.uploadDate`)
-  - Reads variant manifest entry for the video (`sources.mp4` → `contentUrl`, poster → `thumbnailUrl`, `durationSec` → ISO 8601 duration)
+  - Reads `context.page.blocks` for blocks with `video` field
   - Returns `VideoObjectNode` or `null` when no opted-in video on the page
 - Add `VideoObjectNode` type to `packages/werkstatt-shared/src/share/semantic/jsonld/types.ts`
 - Update `packages/werkstatt-shared/src/share/semantic/jsonld.ts` `buildJsonLd`:
   - Import `buildVideoObjectNode`
   - Add `...(videoNode ? [videoNode] : [])` to the `dedupeGraph` array
-- Add video fields to `SemanticPageModel` in `models.ts` if the model doesn't already carry video block data
 - Export `buildVideoObjectNode` from `packages/werkstatt-shared/src/share/semantic/jsonld/index.ts` barrel
 
 **Validation:**
 
 - `pnpm --filter @warpgogol/werkstatt-shared run build:check`
 
-**Completion criterion:** `buildVideoObjectNode` is exported, `buildJsonLd` includes video nodes when opted-in, typecheck passes.
+**Completion criterion:** `SemanticBlock` has optional `video` field, `buildSemanticPageModelWith` populates it from variant manifest, `buildVideoObjectNode` is exported, `buildJsonLd` includes video nodes when opted-in, typecheck passes.
 
 **Human review:** no
 
 ---
 
-### Step 3. Reorder `sitemap.generate` in build-prepare pipeline
+### Step 3. Reorder `video.variants.generate` in build-prepare pipeline
 
-**Goal:** Move `sitemap.generate` after `video.variants.generate` so the variant manifest is available.
+**Goal:** Move `video.variants.generate` before `sitemap.generate` so the variant manifest is available when the sitemap is generated.
 
 **Agent actions:**
 
 - Edit `packages/werkstatt-site/src/checks/pipelines/build-prepare.ts`
-- Move the `{ command: "sitemap.generate" }` step from its current position (before `video.variants.generate`) to after `{ command: "video.variants.generate", ... }`
-- Also move `sitemap.generate` in the dev pipeline (`SITES_BUILD_PREPARE_DEV_PIPELINE`) if it has the same ordering
-- Verify no step between the old and new position depends on `sitemap.xml` being present (preview.images.generate, llms generate, image.variants.generate do not read sitemaps)
+- Move the `{ command: "video.variants.generate", expectedDurationMs: 180_000, timeoutMs: 1_200_000 }` step from its current position (line 136) to just before `{ command: "sitemap.generate" }` (line 113)
+- `sitemap.generate` is NOT in `SITES_BUILD_PREPARE_DEV_PIPELINE` (excluded per RFC-0597), so no dev pipeline change is needed
+- Verify no step between the old and new position depends on `video.variants.generate` being after them (image.variants.generate at 134 is independent, live.variants.generate at 138 is independent, material.metadata.write at 141 reads variants but runs after both positions)
 
 **Validation:**
 
 - `pnpm --filter @warpgogol/werkstatt-site run build:check`
 
-**Completion criterion:** `sitemap.generate` appears after `video.variants.generate` in both `SITES_BUILD_PREPARE_PIPELINE` and `SITES_BUILD_PREPARE_DEV_PIPELINE`.
+**Completion criterion:** `video.variants.generate` appears before `sitemap.generate` in `SITES_BUILD_PREPARE_PIPELINE`. No change to `SITES_BUILD_PREPARE_DEV_PIPELINE`.
 
 **Human review:** no
 
@@ -153,12 +159,12 @@ scope:
 
 - Edit `packages/werkstatt-site/src/checks/sitemap-helpers.ts`:
   - Add `VIDEO_SITEMAP_FILENAME = "sitemap-video.xml"`
-  - Add `generateVideoSitemapXml(entries)` — formats `<urlset>` with `xmlns:video` and `<video:video>` entries
+  - Add `generateVideoSitemapXml(entries)` — formats `<urlset>` with `xmlns:video` and `<video:video>` entries; writes empty `<urlset>` when entries is empty
   - Add `buildVideoSitemapEntries(clusters, videoManifest, siteUrl)` — scans page frontmatter for `seo.videoObject: true`, matches to variant manifest entries, builds `<url> → <video:video>` per language
 - Edit `packages/werkstatt-site/src/checks/sitemap.ts`:
   - In `runSitemapGenerate`, after generating content/legal sub-sitemaps, scan for opted-in videos
-  - If opted-in videos exist: call `generateVideoSitemapXml` and write `public/sitemap-video.xml`; add `<sitemap>` entry to the index
-  - If no opted-in videos: skip the file and index entry (absence is valid)
+  - Always write `public/sitemap-video.xml` (empty `<urlset>` when no opted-in videos)
+  - Always add `<sitemap>` entry for `sitemap-video.xml` to the sitemap index
 - Register `public/sitemap-video.xml` in `GENERATOR_OWNERSHIP_MAP` (`packages/werkstatt-site/src/checks/generator-ownership.ts`):
   ```ts
   {
@@ -173,7 +179,7 @@ scope:
 
 - `pnpm --filter @warpgogol/werkstatt-site run build:check`
 
-**Completion criterion:** `sitemap.generate` emits `sitemap-video.xml` when opted-in videos exist; ownership map includes the new file; typecheck passes.
+**Completion criterion:** `sitemap.generate` always writes `sitemap-video.xml` (empty when no opted-in videos) and includes it in the sitemap index; ownership map includes the new file; typecheck passes.
 
 **Human review:** no
 
@@ -232,7 +238,7 @@ scope:
   - Test: rendered VideoObject without opt-in → VIDEO-SEO-03 error
   - Test: sitemap-video.xml entry missing for opted-in → VIDEO-SEO-04 error
   - Test: hero/background video never produces VideoObject
-  - Test: zero opted-in videos → trivial pass, no sitemap-video.xml
+  - Test: zero opted-in videos → trivial pass, sitemap-video.xml is empty `<urlset>`
 
 **Validation:**
 

@@ -108,7 +108,7 @@ Video-bearing content blocks gain an explicit opt-in (`seo.videoObject: true` pl
 - **RFC-0498 (related)** — structured-data policy for surfaces; VideoObject joins the declared per-depth policy rather than appearing ad hoc.
 - **RFC-0907 (related)** — sitemap integrity validators will cover the new sitemap like any other (placeholder/coverage rules apply to `sitemap-video.xml` too).
 - **DNA-16 (related)** — semantic outputs share topology with navigation; VideoObject nodes are derived from the same route registry and page topology as existing JSON-LD nodes, not from a parallel model.
-- **Site OS operator model** — the validator is app-scoped postbuild; generation rides the existing `sitemap.generate` step (changed command), reordered to run after `video.variants.generate` in `SITES_BUILD_PREPARE_PIPELINE` so the variant manifest is available. No new pipeline step is added beyond the validator.
+- **Site OS operator model** — the validator is app-scoped postbuild; generation rides the existing `sitemap.generate` step (changed command). `video.variants.generate` is reordered to run before `sitemap.generate` in `SITES_BUILD_PREPARE_PIPELINE` so the variant manifest is available. No new pipeline step is added beyond the validator.
 
 ## Design
 
@@ -140,7 +140,8 @@ interface VideoSeoProps {
   };
 }
 
-// JSON-LD node, built from the variant manifest (video-variants.ts probe data):
+// JSON-LD node, built from SemanticBlock.video (populated by buildSemanticPageModelWith
+// from the variant manifest — buildJsonLd remains a pure function of SemanticPageModel):
 interface VideoObjectNode {
   "@type": "VideoObject";
   name: string;
@@ -152,21 +153,36 @@ interface VideoObjectNode {
   embedUrl?: string;               // omitted for inline videos; present only when a standalone player URL exists
 }
 
+// SemanticBlock extension (RFC-0868: SemanticBlock lives in werkstatt-shared/src/share/semantic/models.ts):
+interface SemanticBlock {
+  // ...existing fields...
+  video?: VideoSeoData;            // populated by buildSemanticPageModelWith for opted-in blocks
+}
+
+interface VideoSeoData {
+  seo: { name: string; description: string; uploadDate: string };
+  manifest: { posterUrl: string; durationSec?: number; contentUrl: string };
+}
+
 // Sitemap entries follow the Google video sitemap schema:
 // <video:video> with thumbnail_loc, title, description, content_loc, duration, publication_date.
 // content_loc uses the same sources.mp4 URL as VideoObject.contentUrl.
+// sitemap-video.xml is always written (empty <urlset> when no opted-in videos) so that
+// GENERATOR_OWNERSHIP_MAP registration and generated.files.validate are consistent.
 ```
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
+| `packages/werkstatt-shared/src/share/semantic/models.ts` | `SemanticBlock` extended with optional `video?: VideoSeoData` field |
+| `packages/werkstatt-shared/src/share/semantic/build-page.ts` | `buildSemanticPageModelWith` reads variant manifest and populates `video` for opted-in blocks |
 | `packages/werkstatt-shared/src/share/semantic/jsonld/video.ts` | New `VideoObject` node builder (RFC-0868 moved jsonld builders to `werkstatt-shared`) |
 | `packages/werkstatt-shared/src/share/semantic/jsonld.ts` | `buildJsonLd` composition updated to include video nodes when opted-in |
 | `packages/werkstatt-site/src/checks/sitemap*.ts` | `sitemap.generate` extended to emit `sitemap-video.xml` + index entry |
 | `packages/werkstatt-site/src/checks/audit/validators/video-structured-data.ts` | Home of `video.structured-data.validate` |
 | `packages/werkstatt-site/src/domain/ontology/archetypes/sections/video-section.yaml` | `seo` opt-in props added to propsSchema |
-| `packages/werkstatt-site/src/checks/pipelines/build-prepare.ts` | `sitemap.generate` reordered to run after `video.variants.generate` |
+| `packages/werkstatt-site/src/checks/pipelines/build-prepare.ts` | `video.variants.generate` reordered to run before `sitemap.generate` |
 | `public/sitemap-video.xml` (workpiece) | Generated, ownership-registered |
 | Hero/background section schemas | Explicitly untouched — decorative video never opts in |
 
@@ -184,7 +200,7 @@ Standard Diagnostic envelope. Rules:
 
 ### Pipeline ordering
 
-`sitemap.generate` currently runs at step 114 in `SITES_BUILD_PREPARE_PIPELINE`, before `video.variants.generate` at step 136. The variant manifest (`src/video-manifest.generated.yaml`) does not exist when `sitemap.generate` runs, so the video sitemap cannot be emitted at the current position. The fix is a one-step reorder: move `sitemap.generate` to after `video.variants.generate` in the pipeline. This is safe because `sitemap.generate` only reads the route registry and generated manifests — it has no dependents between steps 114 and 136 that would break.
+`sitemap.generate` currently runs at step 114 in `SITES_BUILD_PREPARE_PIPELINE`, before `video.variants.generate` at step 136. The variant manifest (`src/video-manifest.generated.yaml`) does not exist when `sitemap.generate` runs, so the video sitemap cannot be emitted at the current position. The fix is a one-step reorder: move `video.variants.generate` backward to just before `sitemap.generate` (line 113). This is the minimal change — only one step moves, and `sitemap.generate` retains its relative position with `robots.generate` (131), `public.managed.clean` (120), and all other downstream steps. `sitemap.generate` is not in `SITES_BUILD_PREPARE_DEV_PIPELINE` (excluded per RFC-0597), so no dev pipeline change is needed.
 
 ### Multi-language videos
 
@@ -197,14 +213,14 @@ The `seo.videoObject` opt-in scan adds negligible cost to `sitemap.generate`: it
 ### Failure modes
 
 - Error diagnostics exit 1 — error from day one (operator decision 2026-08-21). warpgogol-com currently has no opted-in videos, so the site passes trivially; the gate protects the first future content video.
-- A site with zero opted-in videos produces no `sitemap-video.xml` and no index entry — absence is valid, not a violation.
+- A site with zero opted-in videos produces an empty `sitemap-video.xml` (valid `<urlset>` with zero entries) and the sitemap index always references it. This keeps `GENERATOR_OWNERSHIP_MAP` registration and `generated.files.validate` consistent — no conditional logic needed.
 - Missing variant-manifest metadata (e.g. undeterminable duration) degrades to VIDEO-SEO-05 warning, never to a build crash.
 
 ## Rollout
 
 1. Extend the props schema of the `video-section` archetype with the `seo` opt-in; hero/background archetypes are deliberately skipped (structural exclusion).
 2. Add the `video.ts` JSON-LD builder in `packages/werkstatt-shared/src/share/semantic/jsonld/` and wire it into `buildJsonLd` for pages containing opted-in videos.
-3. Reorder `sitemap.generate` to run after `video.variants.generate` in `SITES_BUILD_PREPARE_PIPELINE`; extend it to emit `sitemap-video.xml` + index entry when opted-in videos exist; register generator ownership.
+3. Reorder `video.variants.generate` to run before `sitemap.generate` in `SITES_BUILD_PREPARE_PIPELINE`; extend `sitemap.generate` to always emit `sitemap-video.xml` (empty when no opted-in videos) + sitemap-index entry; register generator ownership.
 4. Add `video.structured-data.validate` to `SITES_CHECK_POSTBUILD_PIPELINE` as error.
 5. warpgogol-com needs no content change until its first content video is authored; the first opted-in video is exercised through a mission and validated end-to-end.
 
@@ -226,7 +242,7 @@ The `seo.videoObject` opt-in scan adds negligible cost to `sitemap.generate`: it
 
 - [ ] The `video-section` archetype exposes the `seo.videoObject` opt-in with required `name`/`description`/`uploadDate`; hero/background archetypes do not (evidence: archetype YAML)
 - [ ] `VideoObject` JSON-LD node emitted from the variant manifest for opted-in videos (evidence: `packages/werkstatt-shared/src/share/semantic/jsonld/video.ts` + rendered HTML test)
-- [ ] `sitemap.generate` reordered after `video.variants.generate`; emits `sitemap-video.xml` and a sitemap-index entry when opted-in videos exist; generator ownership registered (evidence: sitemap generator + ownership map + pipeline definition)
+- [ ] `video.variants.generate` reordered before `sitemap.generate`; `sitemap.generate` always emits `sitemap-video.xml` (empty when no opted-in videos) and a sitemap-index entry; generator ownership registered (evidence: sitemap generator + ownership map + pipeline definition)
 - [ ] `video.structured-data.validate` registered (app scope, postbuild) with VIDEO-SEO-01..05 (evidence: command table + handler)
 - [ ] Validator wired into `SITES_CHECK_POSTBUILD_PIPELINE` as error (evidence: pipeline definition)
 - [ ] Unit tests: opt-in emits node, hero video never emits, missing field fails, sitemap parity (evidence: test file)
