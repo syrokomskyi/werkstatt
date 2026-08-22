@@ -1,7 +1,7 @@
 ---
 id: RFC-0911
 title: "SEO metadata quality gates: cross-page title and description uniqueness plus anchor-text lint"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-21
 updatedAt: 2026-08-22
 enhancedAt: 2026-08-22
-implementedAt:
+implementedAt: 2026-08-22
 closedAt:
 supersedes: []
 supersededBy:
@@ -204,13 +204,13 @@ Each diagnostic names the colliding files (for uniqueness) or the file and ancho
 
 ## Acceptance criteria
 
-- [ ] `seo.meta-uniqueness.validate` registered (app scope, postbuild) with SEO-UNIQ-01/02 (evidence: command table + handler)
-- [ ] `seo.anchor-text.validate` registered (app scope, postbuild) with SEO-ANCHOR-01/02 and built-in de/uk stop-lists (evidence: command table + handler)
-- [ ] `system.md` supports `seo.anchorText.extraStopPhrases` extension (evidence: system-manifest schema + test)
-- [ ] Both validators wired into `SITES_CHECK_POSTBUILD_PIPELINE` as error (evidence: pipeline definition)
-- [ ] Unit tests: same-language collision fails, translation pair does not collide, noindex excluded, whole-text anchor matching only (evidence: test file)
-- [ ] warpgogol-com content greened and passes both validators — content decisions (rewriting duplicate titles, replacing generic anchors) are human authoring tasks, not mechanical agent edits (evidence: probe run output)
-- [ ] `AGENTS.md` updated where agent behavior rules changed
+- [x] `seo.meta-uniqueness.validate` registered (app scope, postbuild) with SEO-UNIQ-01/02 (evidence: packages/werkstatt-site/src/checks/command-tables/05-seo-audit.ts:270-277, packages/werkstatt-site/src/checks/audit/validators/seo-meta-uniqueness.ts:78-203)
+- [x] `seo.anchor-text.validate` registered (app scope, postbuild) with SEO-ANCHOR-01/02 and built-in de/uk stop-lists (evidence: packages/werkstatt-site/src/checks/command-tables/05-seo-audit.ts:280-287, packages/werkstatt-site/src/checks/audit/validators/seo-anchor-text.ts:131-240)
+- [x] `system.md` supports `seo.anchorText.extraStopPhrases` extension (evidence: packages/werkstatt-shared/src/content/system-manifest.ts:106-111, packages/werkstatt-site/src/checks/tests/seo-anchor-text.test.ts:176-188)
+- [x] Both validators wired into `SITES_CHECK_POSTBUILD_PIPELINE` as error (evidence: packages/werkstatt-site/src/checks/pipelines/sites-check-postbuild.ts:29-30)
+- [x] Unit tests: same-language collision fails, translation pair does not collide, noindex excluded, whole-text anchor matching only (evidence: packages/werkstatt-site/src/checks/tests/seo-meta-uniqueness.test.ts:1-179, packages/werkstatt-site/src/checks/tests/seo-anchor-text.test.ts:1-211)
+- [ ] warpgogol-com content greened and passes both validators — content decisions (rewriting duplicate titles, replacing generic anchors) are human authoring tasks, not mechanical agent edits (evidence: pending mission workpiece probe run)
+- [x] `AGENTS.md` updated where agent behavior rules changed (evidence: packages/werkstatt-site/AGENTS.md:114-115, packages/werkstatt-shared/AGENTS.md:75-88)
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
