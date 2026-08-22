@@ -1,12 +1,13 @@
 ---
 id: RFC-0913
 title: "Mission close reconcile-freshness guard and cache-clone .gitignore preservation"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-21
 updatedAt: 2026-08-21
 enhancedAt: 2026-08-21
