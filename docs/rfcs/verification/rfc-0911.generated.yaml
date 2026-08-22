@@ -6,26 +6,26 @@
 rfcId: RFC-0911
 title: "SEO metadata quality gates: cross-page title and description uniqueness
   plus anchor-text lint"
-rfcStatus: implemented
-emittedAt: 2026-08-22T01:53:30.249Z
-commit: 9cf20b97d65d025227cd365e5812974cf43cf9eb
+rfcStatus: accepted
+emittedAt: 2026-08-22T01:54:55.229Z
+commit: 664245c204e772478a30beea226f14948898482c
 workingTreeDirty: false
 kernelVersion: unknown
-rfcFileHash: 851e186dc01651ba7bf45ddbbb42b26d78d50f2b423244d64ab3503ec96f1186
+rfcFileHash: 44459dd48f62194f42a53da8f3d45bfa779460a19faf91a44f7cfb31f440872b
 acceptanceHash: 714fa511943079bad43eb35f7c5ddadf946070171185f2a70264032687e0098d
 probes:
   - probe:
       probe: command-registered
       name: seo.meta-uniqueness.validate
-    ok: false
-    detail: not registered
-    durationMs: 182
+    ok: true
+    detail: registered
+    durationMs: 187
   - probe:
       probe: command-registered
       name: seo.anchor-text.validate
-    ok: false
-    detail: not registered
-    durationMs: 186
+    ok: true
+    detail: registered
+    durationMs: 184
   - probe:
       probe: run
       command: werkstatt run seo.meta-uniqueness.validate --site warpgogol-com
@@ -33,6 +33,6 @@ probes:
         exitCode: 0
     ok: false
     detail: exitCode=1 (expected 0)
-    durationMs: 5361
+    durationMs: 5156
 overall: fail
 
