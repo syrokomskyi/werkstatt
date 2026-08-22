@@ -165,6 +165,16 @@ export async function getRouteRegistry(): Promise<RouteRegistry> {
         continue;
       }
 
+      // Skip route template entries (e.g. nachweis-detail with [slug], nachweis-verify
+      // with [version]). These are patterns expanded by dedicated route generators
+      // (getNachweisRoutes, getNachweisVerifyRoutes), not actual pages.
+      const hasPlaceholder = Object.values(page.routes).some(
+        (slug) => typeof slug === "string" && (slug.includes("[") || slug.includes("]")),
+      );
+      if (hasPlaceholder) {
+        continue;
+      }
+
       if (blogGated && page.semanticType === "article") {
         continue;
       }
