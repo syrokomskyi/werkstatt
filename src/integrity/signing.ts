@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Migrated sha256StringHex from deleted ./hash.ts to byteHash from @warpgogol/fingerprint directly.</item>
+  <item>RFC-0921: delegate signing/verification/keygen to shared signing core. Remove node:crypto sign/verify imports and canonicalJson function.</item>
 </CHANGE_SUMMARY>
 
 /**
@@ -15,15 +16,18 @@
  * Provides key generation, payload signing, signature verification, and manifest handling.
  */
 
-import {
-  createPrivateKey,
-  createPublicKey,
-  generateKeyPairSync,
-  sign as cryptoSign,
-  verify as cryptoVerify,
-} from "node:crypto";
 import path from "node:path";
 import { byteHash } from "@warpgogol/werkstatt/fingerprint";
+import {
+  generateKeyPair as signingGenerateKeyPair,
+  toPem as signingToPem,
+  privateKeyPemToBytes,
+  publicKeyPemToBytes,
+  sign as signingSign,
+  verify as signingVerify,
+  canonicalBytes as signingCanonicalBytes,
+  fromHex as signingFromHex,
+} from "@warpgogol/werkstatt/signing";
 import { ensureDir, pathExists, readBuffer, readText, writeText } from "./fs.ts";
 import { readJsonFile, stableStringify } from "./json.ts";
 import {
@@ -55,7 +59,7 @@ export interface ReleaseSignatureArtifacts {
 }
 
 export function canonicalJson(value: unknown): string {
-  return JSON.stringify(JSON.parse(stableStringify(value)));
+  return Buffer.from(signingCanonicalBytes(value as Record<string, unknown>)).toString("utf8");
 }
 
 function pemFromBase64(label: "PRIVATE KEY" | "PUBLIC KEY", base64Value: string): string {
@@ -129,15 +133,11 @@ export async function optionalEnv(name: string, cwd = process.cwd()): Promise<st
   return process.env[name] ?? undefined;
 }
 
-export function generateSigningKeyPairPem(): SigningKeyPairPem {
-  const { privateKey, publicKey } = generateKeyPairSync("ed25519", {
-    privateKeyEncoding: { type: "pkcs8", format: "pem" },
-    publicKeyEncoding: { type: "spki", format: "pem" },
-  });
-
+export async function generateSigningKeyPairPemAsync(): Promise<SigningKeyPairPem> {
+  const keyPair = await signingGenerateKeyPair();
   return {
-    privateKeyPem: privateKey,
-    publicKeyPem: publicKey,
+    privateKeyPem: signingToPem(keyPair.privateKey, "private"),
+    publicKeyPem: signingToPem(keyPair.publicKey, "public"),
   };
 }
 
@@ -177,45 +177,19 @@ export function createSignablePayload(args: {
   };
 }
 
-export function signPayload(
-  privateKeyPem: string,
-  payload: SignablePayload,
-): {
-  payloadBytes: Buffer;
-  signatureBuffer: Buffer;
-  signatureHex: string;
-  signatureBase64: string;
-} {
-  return signJsonPayload(privateKeyPem, payload as unknown as Record<string, unknown>);
-}
-
-export function signJsonPayload(
+export async function signJsonPayloadAsync(
   privateKeyPem: string,
   payload: Record<string, unknown>,
-): {
+): Promise<{
   payloadBytes: Buffer;
   signatureBuffer: Buffer;
   signatureHex: string;
   signatureBase64: string;
-} {
-  let privateKey;
-  try {
-    privateKey = createPrivateKey(normalizePemLikeValue(privateKeyPem, "PRIVATE KEY"));
-  } catch {
-    throw new Error(
-      "Failed to parse SIGNING_PRIVATE_KEY. Expected an Ed25519 private key in PKCS8 PEM format or as base64-encoded PKCS8 DER.",
-    );
-  }
-
-  if (privateKey.asymmetricKeyType !== "ed25519") {
-    throw new Error(
-      `Wrong private key type: ${privateKey.asymmetricKeyType ?? "unknown"}. Expected ed25519.`,
-    );
-  }
-
-  const payloadBytes = Buffer.from(canonicalJson(payload), "utf8");
-  const signatureBuffer = cryptoSign(null, payloadBytes, privateKey);
-
+}> {
+  const privateKeyBytes = privateKeyPemToBytes(privateKeyPem);
+  const payloadBytes = Buffer.from(signingCanonicalBytes(payload));
+  const signatureBytes = await signingSign(privateKeyBytes, payload);
+  const signatureBuffer = Buffer.from(signatureBytes);
   return {
     payloadBytes,
     signatureBuffer,
@@ -252,7 +226,9 @@ export async function signLatestBuildArtifacts(args: {
       existingManifest.payload.provenanceDigest === nextPayload.provenanceDigest;
 
     if (digestsMatch) {
-      const existingPayloadBytes = Buffer.from(canonicalJson(existingManifest.payload), "utf8");
+      const existingPayloadBytes = Buffer.from(
+        signingCanonicalBytes(existingManifest.payload as unknown as Record<string, unknown>),
+      );
       const existingSignatureBuffer = Buffer.from(existingManifest.signatureHex, "hex");
 
       return {
@@ -268,7 +244,10 @@ export async function signLatestBuildArtifacts(args: {
     }
   }
 
-  const signed = signPayload(args.privateKeyPem, nextPayload);
+  const signed = await signJsonPayloadAsync(
+    args.privateKeyPem,
+    nextPayload as unknown as Record<string, unknown>,
+  );
 
   const signedManifest: SignedManifest = {
     buildId: nextPayload.buildId,
@@ -343,37 +322,22 @@ export async function loadPublicKeyPem(args: {
 export function verifyManifestSignature(args: {
   manifest: SignedManifest;
   publicKeyPem: string;
-}): boolean {
-  return verifyJsonSignature({
+}): Promise<boolean> {
+  return verifyJsonSignatureAsync({
     payload: args.manifest.payload as unknown as Record<string, unknown>,
     signatureHex: args.manifest.signatureHex,
     publicKeyPem: args.publicKeyPem,
   });
 }
 
-export function verifyJsonSignature(args: {
+export async function verifyJsonSignatureAsync(args: {
   payload: Record<string, unknown>;
   signatureHex: string;
   publicKeyPem: string;
-}): boolean {
-  let publicKey;
-  try {
-    publicKey = createPublicKey(args.publicKeyPem);
-  } catch {
-    throw new Error(
-      "Failed to parse public key PEM. Expected an Ed25519 public key in SPKI PEM format.",
-    );
-  }
-
-  if (publicKey.asymmetricKeyType !== "ed25519") {
-    throw new Error(
-      `Wrong public key type: ${publicKey.asymmetricKeyType ?? "unknown"}. Expected ed25519.`,
-    );
-  }
-
-  const payloadBytes = Buffer.from(canonicalJson(args.payload), "utf8");
-  const signatureBuffer = Buffer.from(args.signatureHex, "hex");
-  return cryptoVerify(null, payloadBytes, publicKey, signatureBuffer);
+}): Promise<boolean> {
+  const publicKeyBytes = publicKeyPemToBytes(args.publicKeyPem);
+  const signatureBytes = signingFromHex(args.signatureHex);
+  return signingVerify(publicKeyBytes, args.payload, signatureBytes);
 }
 
 export async function compareManifestWithLocalArtifacts(

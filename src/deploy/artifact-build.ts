@@ -26,7 +26,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { signJsonPayload, requireEnv } from "@warpgogol/werkstatt/integrity";
+import { signJsonPayloadAsync, requireEnv } from "@warpgogol/werkstatt/integrity";
 import type { ArtifactBuildResult, ArtifactManifest } from "./types.ts";
 import {
   artifactDir,
@@ -132,7 +132,7 @@ export async function runDeployArtifactBuild(
     if (!skipSign) {
       try {
         const privateKeyPem = await requireEnv("SIGNING_PRIVATE_KEY", workspaceRoot);
-        const signed = signJsonPayload(
+        const signed = await signJsonPayloadAsync(
           privateKeyPem,
           manifest as unknown as Record<string, unknown>,
         );

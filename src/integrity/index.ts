@@ -40,14 +40,13 @@ export { runRecordBuild } from "./run-record-build.ts";
 export { runBackfillRevisions } from "./run-backfill-revisions.ts";
 
 export {
-  generateSigningKeyPairPem,
-  signPayload,
-  signJsonPayload,
+  generateSigningKeyPairPemAsync,
+  signJsonPayloadAsync,
   signLatestBuildArtifacts,
   loadSignedManifest,
   loadPublicKeyPem,
   verifyManifestSignature,
-  verifyJsonSignature,
+  verifyJsonSignatureAsync,
   compareManifestWithLocalArtifacts,
   requireEnv,
   optionalEnv,

@@ -22,7 +22,7 @@ import {
   buildLatestDir,
   compareManifestWithLocalArtifacts,
   ensureDir,
-  generateSigningKeyPairPem,
+  generateSigningKeyPairPemAsync,
   loadPublicKeyPem,
   loadSignedManifest,
   optionalEnv,
@@ -223,7 +223,7 @@ export async function runIntegrityVerifyRelease(
     publicKeyPemPath: resolvedKeyPath,
     publicKeyUrl,
   });
-  const signatureValid = verifyManifestSignature({ manifest, publicKeyPem });
+  const signatureValid = await verifyManifestSignature({ manifest, publicKeyPem });
 
   context.logger.info(`Manifest source: ${manifestSource}`);
   context.logger.info(`Build ID: ${manifest.buildId}`);
@@ -285,7 +285,7 @@ export async function runIntegrityGenerateSigningKeypair(
     };
   }
 
-  const { privateKeyPem, publicKeyPem } = generateSigningKeyPairPem();
+  const { privateKeyPem, publicKeyPem } = await generateSigningKeyPairPemAsync();
   await ensureDir(path.dirname(privateKeyTarget));
   await ensureDir(path.dirname(publicKeyTarget));
   await Promise.all([

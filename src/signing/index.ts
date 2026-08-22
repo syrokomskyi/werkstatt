@@ -25,6 +25,8 @@ export {
   fromHex,
   toPem,
   fromPem,
+  privateKeyPemToBytes,
+  publicKeyPemToBytes,
   keyExists,
 } from "./key.ts";
 export { canonicalBytes, signBytes, verifyBytes, sign, verify } from "./sign.ts";

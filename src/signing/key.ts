@@ -21,6 +21,7 @@
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { createPrivateKey, createPublicKey } from "node:crypto";
 import * as ed from "@noble/ed25519";
 import type { KeyEncoding, SigningKeyPair } from "./types.ts";
 
@@ -108,6 +109,28 @@ export function fromPem(pem: string): Uint8Array {
     .replace(/-----END [A-Z ]+-----/g, "")
     .replace(/\s+/g, "");
   return new Uint8Array(Buffer.from(base64, "base64"));
+}
+
+export function privateKeyPemToBytes(pem: string): Uint8Array {
+  const key = createPrivateKey(pem);
+  if (key.asymmetricKeyType !== "ed25519") {
+    throw new Error(
+      `Wrong private key type: ${key.asymmetricKeyType ?? "unknown"}. Expected ed25519.`,
+    );
+  }
+  const jwk = key.export({ format: "jwk" }) as { d: string };
+  return new Uint8Array(Buffer.from(jwk.d, "base64url"));
+}
+
+export function publicKeyPemToBytes(pem: string): Uint8Array {
+  const key = createPublicKey(pem);
+  if (key.asymmetricKeyType !== "ed25519") {
+    throw new Error(
+      `Wrong public key type: ${key.asymmetricKeyType ?? "unknown"}. Expected ed25519.`,
+    );
+  }
+  const jwk = key.export({ format: "jwk" }) as { x: string };
+  return new Uint8Array(Buffer.from(jwk.x, "base64url"));
 }
 
 export function keyExists(filePath: string): boolean {

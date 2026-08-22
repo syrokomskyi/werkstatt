@@ -22,7 +22,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/werkstatt/kernel";
-import { verifyJsonSignature, requireEnv } from "@warpgogol/werkstatt/integrity";
+import { verifyJsonSignatureAsync, requireEnv } from "@warpgogol/werkstatt/integrity";
 import type { ArtifactVerifyResult } from "./types.ts";
 import { artifactDir, distPath, hashArtifactDir, readManifest } from "./deploy-utils.ts";
 
@@ -79,7 +79,7 @@ export async function runDeployArtifactVerify(
         gitSha: manifest.gitSha,
         buildHost: manifest.buildHost,
       };
-      signatureVerified = verifyJsonSignature({
+      signatureVerified = await verifyJsonSignatureAsync({
         payload,
         signatureHex: manifest.signature,
         publicKeyPem,
