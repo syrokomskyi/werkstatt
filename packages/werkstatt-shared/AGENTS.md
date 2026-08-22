@@ -55,6 +55,23 @@ Location: `packages/werkstatt-shared/src/share/semantic/` — exported via `@war
 | --- | --- |
 | `splitSentences(text, locale?)` | Locale-aware sentence boundary detection with abbreviation handling for `de`, `uk`, `en` (RFC-0901) |
 
+### Canonical entity URL policy (RFC-0910)
+
+Entity identity URLs in JSON-LD (`Organization.url`, `WebSite.url`, `BreadcrumbList` home item, same-origin `Person.url`) MUST be canonical — the unprefixed root URL (`https://site/`), never language-prefixed (`https://site/de/`).
+
+| Export                      | Purpose                                                        |
+| --------------------------- | -------------------------------------------------------------- |
+| `canonicalRootUrl(baseUrl)` | Produce the unprefixed root URL for entity identity (RFC-0910) |
+
+Rules:
+
+- `buildOrganizationProfile` uses `canonicalRootUrl(baseUrl)` for `Organization.url`.
+- `WebSite.url` inherits from `page.organization.url` — no separate fix needed.
+- Breadcrumb home item uses `localizeUrl(lang, "", { defaultLanguage })` which produces `/` for the default language (RFC-0160) — already correct.
+- Same-origin `Person.url` must not carry the default-language prefix (e.g. `/de/team/jane` is a violation; `/team/jane` is correct).
+- External `Person.url` (different origin) is not canonicalized — only same-origin profile URLs are checked.
+- Enforcement: `jsonld.canonical-entity.validate` (RFC-0910) in `@warpgogol/werkstatt-site` scans rendered HTML and emits JSONLD-ENTITY-01..03.
+
 ### Utility registry (RFC-0916)
 
 Location: `packages/werkstatt-shared/src/share/utility-registry.yaml`
