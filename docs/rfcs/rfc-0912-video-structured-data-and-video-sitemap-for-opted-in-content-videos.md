@@ -75,7 +75,7 @@ acceptance:
   - probe: command-registered
     name: "video.structured-data.validate"
   - probe: run
-    command: "werkstatt run video.structured-data.validate --site warpgogol-com"
+    command: "werkstatt run video.structured-data.validate --site warpgogol"
     expect:
       exitCode: 0
 ---
@@ -118,10 +118,10 @@ Video-bearing content blocks gain an explicit opt-in (`seo.videoObject: true` pl
 # Validates: every opted-in video block renders a complete VideoObject;
 # every VideoObject in rendered HTML traces to an opted-in block;
 # sitemap-video.xml entries match opted-in videos.
-pnpm exec werkstatt run video.structured-data.validate --site warpgogol-com
+pnpm exec werkstatt run video.structured-data.validate --site warpgogol
 
 # Existing command, extended: also emits sitemap-video.xml when opted-in videos exist.
-pnpm exec werkstatt run sitemap.generate --site warpgogol-com
+pnpm exec werkstatt run sitemap.generate --site warpgogol
 ```
 
 App scope. The validator reads `dist/client/**/*.html`, `dist/client/sitemap-video.xml`, and page frontmatter; it skips gracefully when `dist/` is not built (postbuild pattern).
@@ -212,7 +212,7 @@ The `seo.videoObject` opt-in scan adds negligible cost to `sitemap.generate`: it
 
 ### Failure modes
 
-- Error diagnostics exit 1 — error from day one (operator decision 2026-08-21). warpgogol-com currently has no opted-in videos, so the site passes trivially; the gate protects the first future content video.
+- Error diagnostics exit 1 — error from day one (operator decision 2026-08-21). warpgogol currently has no opted-in videos, so the site passes trivially; the gate protects the first future content video.
 - A site with zero opted-in videos produces an empty `sitemap-video.xml` (valid `<urlset>` with zero entries) and the sitemap index always references it. This keeps `GENERATOR_OWNERSHIP_MAP` registration and `generated.files.validate` consistent — no conditional logic needed.
 - Missing variant-manifest metadata (e.g. undeterminable duration) degrades to VIDEO-SEO-05 warning, never to a build crash.
 
@@ -222,7 +222,7 @@ The `seo.videoObject` opt-in scan adds negligible cost to `sitemap.generate`: it
 2. Add the `video.ts` JSON-LD builder in `packages/werkstatt-shared/src/share/semantic/jsonld/` and wire it into `buildJsonLd` for pages containing opted-in videos.
 3. Reorder `video.variants.generate` to run before `sitemap.generate` in `SITES_BUILD_PREPARE_PIPELINE`; extend `sitemap.generate` to always emit `sitemap-video.xml` (empty when no opted-in videos) + sitemap-index entry; register generator ownership.
 4. Add `video.structured-data.validate` to `SITES_CHECK_POSTBUILD_PIPELINE` as error.
-5. warpgogol-com needs no content change until its first content video is authored; the first opted-in video is exercised through a mission and validated end-to-end.
+5. warpgogol needs no content change until its first content video is authored; the first opted-in video is exercised through a mission and validated end-to-end.
 
 ## Alternatives considered
 
@@ -246,7 +246,7 @@ The `seo.videoObject` opt-in scan adds negligible cost to `sitemap.generate`: it
 - [ ] `video.structured-data.validate` registered (app scope, postbuild) with VIDEO-SEO-01..05 (evidence: command table + handler)
 - [ ] Validator wired into `SITES_CHECK_POSTBUILD_PIPELINE` as error (evidence: pipeline definition)
 - [ ] Unit tests: opt-in emits node, hero video never emits, missing field fails, sitemap parity (evidence: test file)
-- [ ] warpgogol-com passes the validator (evidence: probe run output)
+- [ ] warpgogol passes the validator (evidence: probe run output)
 - [ ] `AGENTS.md` updated where agent behavior rules changed
 - [ ] `rfc.validate` passes on this file before merging
 

@@ -1,7 +1,7 @@
 ---
 id: RFC-0911
 title: "SEO metadata quality gates: cross-page title and description uniqueness plus anchor-text lint"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-21
 updatedAt: 2026-08-22
 enhancedAt: 2026-08-22
-implementedAt:
+implementedAt: 2026-08-22
 closedAt:
 supersedes: []
 supersededBy:
@@ -45,10 +45,10 @@ satisfies: []
 # major (architectural, manually reserved). Default: patch.
 versionBump: minor
 commands:
-  proposed:
+  proposed: []
+  added:
     - seo.meta-uniqueness.validate
     - seo.anchor-text.validate
-  added: []
   changed: []
   removed: []
 appsImpacted: []
@@ -59,7 +59,7 @@ packagesImpacted:
 successSignals:
   - "seo.meta-uniqueness.validate fails when two indexable pages share an identical <title> or meta description within one language"
   - "seo.anchor-text.validate fails on generic anchor text (\"click here\", \"hier klicken\", \"тут\") in rendered HTML"
-  - "warpgogol-com passes both validators after content greening"
+  - "warpgogol passes both validators after content greening"
 nonGoals:
   - Title/description presence and OG/Twitter parity (covered by content.validate RFC-0026 and seo.meta.validate RFC-0162).
   - Internal link target integrity (covered by content.links.validate RFC-0206).
@@ -74,7 +74,7 @@ acceptance:
   - probe: command-registered
     name: "seo.anchor-text.validate"
   - probe: run
-    command: "werkstatt run seo.meta-uniqueness.validate --site warpgogol-com"
+    command: "werkstatt run seo.meta-uniqueness.validate --site warpgogol"
     expect:
       exitCode: 0
 ---
@@ -109,9 +109,9 @@ The workshop gains two post-build validators: `seo.meta-uniqueness.validate`, wh
 ### CLI surface
 
 ```sh
-pnpm exec werkstatt run seo.meta-uniqueness.validate --site warpgogol-com
-pnpm exec werkstatt run seo.anchor-text.validate --site warpgogol-com
-pnpm exec werkstatt run seo.anchor-text.validate --site warpgogol-com --json
+pnpm exec werkstatt run seo.meta-uniqueness.validate --site warpgogol
+pnpm exec werkstatt run seo.anchor-text.validate --site warpgogol
+pnpm exec werkstatt run seo.anchor-text.validate --site warpgogol --json
 ```
 
 Both are app scope, read `dist/client/**/*.html`, and skip gracefully (exit 0) when `dist/` is not built — same postbuild-gate pattern as `seo.meta.validate` (RFC-0162).
@@ -175,9 +175,9 @@ Each diagnostic names the colliding files (for uniqueness) or the file and ancho
 
 ### Failure modes
 
-- `SEO-UNIQ-01`, `SEO-UNIQ-02`, and `SEO-ANCHOR-01` exit 1 — error from day one (operator decision 2026-08-21). `SEO-ANCHOR-02` is a warning (exit 0). warpgogol-com content is greened inside this RFC's rollout (duplicate titles/descriptions rewritten, generic anchors replaced) before the validators join the pipeline as error.
+- `SEO-UNIQ-01`, `SEO-UNIQ-02`, and `SEO-ANCHOR-01` exit 1 — error from day one (operator decision 2026-08-21). `SEO-ANCHOR-02` is a warning (exit 0). warpgogol content is greened inside this RFC's rollout (duplicate titles/descriptions rewritten, generic anchors replaced) before the validators join the pipeline as error.
 - `noindex` pages, HTML redirect pages, and `.well-known` artifacts are excluded (same filters as `seo.meta.validate`) — utility pages may share boilerplate legitimately.
-- **Performance:** each validator independently calls `collectRenderedHtml(audit.distDirectory)`, reading all HTML files into memory. For warpgogol-com (~124 pages) this is acceptable. The double-scan cost is consistent with the existing SEO validator family pattern (`seo.meta.validate`, `seo.structured-data.validate`, `seo.domain.validate` each scan independently).
+- **Performance:** each validator independently calls `collectRenderedHtml(audit.distDirectory)`, reading all HTML files into memory. For warpgogol (~124 pages) this is acceptable. The double-scan cost is consistent with the existing SEO validator family pattern (`seo.meta.validate`, `seo.structured-data.validate`, `seo.domain.validate` each scan independently).
 - **Single-page sites:** uniqueness is trivially satisfied with one page — no collision is possible. The validator returns pass without special-casing.
 - **`lang` extraction chain:** prefer `<html lang>` attribute; fall back to route prefix (first path segment matching a supported locale); fall back to `i18n.default` from the system manifest. Root-level pages without a language prefix (e.g. `/impressum`) are assigned the manifest's default language.
 - Anchor matching is whole-text only: a descriptive sentence containing "hier" does not trigger SEO-ANCHOR-01; a link whose entire text is "hier" does.
@@ -185,7 +185,7 @@ Each diagnostic names the colliding files (for uniqueness) or the file and ancho
 ## Rollout
 
 1. Implement both validators with tests (collision fixtures, translation non-collision, noindex exclusion, stop-list extension).
-2. Run both against warpgogol-com; fix the flagged content through a mission (unique titles/descriptions, descriptive anchors) before pipeline wiring.
+2. Run both against warpgogol; fix the flagged content through a mission (unique titles/descriptions, descriptive anchors) before pipeline wiring.
 3. Wire both into `SITES_CHECK_POSTBUILD_PIPELINE` as error.
 4. New sites comply from day one: generated starter content uses unique per-page metadata already, and any generic anchor fails the pipeline at first build.
 
@@ -193,7 +193,7 @@ Each diagnostic names the colliding files (for uniqueness) or the file and ancho
 
 - **Author-time validation (frontmatter scan) instead of rendered HTML** — rejected: titles and descriptions can be assembled by builders (suffixes, brand appending), so only the rendered output is the truth worth comparing.
 - **Fixed stop-list in code only** — rejected (operator decision 2026-08-21): fleets span languages and domains; `system.md` extension keeps the defaults without blocking site-specific vocabulary.
-- **Warning-first gated adoption (RFC-0903 precedent)** — rejected by the operator: error from day one, with warpgogol-com greened inside the same rollout.
+- **Warning-first gated adoption (RFC-0903 precedent)** — rejected by the operator: error from day one, with warpgogol greened inside the same rollout.
 - **Similarity threshold instead of exact-match uniqueness** — rejected: fuzzy matching has false positives on legitimately similar pages (de/uk legal twins); exact match after normalization is deterministic and explainable.
 
 ## Risks
@@ -209,9 +209,9 @@ Each diagnostic names the colliding files (for uniqueness) or the file and ancho
 - [x] `system.md` supports `seo.anchorText.extraStopPhrases` extension (evidence: packages/werkstatt-shared/src/content/system-manifest.ts:106-111, packages/werkstatt-site/src/checks/tests/seo-anchor-text.test.ts:176-188)
 - [x] Both validators wired into `SITES_CHECK_POSTBUILD_PIPELINE` as error (evidence: packages/werkstatt-site/src/checks/pipelines/sites-check-postbuild.ts:29-30)
 - [x] Unit tests: same-language collision fails, translation pair does not collide, noindex excluded, whole-text anchor matching only (evidence: packages/werkstatt-site/src/checks/tests/seo-meta-uniqueness.test.ts:1-179, packages/werkstatt-site/src/checks/tests/seo-anchor-text.test.ts:1-211)
-- [ ] warpgogol-com content greened and passes both validators — content decisions (rewriting duplicate titles, replacing generic anchors) are human authoring tasks, not mechanical agent edits (evidence: pending mission workpiece probe run)
+- [x] warpgogol content greened and passes both validators — content decisions (rewriting duplicate titles, replacing generic anchors) are human authoring tasks, not mechanical agent edits (evidence: mission m000085 workpiece `astro build` + `seo.meta-uniqueness.validate` exitCode=0 + `seo.anchor-text.validate` exitCode=0, 2026-08-22)
 - [x] `AGENTS.md` updated where agent behavior rules changed (evidence: packages/werkstatt-site/AGENTS.md:114-115, packages/werkstatt-shared/AGENTS.md:75-88)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0911 0 errors after V-27 fix + evidence file pass)
 
 ## Implementation notes for agents
 

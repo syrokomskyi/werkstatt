@@ -358,6 +358,13 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     markerPolicy: "registry-only",
     module: "packages/werkstatt-site/src/checks/sitemap.ts",
   },
+  // RFC-0912: sitemap-video.xml — always emitted (even when empty) by sitemap.generate
+  {
+    path: "public/sitemap-video.xml",
+    command: "sitemap.generate",
+    markerPolicy: "registry-only",
+    module: "packages/werkstatt-site/src/checks/sitemap.ts",
+  },
 
   // llms.generate — RFC-0050 LLM-facing text exports
   {

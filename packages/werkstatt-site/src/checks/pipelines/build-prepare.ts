@@ -110,7 +110,11 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "archetype.registry.build" },
   // RFC-0055: generate language-redirect middleware before Astro build
   { command: "i18n.middleware.generate" },
+  // RFC-0210: derive per-profile video delivery formats (HLS/MP4/WebM/poster) before sitemap generation
+  // RFC-0912: moved before sitemap.generate so the variant manifest is available for sitemap-video.xml
+  { command: "video.variants.generate", expectedDurationMs: 180_000, timeoutMs: 1_200_000 },
   // RFC-0049: generate sitemap.xml into public/ before Astro build copies it to dist/
+  // RFC-0912: also emits sitemap-video.xml from the variant manifest
   { command: "sitemap.generate" },
   // RFC-0150: generate OG preview PNG images into public/ before Astro build
   { command: "preview.images.generate", expectedDurationMs: 30_000, timeoutMs: 300_000 },
@@ -132,8 +136,6 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "public.artifact.generate", dependsOn: [] },
   // RFC-0204: generate responsive image variants from content assets before Astro build
   { command: "image.variants.generate", expectedDurationMs: 60_000, timeoutMs: 600_000 },
-  // RFC-0210: derive per-profile video delivery formats (HLS/MP4/WebM/poster) before Astro build
-  { command: "video.variants.generate", expectedDurationMs: 180_000, timeoutMs: 1_200_000 },
   // RFC-0234: derive the cross-device delivery set for living-photo clips (desktop WebM + iOS MP4)
   { command: "live.variants.generate", expectedDurationMs: 120_000, timeoutMs: 900_000 },
   // RFC-0528: write IPTC/XMP metadata into derived media variants after all variant generators

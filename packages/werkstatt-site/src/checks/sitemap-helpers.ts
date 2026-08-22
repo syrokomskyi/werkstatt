@@ -10,6 +10,7 @@ import { parse as yamlParse } from "yaml";
   <item>RFC-0303: extracted helpers from sitemap.ts into sitemap-helpers.ts.</item>
   <item>RFC-0788: Add markdown alternate link support — generateSitemapXml accepts optional markdownTwins map, SitemapUrlEntry gains markdownAlternates field, parseSitemapXml extracts type-bearing alternates, validateSitemapFile validates markdown alternates separately from hreflang.</item>
   <item>RFC-0788 fix: parseSitemapXml now uses attribute-order-independent regex — single regex captures all xhtml:link elements, dispatches by attribute presence.</item>
+  <item>RFC-0912: add VIDEO_SITEMAP_FILENAME, VideoSitemapEntry, generateVideoSitemapXml for video sitemap generation.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -32,6 +33,7 @@ import { readEntitledFeatures } from "./lib/entitlements.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 
 export const IMAGE_SITEMAP_FILENAME = "sitemap-images.xml";
+export const VIDEO_SITEMAP_FILENAME = "sitemap-video.xml";
 
 export interface SitemapLocaleEntry {
   lang: string;
@@ -292,6 +294,30 @@ export function generateSitemapXml(
 
   // RFC-0375: sitemap-0.xml is Category B — no marker in output.
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset\n  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n  xmlns:xhtml="http://www.w3.org/1999/xhtml"\n>\n${urls.join("\n")}\n</urlset>`;
+}
+
+/** RFC-0912: video sitemap entry — one per opted-in content video per language. */
+export interface VideoSitemapEntry {
+  pageUrl: string;
+  thumbnailLoc: string;
+  title: string;
+  description: string;
+  contentLoc: string;
+  duration?: number;
+  publicationDate: string;
+}
+
+/** RFC-0912: generate sitemap-video.xml from opted-in video entries. Always emits a valid urlset, even when empty. */
+export function generateVideoSitemapXml(entries: VideoSitemapEntry[]): string {
+  const urls = entries.map((entry) => {
+    const durationXml =
+      typeof entry.duration === "number" && entry.duration > 0
+        ? `\n      <video:duration>${Math.round(entry.duration)}</video:duration>`
+        : "";
+    return `  <url>\n    <loc>${escapeXml(entry.pageUrl)}</loc>\n    <video:video>\n      <video:thumbnail_loc>${escapeXml(entry.thumbnailLoc)}</video:thumbnail_loc>\n      <video:title>${escapeXml(entry.title)}</video:title>\n      <video:description>${escapeXml(entry.description)}</video:description>\n      <video:content_loc>${escapeXml(entry.contentLoc)}</video:content_loc>${durationXml}\n      <video:publication_date>${escapeXml(entry.publicationDate)}</video:publication_date>\n    </video:video>\n  </url>`;
+  });
+
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset\n  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n  xmlns:video="http://www.google.com/schemas/sitemap-video/1.1"\n>\n${urls.join("\n")}\n</urlset>`;
 }
 
 export async function writeGeneratedFile(

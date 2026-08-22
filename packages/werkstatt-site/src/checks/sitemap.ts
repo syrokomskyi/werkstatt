@@ -21,10 +21,12 @@
   <item>RFC-0267: routed all filesystem access through context.io (WorkspaceIO port) — sitemap.generate gains universal --dry-run and drops its hand-rolled dryRun guard; the module no longer imports node:fs (readdir now returns port-neutral DirEntry[]).</item>
   <item>RFC-0788: Build markdownTwins map from public/*.md files and pass to generateSitemapXml/validateSitemapFile for markdown alternate link support.</item>
   <item>RFC-0788 fix: Add diagnostic log when no markdown twins found in public/ — helps operators distinguish "no twins generated yet" from "directory missing".</item>
+  <item>RFC-0912: emit sitemap-video.xml from opted-in content video blocks + variant manifest; always written (even when empty); added to sitemap index.</item>
 </CHANGE_SUMMARY>
 */
 
 import { join, relative } from "node:path";
+import { parse as yamlParse } from "yaml";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -32,15 +34,23 @@ import type {
 } from "@warpgogol/werkstatt/kernel";
 import { requireAstroSitePaths } from "@warpgogol/werkstatt-site/paths";
 import { collectFiles } from "@warpgogol/werkstatt-shared/share/fs";
-import { markdownTwinRelPath, markdownTwinUrlPath } from "@warpgogol/werkstatt-shared/share/semantic";
+import {
+  markdownTwinRelPath,
+  markdownTwinUrlPath,
+} from "@warpgogol/werkstatt-shared/share/semantic";
+import type { VideoManifest } from "@warpgogol/werkstatt-shared/share/schemas/media";
+import { parseMarkdownFrontmatter } from "@warpgogol/werkstatt-site/content";
 import { passResult, failResult } from "./result-helpers.ts";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import {
   IMAGE_SITEMAP_FILENAME,
+  VIDEO_SITEMAP_FILENAME,
+  VideoSitemapEntry,
   buildClustersFromSystemMd,
   groupClustersByCategory,
   generateSitemapIndex,
   generateSitemapXml,
+  generateVideoSitemapXml,
   writeGeneratedFile,
   parseSitemapXml,
   parseSitemapIndex,
@@ -76,6 +86,130 @@ async function buildMarkdownTwinsMap(
     }
   }
   return map;
+}
+
+/** RFC-0912: scan page frontmatter for blocks with seo.videoObject opt-in and collect video sitemap entries. */
+async function collectVideoSitemapEntries(
+  io: KernelRuntimeContext["io"],
+  appDir: string,
+  siteUrl: string,
+  clusters: Array<{ pageId: string; locales: Array<{ lang: string; path: string; url: string }> }>,
+  defaultLanguage: string,
+): Promise<VideoSitemapEntry[]> {
+  // Read the variant manifest produced by video.variants.generate.
+  const manifestPath = join(appDir, "src", "video-manifest.generated.yaml");
+  let manifest: VideoManifest | null = null;
+  try {
+    const raw = await io.readFile(manifestPath);
+    manifest = yamlParse(raw) as VideoManifest;
+  } catch {
+    // No manifest — no opted-in videos to emit.
+    return [];
+  }
+  if (!manifest || !manifest.byToken || !manifest.byOrigin) return [];
+
+  // Build (pageId, lang) → url lookup from clusters.
+  const urlByPageIdLang = new Map<string, string>();
+  for (const cluster of clusters) {
+    for (const locale of cluster.locales) {
+      urlByPageIdLang.set(`${cluster.pageId}|${locale.lang}`, locale.url);
+    }
+  }
+
+  const pagesDir = join(appDir, "src", "content", "pages");
+  let files: string[];
+  try {
+    files = await collectFiles(pagesDir, {
+      extensions: [".md"],
+      ignore: (name) => name === "AGENTS.md",
+    });
+  } catch {
+    return [];
+  }
+
+  const entries: VideoSitemapEntry[] = [];
+  for (const file of files) {
+    let raw: string;
+    try {
+      raw = await io.readFile(file);
+    } catch {
+      continue;
+    }
+    const { data: fm } = parseMarkdownFrontmatter(raw);
+    if (!fm || typeof fm !== "object") continue;
+
+    const pageId = fm["pageId"] as string | undefined;
+    if (!pageId) continue;
+
+    // Derive lang from file path: src/content/pages/<lang>/...
+    const rel = relative(pagesDir, file).replace(/\\/g, "/");
+    const lang = rel.split("/")[0] ?? defaultLanguage;
+
+    const pageUrl = urlByPageIdLang.get(`${pageId}|${lang}`);
+    if (!pageUrl) continue;
+
+    // Walk blocks to find opted-in video blocks.
+    const blocks = (fm["blocks"] as Array<Record<string, unknown>> | undefined) ?? [];
+    for (const block of blocks) {
+      const props = (block["props"] ?? block) as Record<string, unknown>;
+      const seo = props["seo"];
+      if (!seo || typeof seo !== "object") continue;
+      const seoRecord = seo as Record<string, unknown>;
+      if (seoRecord["videoObject"] !== true) continue;
+
+      const name = seoRecord["name"];
+      const description = seoRecord["description"];
+      const uploadDate = seoRecord["uploadDate"];
+      if (
+        typeof name !== "string" ||
+        typeof description !== "string" ||
+        typeof uploadDate !== "string"
+      ) {
+        continue;
+      }
+
+      // Find the media token for this block.
+      const media = props["media"];
+      if (!media || typeof media !== "object") continue;
+      const mediaRecord = media as Record<string, unknown>;
+      const source = mediaRecord["source"];
+      if (!source || typeof source !== "object") continue;
+      const sourceRecord = source as Record<string, unknown>;
+      const token = sourceRecord["name"];
+      if (typeof token !== "string") continue;
+
+      const cleanToken = token.replace(/\.(mp4|webm)$/i, "");
+      const originKey =
+        manifest.byToken[`${lang}/${cleanToken}`] ??
+        (lang !== defaultLanguage
+          ? manifest.byToken[`${defaultLanguage}/${cleanToken}`]
+          : undefined);
+      if (!originKey) continue;
+
+      const entry = manifest.byOrigin[originKey];
+      if (!entry) continue;
+
+      const baseUrl = siteUrl.replace(/\/$/, "");
+      const poster = entry.poster;
+      if (!poster) continue;
+      const thumbnailLoc = poster.startsWith("http") ? poster : `${baseUrl}${poster}`;
+      const mp4 = entry.sources.mp4;
+      if (!mp4) continue;
+      const contentLoc = mp4.startsWith("http") ? mp4 : `${baseUrl}${mp4}`;
+
+      entries.push({
+        pageUrl,
+        thumbnailLoc,
+        title: name,
+        description,
+        contentLoc,
+        duration: entry.durationSec,
+        publicationDate: uploadDate,
+      });
+    }
+  }
+
+  return entries;
 }
 
 export async function runSitemapGenerate(
@@ -117,7 +251,20 @@ export async function runSitemapGenerate(
   // RFC-0172: advertise the post-build image sitemap so crawlers discover it.
   // The file itself is emitted into dist/client by sitemap.images.generate (it is
   // not written here, and sitemap.validate skips it — it is dist-only, image-only).
-  const indexNames = [...subSitemapNames, IMAGE_SITEMAP_FILENAME];
+  // RFC-0912: always emit sitemap-video.xml (even when empty) and add it to the index.
+  const videoEntries = await collectVideoSitemapEntries(
+    context.io,
+    paths.appDirectory,
+    siteUrl,
+    clusters,
+    defaultLanguage,
+  );
+  const videoSitemapXml = generateVideoSitemapXml(videoEntries);
+  const videoSitemapPath = join(paths.publicDirectory, VIDEO_SITEMAP_FILENAME);
+  await writeGeneratedFile(context.io, videoSitemapPath, videoSitemapXml);
+  writtenFiles.push(videoSitemapPath);
+
+  const indexNames = [...subSitemapNames, IMAGE_SITEMAP_FILENAME, VIDEO_SITEMAP_FILENAME];
 
   // Write sitemap index
   const indexXml = generateSitemapIndex(siteUrl, indexNames);
@@ -132,6 +279,7 @@ export async function runSitemapGenerate(
       command: "sitemap.generate",
       status: "pass",
       urlCount,
+      videoCount: videoEntries.length,
       files: writtenFiles,
       categories: Array.from(grouped.keys()),
       clusters: clusters.map((c) => ({
@@ -183,8 +331,9 @@ export async function runSitemapValidate(
 
   // RFC-0172: the image sitemap is dist-only and image-shaped — validated by
   // sitemap.images.validate, not here.
+  // RFC-0912: the video sitemap is video-shaped — validated by video.structured-data.validate, not here.
   const subSitemapNames = parseSitemapIndex(indexXml, siteUrl).filter(
-    (name) => name !== IMAGE_SITEMAP_FILENAME,
+    (name) => name !== IMAGE_SITEMAP_FILENAME && name !== VIDEO_SITEMAP_FILENAME,
   );
   if (subSitemapNames.length === 0) {
     return failResult("sitemap.validate", [
