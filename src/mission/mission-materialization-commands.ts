@@ -1158,6 +1158,12 @@ export interface MissionReconcileData {
     succeeded: boolean;
     error: string | null;
   };
+  // RFC-0918: post-push divergence diagnostic
+  divergenceWarning?: {
+    cacheCloneHead: string;
+    originHead: string;
+    diverged: boolean;
+  } | null;
 }
 
 // RFC-0584: shared merge-abort helper — attempts git merge --abort, silently catches failure
@@ -1759,6 +1765,7 @@ export async function runMissionReconcile(
         workpieceAutoCommitted: workpieceCommit.committed,
         workpieceCommitSha: workpieceCommit.commitSha,
         ...(mirrorSync.attempted ? { mirrorSync } : {}),
+        divergenceWarning,
       },
       summary: `[mission.reconcile] ${missionId} reconciled (${commitSha ? `${commitSha.slice(0, 8)}, ${transferredCommits} commits merged` : "no git"}${autoResolveSuffix}${workpieceCommit.committed ? `, workpiece auto-committed ${workpieceCommit.commitSha?.slice(0, 8)}` : ""}${mirrorSyncSuffix})`,
       nextSteps: [
