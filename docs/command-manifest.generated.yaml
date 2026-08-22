@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: c1f472d9a2ed31f12d4f1f7188f814002f3d5592e43cfc9e3f86c35089bf98a1
+  contentHash: 08befecf32172c9c5ccc8fa6566588ef7eb33c64651d69624dda98e61605d4d8
 commands:
   - name: a11y.label-in-name.component.validate
     description: "RFC-0836: scan .astro component source files in
@@ -27268,6 +27268,44 @@ commands:
     pipelines:
       - build.check
       - check
+  - name: video.structured-data.validate
+    description: "RFC-0912: Validate that every opted-in content video renders a
+      complete VideoObject JSON-LD node, no non-opted-in video carries
+      VideoObject markup, and sitemap-video.xml entries match opted-in videos."
+    scope: app
+    provider: site:warpgogol
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: &a1111 {}
+    reads: &a1112
+      - <app>/dist/client/**/*.html
+      - <app>/dist/client/sitemap-video.xml
+      - <app>/src/content/pages/**/*.md
+      - <app>/src/video-manifest.generated.yaml
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.post
+      - check
+  - name: video.structured-data.validate
+    description: "RFC-0912: Validate that every opted-in content video renders a
+      complete VideoObject JSON-LD node, no non-opted-in video carries
+      VideoObject markup, and sitemap-video.xml entries match opted-in videos."
+    scope: app
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: *a1111
+    reads: *a1112
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.post
+      - check
   - name: video.variants.generate
     description: "RFC-0210 unified media contract: derive per-profile delivery
       formats (HLS ABR + MP4 + WebM + poster) from source videos via ffmpeg.
@@ -27278,11 +27316,11 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: 1200000
-    flags: &a1111 {}
-    reads: &a1112
+    flags: &a1113 {}
+    reads: &a1114
       - <app>/src/content/system.md
       - <app>/public/**/*.{mp4,webm,mov}
-    writes: &a1113
+    writes: &a1115
       - <app>/src/video-manifest.generated.yaml
       - <app>/public/_video/**
       - <app>/.cache/video/**
@@ -27300,9 +27338,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: 1200000
-    flags: *a1111
-    reads: *a1112
-    writes: *a1113
+    flags: *a1113
+    reads: *a1114
+    writes: *a1115
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -27317,8 +27355,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1114 {}
-    reads: &a1115
+    flags: &a1116 {}
+    reads: &a1117
       - <app>/src/video-manifest.generated.yaml
       - <app>/public/_video/**
     writes: []
@@ -27335,8 +27373,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1114
-    reads: *a1115
+    flags: *a1116
+    reads: *a1117
     writes: []
     validatesOutputs: []
     pipelines:
@@ -27350,10 +27388,10 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1116 {}
-    reads: &a1117
+    flags: &a1118 {}
+    reads: &a1119
       - <app>/src/surface/visibility/*.snapshot.json
-    writes: &a1118
+    writes: &a1120
       - <app>/src/surface/visibility/outcomes.generated.yaml
     validatesOutputs: []
     pipelines:
@@ -27368,9 +27406,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1116
-    reads: *a1117
-    writes: *a1118
+    flags: *a1118
+    reads: *a1119
+    writes: *a1120
     validatesOutputs: []
     pipelines:
       - build.check
@@ -27384,8 +27422,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1119 {}
-    reads: &a1120
+    flags: &a1121 {}
+    reads: &a1122
       - <app>/src/content/**/*.md
       - <app>/src/content/**/*.yaml
     writes: []
@@ -27402,8 +27440,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1119
-    reads: *a1120
+    flags: *a1121
+    reads: *a1122
     writes: []
     validatesOutputs: []
     pipelines:
@@ -27418,7 +27456,7 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1121
+    flags: &a1123
       input:
         kind: string
         description: Input file path.
@@ -27426,7 +27464,7 @@ commands:
         kind: string
         description: Source descriptor id or source label.
     reads: []
-    writes: &a1122
+    writes: &a1124
       - <app>/src/surface/visibility/*.snapshot.json
     validatesOutputs: []
     pipelines: []
@@ -27439,9 +27477,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1121
+    flags: *a1123
     reads: []
-    writes: *a1122
+    writes: *a1124
     validatesOutputs: []
     pipelines: []
   - name: visibility.reconcile
@@ -27453,10 +27491,10 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1123 {}
-    reads: &a1124
+    flags: &a1125 {}
+    reads: &a1126
       - <app>/src/surface/visibility/*.snapshot.json
-    writes: &a1125
+    writes: &a1127
       - <app>/src/surface/visibility/outcomes.generated.yaml
     validatesOutputs: []
     pipelines:
@@ -27471,9 +27509,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1123
-    reads: *a1124
-    writes: *a1125
+    flags: *a1125
+    reads: *a1126
+    writes: *a1127
     validatesOutputs: []
     pipelines:
       - build.check
@@ -27484,42 +27522,6 @@ commands:
       last/first block) gate the build; VIS-BG-03 (adjacent duplicate
       background) warns. Federates RFC-0203 Diagnostics under the `visual`
       domain (RFC-0233)."
-    scope: app
-    provider: site:warpgogol
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: &a1126 {}
-    reads: &a1127
-      - <app>/src/content/system.md
-      - <app>/src/content/**/*.md
-      - <app>/src/content/**/*.yaml
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - build.check
-  - name: visual.contract.validate
-    description: "Per-app: enforce Tier-1 positional visual invariants over authored
-      pages in page context. VIS-BG-01/02 (edge-merge fade must be on the
-      last/first block) gate the build; VIS-BG-03 (adjacent duplicate
-      background) warns. Federates RFC-0203 Diagnostics under the `visual`
-      domain (RFC-0233)."
-    scope: app
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags: *a1126
-    reads: *a1127
-    writes: []
-    validatesOutputs: []
-    pipelines:
-      - build.check
-  - name: visual.report
-    description: "Per-app: report the full visual posture (all visual findings incl.
-      warnings) without gating the build. Advisory — always exits 0 (RFC-0233)."
     scope: app
     provider: site:warpgogol
     module: check
@@ -27533,6 +27535,42 @@ commands:
       - <app>/src/content/**/*.yaml
     writes: []
     validatesOutputs: []
+    pipelines:
+      - build.check
+  - name: visual.contract.validate
+    description: "Per-app: enforce Tier-1 positional visual invariants over authored
+      pages in page context. VIS-BG-01/02 (edge-merge fade must be on the
+      last/first block) gate the build; VIS-BG-03 (adjacent duplicate
+      background) warns. Federates RFC-0203 Diagnostics under the `visual`
+      domain (RFC-0233)."
+    scope: app
+    provider: workspace
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: *a1128
+    reads: *a1129
+    writes: []
+    validatesOutputs: []
+    pipelines:
+      - build.check
+  - name: visual.report
+    description: "Per-app: report the full visual posture (all visual findings incl.
+      warnings) without gating the build. Advisory — always exits 0 (RFC-0233)."
+    scope: app
+    provider: site:warpgogol
+    module: check
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: &a1130 {}
+    reads: &a1131
+      - <app>/src/content/system.md
+      - <app>/src/content/**/*.md
+      - <app>/src/content/**/*.yaml
+    writes: []
+    validatesOutputs: []
     pipelines: []
   - name: visual.report
     description: "Per-app: report the full visual posture (all visual findings incl.
@@ -27543,8 +27581,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1128
-    reads: *a1129
+    flags: *a1130
+    reads: *a1131
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -27558,7 +27596,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1130 {}
+    flags: &a1132 {}
     reads: []
     writes: []
     validatesOutputs: []
@@ -27573,7 +27611,7 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1130
+    flags: *a1132
     reads: []
     writes: []
     validatesOutputs: []
@@ -27587,8 +27625,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1131 {}
-    reads: &a1132
+    flags: &a1133 {}
+    reads: &a1134
       - packages/os/site-kernel-checks/src/**/*.ts
     writes: []
     validatesOutputs: []
@@ -27603,8 +27641,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1131
-    reads: *a1132
+    flags: *a1133
+    reads: *a1134
     writes: []
     validatesOutputs: []
     pipelines:
@@ -27618,10 +27656,10 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1133 {}
-    reads: &a1134
+    flags: &a1135 {}
+    reads: &a1136
       - <app>/src/content/system.md
-    writes: &a1135
+    writes: &a1137
       - <app>/public/.well-known/warpgogol-check.json
     validatesOutputs: []
     pipelines:
@@ -27635,9 +27673,9 @@ commands:
     mutatesState: true
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1133
-    reads: *a1134
-    writes: *a1135
+    flags: *a1135
+    reads: *a1136
+    writes: *a1137
     validatesOutputs: []
     pipelines:
       - build.prepare
@@ -27650,8 +27688,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1136 {}
-    reads: &a1137
+    flags: &a1138 {}
+    reads: &a1139
       - <app>/public/.well-known/warpgogol-check.json
     writes: []
     validatesOutputs: []
@@ -27665,8 +27703,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1136
-    reads: *a1137
+    flags: *a1138
+    reads: *a1139
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -27679,8 +27717,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1138 {}
-    reads: &a1139
+    flags: &a1140 {}
+    reads: &a1141
       - <app>/src/content/surface/werk-records/**/*.md
     writes: []
     validatesOutputs: []
@@ -27696,8 +27734,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1138
-    reads: *a1139
+    flags: *a1140
+    reads: *a1141
     writes: []
     validatesOutputs: []
     pipelines:
@@ -27901,11 +27939,11 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1140
+    flags: &a1142
       strict:
         kind: boolean
         description: Treat missing Wikidata QIDs as errors instead of warnings.
-    reads: &a1141
+    reads: &a1143
       - <app>/src/content/business-profile/**/*.md
       - <app>/src/content/business-profile/{lang}/claims/*.md
       - <app>/src/content/business-profile/{lang}/evidence-sources/*.md
@@ -27923,8 +27961,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1140
-    reads: *a1141
+    flags: *a1142
+    reads: *a1143
     writes: []
     validatesOutputs: []
     pipelines: []
@@ -28055,8 +28093,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1142 {}
-    reads: &a1143
+    flags: &a1144 {}
+    reads: &a1145
       - missions/*/workpiece/tools/**/*.ts
       - missions/*/workpiece/src/**/*.{ts,mjs,astro}
       - node_modules/@warpgogol/*
@@ -28075,8 +28113,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1142
-    reads: *a1143
+    flags: *a1144
+    reads: *a1145
     writes: []
     validatesOutputs: []
     pipelines:
@@ -28142,8 +28180,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1144 {}
-    reads: &a1145
+    flags: &a1146 {}
+    reads: &a1147
       - pnpm-workspace.yaml
       - packages/*/package.json
     writes: []
@@ -28159,8 +28197,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1144
-    reads: *a1145
+    flags: *a1146
+    reads: *a1147
     writes: []
     validatesOutputs: []
     pipelines:
@@ -28174,8 +28212,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1146 {}
-    reads: &a1147
+    flags: &a1148 {}
+    reads: &a1149
       - pnpm-workspace.yaml
       - turbo.json
       - packages/*/package.json
@@ -28192,8 +28230,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1146
-    reads: *a1147
+    flags: *a1148
+    reads: *a1149
     writes: []
     validatesOutputs: []
     pipelines:
@@ -28208,8 +28246,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1148 {}
-    reads: &a1149
+    flags: &a1150 {}
+    reads: &a1151
       - packages/os/site-kernel/src/**/*.ts
       - packages/os/site-kernel-checks/src/**/*.ts
       - packages/forge/os/**/*.ts
@@ -28227,8 +28265,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1148
-    reads: *a1149
+    flags: *a1150
+    reads: *a1151
     writes: []
     validatesOutputs: []
     pipelines:
@@ -28245,8 +28283,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1150 {}
-    reads: &a1151
+    flags: &a1152 {}
+    reads: &a1153
       - yaml-contract.whitelist.yaml
       - "**/*.json"
       - "**/*.jsonc"
@@ -28269,8 +28307,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1150
-    reads: *a1151
+    flags: *a1152
+    reads: *a1153
     writes: []
     validatesOutputs: []
     pipelines:
@@ -28285,8 +28323,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: &a1152 {}
-    reads: &a1153
+    flags: &a1154 {}
+    reads: &a1155
       - "**/*.yaml"
     writes: []
     validatesOutputs: []
@@ -28303,8 +28341,8 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: *a1152
-    reads: *a1153
+    flags: *a1154
+    reads: *a1155
     writes: []
     validatesOutputs: []
     pipelines:

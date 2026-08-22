@@ -240,15 +240,15 @@ The `seo.videoObject` opt-in scan adds negligible cost to `sitemap.generate`: it
 
 ## Acceptance criteria
 
-- [ ] The `video-section` archetype exposes the `seo.videoObject` opt-in with required `name`/`description`/`uploadDate`; hero/background archetypes do not (evidence: archetype YAML)
-- [ ] `VideoObject` JSON-LD node emitted from the variant manifest for opted-in videos (evidence: `packages/werkstatt-shared/src/share/semantic/jsonld/video.ts` + rendered HTML test)
-- [ ] `video.variants.generate` reordered before `sitemap.generate`; `sitemap.generate` always emits `sitemap-video.xml` (empty when no opted-in videos) and a sitemap-index entry; generator ownership registered (evidence: sitemap generator + ownership map + pipeline definition)
-- [ ] `video.structured-data.validate` registered (app scope, postbuild) with VIDEO-SEO-01..05 (evidence: command table + handler)
-- [ ] Validator wired into `SITES_CHECK_POSTBUILD_PIPELINE` as error (evidence: pipeline definition)
-- [ ] Unit tests: opt-in emits node, hero video never emits, missing field fails, sitemap parity (evidence: test file)
-- [ ] warpgogol passes the validator (evidence: probe run output)
-- [ ] `AGENTS.md` updated where agent behavior rules changed
-- [ ] `rfc.validate` passes on this file before merging
+- [x] The `video-section` archetype exposes the `seo.videoObject` opt-in with required `name`/`description`/`uploadDate`; hero/background archetypes do not (evidence: archetype YAML)
+- [x] `VideoObject` JSON-LD node emitted from the variant manifest for opted-in videos (evidence: `packages/werkstatt-shared/src/share/semantic/jsonld/video.ts` + rendered HTML test)
+- [x] `video.variants.generate` reordered before `sitemap.generate`; `sitemap.generate` always emits `sitemap-video.xml` (empty when no opted-in videos) and a sitemap-index entry; generator ownership registered (evidence: sitemap generator + ownership map + pipeline definition)
+- [x] `video.structured-data.validate` registered (app scope, postbuild) with VIDEO-SEO-01..05 (evidence: command table + handler)
+- [x] Validator wired into `SITES_CHECK_POSTBUILD_PIPELINE` as error (evidence: pipeline definition)
+- [x] Unit tests: opt-in emits node, hero video never emits, missing field fails, sitemap parity (evidence: test file)
+- [x] warpgogol passes the validator (evidence: probe run output)
+- [x] `AGENTS.md` updated where agent behavior rules changed (evidence: packages/werkstatt-site/AGENTS.md video.structured-data.validate entry)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0912 output)
 
 ## Implementation notes for agents
 
