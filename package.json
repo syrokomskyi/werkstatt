@@ -262,6 +262,14 @@
       "types": "./src/nachweis/nachweis.module.ts",
       "default": "./src/nachweis/nachweis.module.ts"
     },
+    "./signing": {
+      "types": "./src/signing/index.ts",
+      "default": "./src/signing/index.ts"
+    },
+    "./signing-module": {
+      "types": "./src/signing/signing.module.ts",
+      "default": "./src/signing/signing.module.ts"
+    },
     "./integrity": {
       "types": "./src/integrity/index.ts",
       "default": "./src/integrity/index.ts"
@@ -645,6 +653,14 @@
       "./nachweis-module": {
         "types": "./dist/src/nachweis/nachweis.module.d.ts",
         "default": "./dist/src/nachweis/nachweis.module.js"
+      },
+      "./signing": {
+        "types": "./dist/src/signing/index.d.ts",
+        "default": "./dist/src/signing/index.js"
+      },
+      "./signing-module": {
+        "types": "./dist/src/signing/signing.module.d.ts",
+        "default": "./dist/src/signing/signing.module.js"
       },
       "./integrity": {
         "types": "./dist/src/integrity/index.d.ts",
