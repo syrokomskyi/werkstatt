@@ -35,6 +35,7 @@
   <item>RFC-0820: add zero-transfer warning in mission.reconcile when transferredCommits is zero; add zeroTransferWarning field to reconciliation report.</item>
   <item>RFC-0913: add post-merge .gitignore restoration and untrackForbiddenGeneratedFiles call; add workpieceHeadAtReconcile, gitignoreRestored, forbiddenFilesUntracked to reconciliation report.</item>
   <item>RFC-0918: add post-push divergence check in mission.reconcile comparing cache clone HEAD against origin/main; add divergenceWarning to reconciliation report.</item>
+  <item>ADR-0060: split bordbuch auto-resolution conflicted paths into tracked (git checkout HEAD) and untracked generated (git add only) — CACHE_CLONE_GENERATED_PATTERNS files are not in HEAD, so git checkout HEAD fails for them.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -1424,7 +1425,7 @@ export async function runMissionReconcile(
                 encoding: "utf-8",
               });
             }
-            // RFC-0916: Split conflicted paths into tracked (checkout HEAD) and
+            // ADR-0060: Split conflicted paths into tracked (checkout HEAD) and
             // untracked generated files (just git add to clear conflict marker).
             // CACHE_CLONE_GENERATED_PATTERNS files are gitignored in the cache clone
             // and not in HEAD — git checkout HEAD -- fails for them. The .gitignore
