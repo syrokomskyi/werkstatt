@@ -1204,7 +1204,8 @@ export async function runMissionMaterialize(
       const { GENERATOR_OWNERSHIP_MAP } =
         await import("@warpgogol/werkstatt-site/checks/generator-ownership");
       const registryOnlyNonConditional = GENERATOR_OWNERSHIP_MAP.filter(
-        (e) => e.markerPolicy === "registry-only" && !e.conditional,
+        (e: { markerPolicy?: string; conditional?: boolean; path: string }) =>
+          e.markerPolicy === "registry-only" && !e.conditional,
       );
       let restoredCount = 0;
       for (const entry of registryOnlyNonConditional) {
