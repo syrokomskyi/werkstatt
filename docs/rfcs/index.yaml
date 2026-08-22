@@ -1,5 +1,5 @@
 command: rfc.index.generate
-generatedAt: 2026-08-21
+generatedAt: 2026-08-22
 count: 897
 entries:
   - id: ""
@@ -17477,7 +17477,7 @@ entries:
     file: docs/rfcs/rfc-0909-search-engine-verification-surface-and-automated-sitemap-submission.md
   - id: RFC-0910
     title: Canonical entity identity URLs in JSON-LD
-    status: draft
+    status: accepted
     kind: architecture
     createdAt: 2026-08-21
     implementedAt: ""
@@ -17512,7 +17512,6 @@ entries:
     amends: []
     amendedBy: []
     related:
-      - DNA-72
       - RFC-0026
       - RFC-0162
       - RFC-0206
@@ -17522,7 +17521,7 @@ entries:
     file: docs/rfcs/rfc-0911-seo-metadata-quality-gates-cross-page-title-and-description-uniqueness-plus-anchor-text-lint.md
   - id: RFC-0912
     title: Video structured data and video sitemap for opted-in content videos
-    status: draft
+    status: accepted
     kind: command
     createdAt: 2026-08-21
     implementedAt: ""
@@ -17532,6 +17531,7 @@ entries:
     amends: []
     amendedBy: []
     related:
+      - DNA-16
       - RFC-0172
       - RFC-0210
       - RFC-0498
@@ -17543,10 +17543,10 @@ entries:
   - id: RFC-0913
     title: Mission close reconcile-freshness guard and cache-clone .gitignore
       preservation
-    status: draft
+    status: implemented
     kind: architecture
     createdAt: 2026-08-21
-    implementedAt: ""
+    implementedAt: 2026-08-21
     closedAt: ""
     supersedes: []
     supersededBy: ""
@@ -17559,7 +17559,7 @@ entries:
       - RFC-0356
       - RFC-0568
       - RFC-0797
-    file: docs/rfcs/rfc-0913-mission-close-reconcile-freshness-guard-and-cache-clone-gitignore-preservation.md
+    file: docs/rfcs/archive/implemented/rfc-0913-mission-close-reconcile-freshness-guard-and-cache-clone-gitignore-preservation.md
   - id: RFC-0914
     title: Mandatory semantic block IDs for all content sections
     status: implemented

@@ -2,12 +2,15 @@
 domain: werkstatt-site
 title: "Living Spec: werkstatt-site"
 lastMergedRfc: RFC-0904
-updatedAt: 2026-08-21
+updatedAt: 2026-08-22
 createdAt: 2026-08-21
 history:
   - rfc: RFC-0904
     mergedAt: 2026-08-21
     operation: created
+  - rfc: RFC-0904
+    mergedAt: 2026-08-22
+    operation: modified
 ---
 
 <!--
@@ -23,6 +26,7 @@ history:
 
 ### CLI surface
 
+
 ```sh
 # CSP element compatibility — post-build, scans dist/client/ HTML
 pnpm exec werkstatt run csp.elements.validate --app warpgogol-com
@@ -34,8 +38,8 @@ pnpm exec werkstatt run headers.coverage.validate --app warpgogol-com --json
 ```
 
 Both commands accept `--app <id>` (optional, single-site scope) and `--json` (machine-readable output). Both commands set `supportsAllSites: true` — `--all` runs across all sites, same convention as `csp.origins.validate`. No additional flags.
-
 ### TypeScript contracts
+
 
 **`csp.elements.validate`** — new file: `packages/werkstatt-site/src/checks/csp-elements.ts`
 
@@ -107,8 +111,8 @@ interface HeadersCoverageResult {
 //    a. Check if any _headers path pattern matches the file path
 //    b. If no match → HDR-COV-02 error
 ```
-
 ### File system responsibilities
+
 
 | Path | Role |
 | --- | --- |
@@ -124,8 +128,8 @@ interface HeadersCoverageResult {
 | `docs/architecture-dna.md` | Modified: add DNA-83 entry |
 | `packages/werkstatt-site/AGENTS.md` | Modified: document both new commands in Check commands section |
 | `docs/verification-plan.xml` | Modified: add CSP-EL-01..03 and HDR-COV-01..02 rule IDs to verification plan |
-
 ### Output format
+
 
 Both commands use `diagnosticsResult` from `@warpgogol/werkstatt-shared/checks/result-helpers`, which returns `KernelCommandResult<CheckResult>` with shape `{ data: { command, status, diagnostics, summary }, exitCode, summary }`. The `diagnostics` array contains `Diagnostic` objects (from `@warpgogol/werkstatt/schemas`) with fields `ruleId`, `severity`, `message`, `file?`, `line?`, `fixHint?`.
 
@@ -183,8 +187,8 @@ Both commands use `diagnosticsResult` from `@warpgogol/werkstatt-shared/checks/r
   "summary": "headers.coverage.validate: 1 error(s), 1 warning(s)"
 }
 ```
-
 ### Failure modes
+
 
 **`csp.elements.validate`:**
 
