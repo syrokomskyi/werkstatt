@@ -60,6 +60,8 @@ import { runCmsSchemaGenerate, runCmsSchemaParity } from "../cms.ts";
 import { runAiGenerate, runAiValidate } from "../ai.ts";
 import { runRobotsGenerate, runRobotsValidate } from "../robots.ts";
 import { runEnvExampleGenerate, runEnvExampleValidate } from "../env/env-example.ts";
+import { runSitemapPlaceholderValidate } from "../sitemap-placeholder.ts";
+import { runSitemapCoverageValidate } from "../sitemap-coverage.ts";
 
 export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
   /* RFC-0192 */
@@ -893,5 +895,28 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     reads: ["<app>/.env.example"],
     modulePaths: ["env/env-example.ts", "result-helpers.ts"],
     execute: runEnvExampleValidate,
+  },
+  /* RFC-0907 */
+  {
+    name: "sitemap.placeholder.validate",
+    description:
+      "Scan dist/client/sitemap*.xml for unresolved bracket placeholders (e.g. [slug], [version]) in URLs (RFC-0907). Emits SITEMAP-PH-01.",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/dist/client/sitemap*.xml"],
+    modulePaths: ["sitemap-placeholder.ts", "canonical-url.ts", "result-helpers.ts"],
+    execute: runSitemapPlaceholderValidate,
+  },
+  {
+    name: "sitemap.coverage.validate",
+    description:
+      "Cross-reference dist/client/sitemap*.xml against indexable pages declared in system.md (RFC-0907). Emits SITEMAP-COV-01 (missing page) and SITEMAP-COV-02 (unexpected URL, warning).",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/dist/client/sitemap*.xml", "<app>/src/content/system.md"],
+    modulePaths: ["sitemap-coverage.ts", "canonical-url.ts", "result-helpers.ts"],
+    execute: runSitemapCoverageValidate,
   },
 ];

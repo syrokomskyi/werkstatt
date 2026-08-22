@@ -39,7 +39,7 @@ import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 import { isHtmlRedirectPage } from "./audit/validators/helpers.ts";
 
-function extractSitemapUrls(xml: string): string[] {
+export function extractSitemapUrls(xml: string): string[] {
   const urls: string[] = [];
   const locRegex = /<loc>(.*?)<\/loc>/g;
   let match;

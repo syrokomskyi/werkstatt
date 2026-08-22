@@ -54,6 +54,9 @@ export const SITES_CHECK_POSTBUILD_PIPELINE: KernelPipelineStep[] = [
   { command: "seo.cross-lang-links.validate" },
   // RFC-0172: the content-image contract holds and sitemap-images.xml is current.
   { command: "dist.sitemap.images.validate" },
+  // RFC-0907: sitemap placeholder and coverage validators.
+  { command: "sitemap.placeholder.validate" },
+  { command: "sitemap.coverage.validate" },
   { command: "passport.verify" },
   { command: "lighthouse.budget.check" },
   // RFC-0838: Playwright mobile layout stability checks — horizontal overflow,
