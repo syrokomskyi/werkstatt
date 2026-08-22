@@ -8,9 +8,6 @@
 */
 
 import { describe, expect, it, vi } from "vitest";
-import { mkdtempSync, writeFileSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
-import { tmpdir } from "node:os";
 
 vi.mock("../../sternsystem/registry-io.ts", () => ({
   readSystemConfigSmart: vi.fn(),
@@ -22,11 +19,13 @@ const { runLeitstandAccessStatus } = await import("../access-commands");
 const { readSystemStateSmart } = await import("../../sternsystem/registry-io.ts");
 
 function makeInput(flags: Record<string, unknown>) {
-  return { flags, args: [] } as any;
+  return { flags, args: [] } as unknown as Parameters<typeof runLeitstandAccessStatus>[0];
 }
 
 function makeContext(workspaceRoot: string) {
-  return { workspaceRoot, dryRun: false, site: undefined } as any;
+  return { workspaceRoot, dryRun: false, site: undefined } as unknown as Parameters<
+    typeof runLeitstandAccessStatus
+  >[1];
 }
 
 describe("RFC-0899: leitstand.access.status", () => {
