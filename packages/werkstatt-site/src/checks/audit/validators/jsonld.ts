@@ -259,35 +259,25 @@ export async function runJsonLdCanonicalEntityValidate(
   const findings: Diagnostic[] = [];
 
   const htmlFiles = await collectRenderedHtml(distDir);
-  if (htmlFiles.length === 0) {
-    const result = buildAuditResult({
+  const skipResult = (reason: string): KernelCommandResult => ({
+    data: buildAuditResult({
       command: "jsonld.canonical-entity.validate",
       app: siteName,
       workspaceRoot: context.workspaceRoot,
       findings,
       runtimeMs: Date.now() - started,
-    });
-    return {
-      data: result,
-      exitCode: 0,
-      summary: "jsonld.canonical-entity.validate: skipped (no dist/ HTML)",
-    };
+    }),
+    exitCode: 0,
+    summary: `jsonld.canonical-entity.validate: skipped (${reason})`,
+  });
+
+  if (htmlFiles.length === 0) {
+    return skipResult("no dist/ HTML");
   }
 
   const siteUrl = await readAstroSiteUrl(paths.appDirectory);
   if (!siteUrl) {
-    const result = buildAuditResult({
-      command: "jsonld.canonical-entity.validate",
-      app: siteName,
-      workspaceRoot: context.workspaceRoot,
-      findings,
-      runtimeMs: Date.now() - started,
-    });
-    return {
-      data: result,
-      exitCode: 0,
-      summary: "jsonld.canonical-entity.validate: skipped (Astro.site not configured)",
-    };
+    return skipResult("Astro.site not configured");
   }
 
   const expectedRoot = new URL("/", siteUrl).toString();
@@ -317,7 +307,7 @@ export async function runJsonLdCanonicalEntityValidate(
               ruleId: "JSONLD-ENTITY-01",
               severity: "error",
               file: page.file,
-              message: `${node["@type"]} url (${url}) is not the canonical root URL (${expectedRoot}). Entity identity URLs must be the unprefixed root, not language-prefixed.`,
+              message: `${Array.isArray(node["@type"]) ? node["@type"].join("/") : node["@type"]} url (${url}) is not the canonical root URL (${expectedRoot}). Entity identity URLs must be the unprefixed root, not language-prefixed.`,
               evidence: [{ kind: "rendered", file: page.file }],
             }),
           );
