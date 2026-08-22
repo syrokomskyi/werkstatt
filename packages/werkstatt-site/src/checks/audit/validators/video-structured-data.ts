@@ -169,6 +169,10 @@ export async function runVideoStructuredDataValidate(
   }
 
   // Collect rendered HTML and extract VideoObject nodes.
+  // RFC-0912: Only consider VideoObjects that have uploadDate — the required opt-in
+  // field. Pre-existing material VideoObjects (credit/attribution nodes with
+  // creditText/creator but no uploadDate) are a different concern and must not be
+  // flagged by VIDEO-SEO-03 or VIDEO-SEO-05.
   const htmlFiles = await collectRenderedHtml(audit.distDirectory);
   const videoObjectNodes: Array<{
     file: string;
@@ -179,9 +183,9 @@ export async function runVideoStructuredDataValidate(
     const nodes = extractAllJsonLdNodes(html.html);
     const routePath = getRoutePathForHtml(audit.distDirectory, html.file, html.html);
     for (const node of nodes) {
-      if (jsonLdNodeHasType(node, "VideoObject")) {
-        videoObjectNodes.push({ file: html.file, routePath, node });
-      }
+      if (!jsonLdNodeHasType(node, "VideoObject")) continue;
+      if (typeof node["uploadDate"] !== "string") continue;
+      videoObjectNodes.push({ file: html.file, routePath, node });
     }
   }
 
@@ -189,8 +193,7 @@ export async function runVideoStructuredDataValidate(
   const optedInContentUrls = new Set<string>();
   if (manifest) {
     for (const video of optedInVideos) {
-      const originKey =
-        manifest.byToken[`${video.lang}/${video.token}`] ?? undefined;
+      const originKey = manifest.byToken[`${video.lang}/${video.token}`] ?? undefined;
       if (!originKey) continue;
       const entry = manifest.byOrigin[originKey];
       if (entry?.sources?.mp4) {
@@ -245,10 +248,7 @@ export async function runVideoStructuredDataValidate(
   // VIDEO-SEO-04: sitemap-video.xml entry missing for opted-in video, or entry for non-opted-in.
   let sitemapVideoXml = "";
   try {
-    sitemapVideoXml = await readFile(
-      join(audit.publicDirectory, "sitemap-video.xml"),
-      "utf-8",
-    );
+    sitemapVideoXml = await readFile(join(audit.publicDirectory, "sitemap-video.xml"), "utf-8");
   } catch {
     // sitemap-video.xml not generated yet — skip VIDEO-SEO-04.
   }
@@ -298,7 +298,13 @@ export async function runVideoStructuredDataValidate(
             severity: "error",
             file: join(audit.publicDirectory, "sitemap-video.xml"),
             message: `sitemap-video.xml entry (content_loc: ${entryUrl}) does not correspond to an opted-in content video.`,
-            evidence: [{ kind: "rendered", file: join(audit.publicDirectory, "sitemap-video.xml"), snippet: entryUrl }],
+            evidence: [
+              {
+                kind: "rendered",
+                file: join(audit.publicDirectory, "sitemap-video.xml"),
+                snippet: entryUrl,
+              },
+            ],
           }),
         );
       }
