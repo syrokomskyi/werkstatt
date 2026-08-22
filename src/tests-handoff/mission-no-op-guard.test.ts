@@ -192,6 +192,33 @@ notes: ""
   };
   writeFileSync(join(missionDir, "mission.yaml"), JSON.stringify(manifest, null, 2) + "\n");
 
+  // RFC-0913: write reconciliation report so freshness gate passes
+  const workpieceHead = execSync("git rev-parse HEAD", {
+    cwd: join(missionDir, "workpiece"),
+    encoding: "utf-8",
+  }).trim();
+  const report = {
+    schemaVersion: "1.0.0",
+    missionId: "test-system-m000001",
+    systemId: "test-system",
+    commitSha: "abc123",
+    preReconcileSha: "def456",
+    reconciledAt: "2026-07-30T02:00:00.000Z",
+    mergeCommitSha: "ghi789",
+    transferredCommits: 1,
+    zeroTransferWarning: false,
+    message: "reconcile",
+    copiedPaths: [],
+    autoResolvedPaths: [],
+    workpieceHeadAtReconcile: workpieceHead,
+    gitignoreRestored: false,
+    forbiddenFilesUntracked: [],
+  };
+  writeFileSync(
+    join(missionDir, "evidence", "reconciliation-report.json"),
+    JSON.stringify(report, null, 2) + "\n",
+  );
+
   gitCommit(testRoot, "add mission");
 }
 
