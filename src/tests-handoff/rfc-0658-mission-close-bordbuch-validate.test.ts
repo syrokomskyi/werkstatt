@@ -162,6 +162,16 @@ notes: ""
   writeFileSync(join(missionDir, "workpiece", "src", "test.md"), "# changed\n");
   gitCommit(join(missionDir, "workpiece"), "operator: test changes");
 
+  const workpieceHead = execSync("git rev-parse HEAD", {
+    cwd: join(missionDir, "workpiece"),
+    stdio: "pipe",
+    encoding: "utf-8",
+  }).trim();
+  writeFileSync(
+    join(missionDir, "evidence", "reconciliation-report.json"),
+    JSON.stringify({ workpieceHeadAtReconcile: workpieceHead }) + "\n",
+  );
+
   const manifest = {
     schemaVersion: "1.0.0",
     missionId: "test-system-m000001",

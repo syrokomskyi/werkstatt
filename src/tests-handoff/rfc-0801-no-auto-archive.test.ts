@@ -165,6 +165,20 @@ systems:
   mkdirSync(join(missionDir, "workpiece"), { recursive: true });
   mkdirSync(join(missionDir, "evidence"), { recursive: true });
 
+  const workpieceDir = join(missionDir, "workpiece");
+  gitInit(workpieceDir);
+  writeFileSync(join(workpieceDir, "README.md"), "# workpiece\n");
+  gitCommit(workpieceDir, "materialize from pin 1.0.0");
+  const workpieceHead = execSync("git rev-parse HEAD", {
+    cwd: workpieceDir,
+    stdio: "pipe",
+    encoding: "utf-8",
+  }).trim();
+  writeFileSync(
+    join(missionDir, "evidence", "reconciliation-report.json"),
+    JSON.stringify({ workpieceHeadAtReconcile: workpieceHead }) + "\n",
+  );
+
   const manifest = {
     schemaVersion: "1.0.0",
     missionId: "test-system-m000001",

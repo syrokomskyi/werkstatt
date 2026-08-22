@@ -13,7 +13,7 @@
 */
 
 import { test, expect, beforeEach, afterEach, vi } from "vitest";
-import { mkdtempSync, rmSync, mkdirSync, writeFileSync, } from "node:fs";
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/werkstatt/kernel";
@@ -226,6 +226,16 @@ lastRelease: null
   gitInit(workpieceDir);
   writeFileSync(join(workpieceDir, "README.md"), "# workpiece\n");
   gitCommit(workpieceDir, "workpiece initial");
+
+  const workpieceHead = execSync("git rev-parse HEAD", {
+    cwd: workpieceDir,
+    stdio: "pipe",
+    encoding: "utf-8",
+  }).trim();
+  writeFileSync(
+    join(missionDir, "evidence", "reconciliation-report.json"),
+    JSON.stringify({ workpieceHeadAtReconcile: workpieceHead }) + "\n",
+  );
 
   gitCommit(tmpWorkspace, "add mission");
 }

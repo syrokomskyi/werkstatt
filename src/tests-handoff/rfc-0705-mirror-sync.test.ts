@@ -377,6 +377,16 @@ lastRelease: null
   writeFileSync(join(workpieceDir, "README.md"), "# workpiece changed\n");
   gitCommit(workpieceDir, "operator: test changes");
 
+  const workpieceHead = execSync("git rev-parse HEAD", {
+    cwd: workpieceDir,
+    stdio: "pipe",
+    encoding: "utf-8",
+  }).trim();
+  writeFileSync(
+    join(missionDir, "evidence", "reconciliation-report.json"),
+    JSON.stringify({ workpieceHeadAtReconcile: workpieceHead }) + "\n",
+  );
+
   gitCommit(tmpWorkspace, "add mission");
 }
 
