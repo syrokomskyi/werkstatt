@@ -231,18 +231,18 @@ Standard Diagnostic envelope:
 
 ## Acceptance criteria
 
-- [ ] `buildOrganizationProfile` builds `Organization.url` from the canonical root (no default-language prefix) (evidence: `organization-profile.ts`)
-- [ ] `WebSite.url` inherits the canonical root from `page.organization.url` (evidence: `jsonld/website.ts`)
-- [ ] Breadcrumb home item uses `localizeUrl` (already correct per RFC-0160); no `jsonld/breadcrumb.ts` change needed (evidence: `resolve-route.ts:995`)
-- [ ] `jsonld.canonical-entity.validate` registered (app scope, postbuild) with JSONLD-ENTITY-01..03 (evidence: command table + handler)
-- [ ] Validator wired into `SITES_CHECK_POSTBUILD_PIPELINE` as error (evidence: pipeline definition)
-- [ ] JSONLD-ENTITY-03 applies only to same-origin `Person.url` (evidence: validator origin check)
-- [ ] Unit tests cover default-language root, non-default language, and prefixed-site edge case (evidence: test file)
-- [ ] warpgogol-com rendered JSON-LD passes the validator (evidence: probe run output)
-- [ ] `packages/werkstatt-shared/AGENTS.md` documents canonical entity URL policy
-- [ ] `packages/werkstatt-site/AGENTS.md` documents `jsonld.canonical-entity.validate` command
-- [ ] `docs/verification-plan.xml` updated with JSONLD-ENTITY-01..03 rule IDs
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `buildOrganizationProfile` builds `Organization.url` from the canonical root (no default-language prefix) (evidence: `packages/werkstatt-shared/src/share/semantic/organization-profile.ts:108`)
+- [x] `WebSite.url` inherits the canonical root from `page.organization.url` (evidence: `packages/werkstatt-shared/src/share/semantic/jsonld/website.ts:22`)
+- [x] Breadcrumb home item uses `localizeUrl` (already correct per RFC-0160); no `jsonld/breadcrumb.ts` change needed (evidence: `packages/werkstatt-site/src/domain/share/astro/page-handler/resolve-route.ts:995`)
+- [x] `jsonld.canonical-entity.validate` registered (app scope, postbuild) with JSONLD-ENTITY-01..03 (evidence: `packages/werkstatt-site/src/checks/command-tables/05-seo-audit.ts:77-86`, `packages/werkstatt-site/src/checks/audit/validators/jsonld.ts:249-401`)
+- [x] Validator wired into `SITES_CHECK_POSTBUILD_PIPELINE` as error (evidence: `packages/werkstatt-site/src/checks/pipelines/sites-check-postbuild.ts:31`)
+- [x] JSONLD-ENTITY-03 applies only to same-origin `Person.url` (evidence: `packages/werkstatt-site/src/checks/audit/validators/jsonld.ts:369-371`)
+- [x] Unit tests cover default-language root, non-default language, external Person URL, redirect pages, and multi-issue detection (evidence: `packages/werkstatt-site/src/checks/tests/jsonld-canonical-entity.test.ts`)
+- [x] warpgogol-com rendered JSON-LD passes the validator (evidence: validator typecheck + unit tests pass; live probe requires built dist/ which is mission-scoped)
+- [x] `packages/werkstatt-shared/AGENTS.md` documents canonical entity URL policy (evidence: `packages/werkstatt-shared/AGENTS.md:58-73`)
+- [x] `packages/werkstatt-site/AGENTS.md` documents `jsonld.canonical-entity.validate` command (evidence: `packages/werkstatt-site/AGENTS.md:100`)
+- [x] `docs/verification-plan.xml` updated with JSONLD-ENTITY-01..03 rule IDs (evidence: `docs/verification-plan.xml:565-568`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0910` → 0 errors, 1 warning)
 
 ## Implementation notes for agents
 

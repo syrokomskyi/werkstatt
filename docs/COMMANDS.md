@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec werkstatt run command.manifest.generate` then
 `pnpm exec werkstatt run docs.commands.generate`.
 
-Generated command rows: 826. Raw manifest entries: 1461.
+Generated command rows: 829. Raw manifest entries: 1467.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -403,6 +403,7 @@ Generated command rows: 826. Raw manifest entries: 1461.
 | `integrity.update` | site:warpgogol | app | yes | no | Update integrity manifests. |
 | `integrity.verify` | site:warpgogol | app | no | no | Verify integrity manifests. |
 | `integrity.verify-release` | site:warpgogol | app | no | yes | Verify release signatures. |
+| `jsonld.canonical-entity.validate` | site:warpgogol, workspace | app | no | no | RFC-0910: Validate Organization.url, WebSite.url, BreadcrumbList home item, and same-origin Person.url are canonical (unprefixed root, no default-language prefix). |
 | `jsonld.parity` | site:warpgogol, workspace | app | no | no | When business web declares socials/logo, the rendered Organization node must emit sameAs/logo (RFC-0163). |
 | `jsonld.url.validate` | site:warpgogol, workspace | app | no | no | Validate every rendered WebPage JSON-LD node carries its own url (matching canonical) and a unique @id (RFC-0163). |
 | `kernel.cache.clear` | workspace | workspace | yes | no | RFC-0382: clear the kernel cache. Pass --namespace to clear only one namespace (e.g. rfc_entries); without --namespace, clears all namespaces. |
@@ -649,6 +650,8 @@ Generated command rows: 826. Raw manifest entries: 1461.
 | `schema.drift.validate` | site:warpgogol, workspace | workspace | no | no | Scan apps/*/src/content/schemas/ for non-proxy Zod schema definitions and exit non-zero if found. Prevents reintroduction of app-local schemas retired in RFC-0033 (DNA-10, RFC-0033). |
 | `scripts.orchestrator.generate` | site:warpgogol, workspace | app | yes | no | Generate the standard layout orchestrator script from shared platform boilerplate (RFC-0078). |
 | `scripts.placement.validate` | site:warpgogol, workspace | app | no | no | Enforce RFC-0011 script placement contract: detect AP-18/AP-19 violations (SP-01..SP-06) in .astro files. |
+| `search.sitemap.submit` | site:warpgogol, workspace | app | no | yes | Submit sitemap index URL to Google Search Console API using service-account JWT auth from GSC_SERVICE_ACCOUNT_JSON env var (RFC-0909). |
+| `search.verification.validate` | site:warpgogol, workspace | app | no | yes | Validate search engine verification config in system.md. Offline mode checks presence and shape; --live mode performs DNS TXT lookup or rendered-head meta tag check (RFC-0909). |
 | `section.background.contract.validate` | site:warpgogol, workspace | workspace | no | no | Validate every section manifest composes the `section-visual` fragment via propsSchemaCompose and does not declare flat legacy visual-modifier props at the manifest propsSchema root (RFC-0101 + RFC-0110). |
 | `section.body.contract.validate` | site:warpgogol, workspace | workspace | no | no | Validate every section archetype declares bodyKind and composes the matching body-{kind} fragment. Cross-checks propsSchema.compose against the catalog (RFC-0103 + RFC-0110). |
 | `section.contract.validate` | site:warpgogol, workspace | workspace | no | no | Validate section folder contract surfaces in packages/werkstatt-site/src/domain/ui/sections including manifest, astro, css, types/schema, and story files (RFC-0072). |
