@@ -20,6 +20,25 @@ import { tsImport } from "tsx/esm/api";
 import type { DiscoveredSiteWorkspace, KernelAppConfig } from "./types.ts";
 import { discoverSiteWorkspaces as discoverSitesFromResolver } from "./site-workspace-resolver.ts";
 // @ai-invariant: Workspace discovery must remain read-only and avoid app-specific path assumptions outside explicit adapters.
+
+function unwrapConfig(moduleNamespace: Record<string, unknown>): unknown {
+  let candidate: unknown = moduleNamespace.default ?? moduleNamespace.config;
+  for (let depth = 0; depth < 8; depth++) {
+    if (
+      candidate &&
+      typeof candidate === "object" &&
+      "default" in (candidate as Record<string, unknown>)
+    ) {
+      const inner = (candidate as Record<string, unknown>).default;
+      if (inner && typeof inner === "object") {
+        candidate = inner;
+        continue;
+      }
+    }
+    break;
+  }
+  return candidate;
+}
 const APP_CONFIG_FILENAMES = [
   "kernel.config.ts",
   "kernel.config.mts",
@@ -53,7 +72,7 @@ export async function loadKernelAppConfig(site: DiscoveredSiteWorkspace): Promis
   process.stderr.write(`  [config] loading ${site.configPath} …\n`);
   const moduleNamespace = await tsImport(pathToFileURL(site.configPath).href, import.meta.url);
   process.stderr.write(`  [config] loaded ${site.configPath}\n`);
-  const candidate = moduleNamespace.default ?? moduleNamespace.config;
+  const candidate = unwrapConfig(moduleNamespace);
 
   if (!candidate || typeof candidate !== "object") {
     throw new Error(`Kernel config \`${site.configPath}\` does not export a valid config object.`);
@@ -82,7 +101,7 @@ export async function loadWorkspaceConfig(
   process.stderr.write(`  [config] loading ${configPath} …\n`);
   const moduleNamespace = await tsImport(pathToFileURL(configPath).href, import.meta.url);
   process.stderr.write(`  [config] loaded ${configPath}\n`);
-  const candidate = moduleNamespace.default ?? moduleNamespace.config;
+  const candidate = unwrapConfig(moduleNamespace);
 
   if (!candidate || typeof candidate !== "object") {
     throw new Error(
