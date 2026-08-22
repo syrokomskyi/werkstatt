@@ -1,12 +1,12 @@
 {
   "name": "@warpgogol/werkstatt",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "private": false,
   "type": "module",
   "engines": {
     "node": ">=24 <25"
   },
-  "description": "Werkstatt engine \u2014 stack-agnostic lifecycle platform (RFC-0769/0772).",
+  "description": "Werkstatt engine — stack-agnostic lifecycle platform (RFC-0769/0772).",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/syrokomskyi/werkstatt.git"
@@ -351,7 +351,12 @@
       "default": "./src/certification/index.ts"
     }
   },
-  "files": ["src", "bin", "os", "dist"],
+  "files": [
+    "src",
+    "bin",
+    "os",
+    "dist"
+  ],
   "scripts": {
     "lint": "pnpm exec eslint \"src/**/*.ts\" \"os/**/*.ts\"",
     "typecheck": "pnpm exec tsc -p tsconfig.json --noEmit",
