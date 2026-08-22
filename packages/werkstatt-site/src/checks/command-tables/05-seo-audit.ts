@@ -29,6 +29,7 @@ import {
   runSeoCrossLangLinksValidate,
   runSeoMetaUniquenessValidate,
   runSeoAnchorTextValidate,
+  runVideoStructuredDataValidate,
 } from "../audit-validators.ts";
 import { runAuditLlm } from "../audit-llm.ts";
 import { runAppQaValidate } from "../app-qa.ts";
@@ -312,5 +313,20 @@ export const SEO_AUDIT_COMMANDS: CheckCommandEntry[] = [
     reads: ["<app>/dist/client/**/*.html"],
     modulePaths: ["checks/mobile-layout-check.ts"],
     execute: runMobileLayoutCheck,
+  },
+  {
+    name: "video.structured-data.validate",
+    description:
+      "RFC-0912: Validate that every opted-in content video renders a complete VideoObject JSON-LD node, no non-opted-in video carries VideoObject markup, and sitemap-video.xml entries match opted-in videos.",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: [
+      "<app>/dist/client/**/*.html",
+      "<app>/dist/client/sitemap-video.xml",
+      "<app>/src/content/pages/**/*.md",
+      "<app>/src/video-manifest.generated.yaml",
+    ],
+    execute: runVideoStructuredDataValidate,
   },
 ];

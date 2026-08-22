@@ -30,3 +30,4 @@ export { runSeoDomainValidate } from "./audit/validators/seo-domain.ts";
 export { runSeoCrossLangLinksValidate } from "./audit/validators/seo-cross-lang-links.ts";
 export { runSeoMetaUniquenessValidate } from "./audit/validators/seo-meta-uniqueness.ts";
 export { runSeoAnchorTextValidate } from "./audit/validators/seo-anchor-text.ts";
+export { runVideoStructuredDataValidate } from "./audit/validators/video-structured-data.ts";

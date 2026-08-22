@@ -18,6 +18,8 @@ export const SITES_CHECK_POSTBUILD_PIPELINE: KernelPipelineStep[] = [
   // RFC-0074: deterministic audit validators that inspect rendered HTML. Relocated
   // from SITES_CHECK_AUTHOR_PIPELINE — they scan dist/ and must run after astro build.
   { command: "seo.structured-data.validate" },
+  // RFC-0912: video structured data — VideoObject JSON-LD + sitemap-video.xml contract.
+  { command: "video.structured-data.validate" },
   // RFC-0512: team JSON endpoint validation (private field exclusion, shape, consent gating).
   { command: "participant.json.validate" },
   // RFC-0513: cross-page alignment (hub ↔ profile ↔ home ↔ navigation ↔ JSON).
