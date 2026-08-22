@@ -26,6 +26,8 @@ export const SITES_CHECK_POSTBUILD_PIPELINE: KernelPipelineStep[] = [
   { command: "first-party-data.validate" },
   // RFC-0162: rendered Open Graph / Twitter Card meta on every indexable page.
   { command: "seo.meta.validate" },
+  { command: "seo.meta-uniqueness.validate" },
+  { command: "seo.anchor-text.validate" },
   // RFC-0163: per-page JSON-LD url/@id correctness + organization-identity parity.
   { command: "jsonld.url.validate" },
   { command: "jsonld.canonical-entity.validate" },

@@ -9,6 +9,7 @@ Stack-agnostic utility used by both engine and site plugin (RFC-0868).</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0868: extracted from werkstatt-site/src/content/system-manifest.ts.</item>
+  <item>RFC-0911: add seo?.anchorText?.extraStopPhrases for anchor-text stop-list extension.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -99,6 +100,13 @@ export interface SystemManifest {
   ui?: {
     responsibilityBlock?: {
       swapOrder?: boolean;
+    };
+  };
+  /** RFC-0911: SEO validator configuration extension point. */
+  seo?: {
+    anchorText?: {
+      /** Added to the built-in de/uk stop-list. */
+      extraStopPhrases?: Record<string, string[]>;
     };
   };
 }

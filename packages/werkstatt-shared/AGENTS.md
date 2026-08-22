@@ -72,6 +72,21 @@ Rules:
 - External `Person.url` (different origin) is not canonicalized — only same-origin profile URLs are checked.
 - Enforcement: `jsonld.canonical-entity.validate` (RFC-0910) in `@warpgogol/werkstatt-site` scans rendered HTML and emits JSONLD-ENTITY-01..03.
 
+### SystemManifest `seo` field (RFC-0911)
+
+The `SystemManifest` interface in `packages/werkstatt-shared/src/content/system-manifest.ts` includes an optional `seo` field for SEO validator configuration:
+
+```ts
+seo?: {
+  anchorText?: {
+    extraStopPhrases?: Record<string, string[]>; // lang -> phrases
+  };
+};
+```
+
+- Sites extend the built-in de/uk anchor-text stop-list by declaring `seo.anchorText.extraStopPhrases` in `system.md` frontmatter.
+- The field is optional; validators fall back to built-in defaults when absent.
+
 ### Utility registry (RFC-0916)
 
 Location: `packages/werkstatt-shared/src/share/utility-registry.yaml`

@@ -27,6 +27,8 @@ import {
   runWikidataValidate,
   runSeoDomainValidate,
   runSeoCrossLangLinksValidate,
+  runSeoMetaUniquenessValidate,
+  runSeoAnchorTextValidate,
 } from "../audit-validators.ts";
 import { runAuditLlm } from "../audit-llm.ts";
 import { runAppQaValidate } from "../app-qa.ts";
@@ -263,6 +265,26 @@ export const SEO_AUDIT_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     reads: ["<app>/dist/client/**/*.html", "<app>/src/content/system.md"],
     execute: runSeoCrossLangLinksValidate,
+  },
+  {
+    name: "seo.meta-uniqueness.validate",
+    description:
+      "RFC-0911: Validate that no two indexable pages in the same language share an identical <title> (SEO-UNIQ-01) or meta description (SEO-UNIQ-02).",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/dist/client/**/*.html"],
+    execute: runSeoMetaUniquenessValidate,
+  },
+  {
+    name: "seo.anchor-text.validate",
+    description:
+      "RFC-0911: Lint rendered internal links for generic anchor text (SEO-ANCHOR-01) and bare URL anchors (SEO-ANCHOR-02) using a built-in de/uk stop-list extensible via system.md.",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/dist/client/**/*.html", "<app>/src/content/system.md"],
+    execute: runSeoAnchorTextValidate,
   },
   {
     name: "mobile.layout.check",

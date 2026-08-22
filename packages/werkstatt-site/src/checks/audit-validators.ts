@@ -28,3 +28,5 @@ export { runInfraBriefValidate } from "./audit/validators/infra-brief.ts";
 export { runWikidataValidate } from "./audit/validators/wikidata.ts";
 export { runSeoDomainValidate } from "./audit/validators/seo-domain.ts";
 export { runSeoCrossLangLinksValidate } from "./audit/validators/seo-cross-lang-links.ts";
+export { runSeoMetaUniquenessValidate } from "./audit/validators/seo-meta-uniqueness.ts";
+export { runSeoAnchorTextValidate } from "./audit/validators/seo-anchor-text.ts";
