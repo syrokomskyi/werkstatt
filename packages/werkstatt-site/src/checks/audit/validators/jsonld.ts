@@ -24,6 +24,8 @@ import type {
 import { buildAuditResult, loadAuditAppContext } from "../helpers.ts";
 import type { Diagnostic } from "../types.ts";
 import { readAstroSiteUrl } from "../../lib/astro-site-url.ts";
+import { getContentDisciplinePaths } from "../../content-discipline.ts";
+import { loadSystemManifest } from "@warpgogol/werkstatt-site/content";
 import {
   collectRenderedHtml,
   extractAllJsonLdNodes,
@@ -292,8 +294,9 @@ export async function runJsonLdCanonicalEntityValidate(
   const expectedPath = new URL("/", siteUrl).pathname;
   const siteOrigin = new URL(siteUrl).origin;
 
-  const audit = await loadAuditAppContext(context);
-  const defaultLang = defaultLanguageFromManifest(audit.systemManifest);
+  const contentPaths = getContentDisciplinePaths(context);
+  const { manifest } = await loadSystemManifest(contentPaths.contentDirectory);
+  const defaultLang = defaultLanguageFromManifest(manifest as unknown as Record<string, unknown>);
   const defaultPrefix = `/${defaultLang}`;
 
   for (const page of htmlFiles) {
@@ -333,11 +336,10 @@ export async function runJsonLdCanonicalEntityValidate(
           const itemUrl = typeof itemNode?.url === "string" ? itemNode.url : null;
           if (!itemUrl) continue;
           const itemPath = toComparablePathname(itemUrl);
-          // The home breadcrumb item must be the canonical root.
-          // Other items are page URLs — only check that they don't carry
-          // the default-language prefix when they are the root.
-          if (itemPath === expectedPath) {
-            // This is the root item — check it matches canonical root
+          // The home breadcrumb item must be the canonical root (unprefixed).
+          // Check both the canonical root path and the default-language-prefixed
+          // root path (e.g. /de) — the latter is a violation.
+          if (itemPath === expectedPath || itemPath === defaultPrefix) {
             const fullUrl = new URL(itemUrl, siteUrl).toString();
             if (toComparablePathname(fullUrl) !== expectedPath) {
               findings.push(
