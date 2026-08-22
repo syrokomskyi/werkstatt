@@ -118,7 +118,7 @@ export async function executeRegisteredCommand(
           info: 0,
         },
       };
-      const summary = `[${command.name}] ${errorDiagnostics.length} flag error(s)`;
+      const summary = `[${command.name}] ${errorDiagnostics.length} flag error${errorDiagnostics.length === 1 ? "" : "s"}`;
       logger.error(summary);
       for (const line of formatFailureDiagnostics(data)) {
         logger.error(line);
@@ -268,7 +268,15 @@ export async function executeRegisteredCommand(
     };
 
     if (report.ok && report.summary) {
-      logger.success(report.summary);
+      const errorCount = report.logSummary?.error ?? 0;
+      const warnCount = report.logSummary?.warning ?? 0;
+      if (errorCount > 0) {
+        logger.error(report.summary);
+      } else if (warnCount > 0) {
+        logger.warn(report.summary);
+      } else {
+        logger.success(report.summary);
+      }
     } else if (!report.ok) {
       if (report.summary) logger.error(report.summary);
       const formatted = formatFailureDiagnostics(report.data);

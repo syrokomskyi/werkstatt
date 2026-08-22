@@ -185,7 +185,7 @@ export async function runMissionOpen(
             .map((v) => `  ${v.rule}: ${v.message}`)
             .join("\n");
           throw new Error(
-            `[mission.open] bordbuch.repair ran but ${recheck.violations.length} violation(s) remain for system '${systemId}'\n${violationLines}`,
+            `[mission.open] bordbuch.repair ran but ${recheck.violations.length} violation${recheck.violations.length === 1 ? "" : "s"} remain for system '${systemId}'\n${violationLines}`,
           );
         }
         // bordbuch.repair now auto-commits its output, so no separate
@@ -193,7 +193,7 @@ export async function runMissionOpen(
         // clean after repair, preventing git pull --rebase failures.
       } catch (repairErr) {
         throw new Error(
-          `[mission.open] bordbuch for system '${systemId}' has ${bordbuchCheck.violations.length} orphan-mission-close violation(s) — auto-repair failed: ${repairErr instanceof Error ? repairErr.message : String(repairErr)}`,
+          `[mission.open] bordbuch for system '${systemId}' has ${bordbuchCheck.violations.length} orphan-mission-close violation${bordbuchCheck.violations.length === 1 ? "" : "s"} — auto-repair failed: ${repairErr instanceof Error ? repairErr.message : String(repairErr)}`,
         );
       }
     } else {
@@ -201,7 +201,7 @@ export async function runMissionOpen(
         .map((v) => `  ${v.rule}: ${v.message}`)
         .join("\n");
       throw new Error(
-        `[mission.open] bordbuch for system '${systemId}' has ${bordbuchCheck.violations.length} violation(s) — run bordbuch.repair first\n${violationLines}`,
+        `[mission.open] bordbuch for system '${systemId}' has ${bordbuchCheck.violations.length} violation${bordbuchCheck.violations.length === 1 ? "" : "s"} — run bordbuch.repair first\n${violationLines}`,
       );
     }
   }

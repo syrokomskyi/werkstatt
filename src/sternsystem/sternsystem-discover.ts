@@ -56,7 +56,7 @@ export async function runSternsystemDiscover(
 
   return {
     data: { systems: summary, errors, count: summary.length },
-    summary: `[sternsystem.discover] ${summary.length} system${summary.length === 1 ? "" : "s"} discovered${errors.length > 0 ? `, ${errors.length} error(s)` : ""}`,
+    summary: `[sternsystem.discover] ${summary.length} system${summary.length === 1 ? "" : "s"} discovered${errors.length > 0 ? `, ${errors.length} error${errors.length === 1 ? "" : "s"}` : ""}`,
     nextSteps: [
       {
         action: `Validate discovered systems: pnpm exec werkstatt run sternsystem.validate`,

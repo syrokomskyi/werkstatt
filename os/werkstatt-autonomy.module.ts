@@ -46,7 +46,7 @@ export const werkstattAutonomyModule: KernelModule = {
           summary:
             result.status === "pass"
               ? `Autonomy guard passed — ${result.scannedFiles} files scanned, zero violations`
-              : `Autonomy guard failed — ${result.violations.length} violation(s) in ${result.scannedFiles} files`,
+              : `Autonomy guard failed — ${result.violations.length} violation${result.violations.length === 1 ? "" : "s"} in ${result.scannedFiles} files`,
         };
       },
     });

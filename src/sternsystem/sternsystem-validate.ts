@@ -530,7 +530,7 @@ export async function runSternsystemValidate(
     );
   } else {
     logger.error(
-      `[sternsystem.validate] ${validated} system${validated === 1 ? "" : "s"} validated, ${violations.length} violation(s)`,
+      `[sternsystem.validate] ${validated} system${validated === 1 ? "" : "s"} validated, ${violations.length} violation${violations.length === 1 ? "" : "s"}`,
     );
     for (const v of violations) {
       logger.error(`  [${v.rule}] ${v.systemId}: ${v.message}`);
@@ -543,12 +543,12 @@ export async function runSternsystemValidate(
   return {
     data: { validated, violations, warnings, withOwner, withoutOwner },
     exitCode: violations.length > 0 ? 1 : 0,
-    summary: `[sternsystem.validate] ${validated} system${validated === 1 ? "" : "s"} validated, ${violations.length} violation(s), ${withOwner} with owner, ${withoutOwner} without owner`,
+    summary: `[sternsystem.validate] ${validated} system${validated === 1 ? "" : "s"} validated, ${violations.length} violation${violations.length === 1 ? "" : "s"}, ${withOwner} with owner, ${withoutOwner} without owner`,
     nextSteps:
       violations.length > 0
         ? [
             {
-              action: `Fix the ${violations.length} validation violation(s) above, then re-run: pnpm exec werkstatt run sternsystem.validate`,
+              action: `Fix the ${violations.length} validation violation${violations.length === 1 ? "" : "s"} above, then re-run: pnpm exec werkstatt run sternsystem.validate`,
               kind: "required",
             },
           ]

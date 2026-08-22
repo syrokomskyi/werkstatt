@@ -251,7 +251,7 @@ export async function runSurfaceContractValidate(
     );
   } else {
     logger.error(
-      `[surface.contract.validate] ${validatedSurfaces.length} surface(s) validated, ${violations.length} violation(s)`,
+      `[surface.contract.validate] ${validatedSurfaces.length} surface(s) validated, ${violations.length} violation${violations.length === 1 ? "" : "s"}`,
     );
     for (const v of violations) {
       logger.error(`  [${v.rule}] ${v.surface}: ${v.message}`);
@@ -261,7 +261,7 @@ export async function runSurfaceContractValidate(
   return {
     data: { systemId, violations, validatedSurfaces },
     exitCode: violations.length > 0 ? 1 : 0,
-    summary: `[surface.contract.validate] ${validatedSurfaces.length} surface(s) validated, ${violations.length} violation(s)`,
+    summary: `[surface.contract.validate] ${validatedSurfaces.length} surface(s) validated, ${violations.length} violation${violations.length === 1 ? "" : "s"}`,
   };
 }
 

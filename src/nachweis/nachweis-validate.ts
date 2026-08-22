@@ -490,7 +490,7 @@ export async function runNachweisValidate(
     nextSteps: hasViolations
       ? [
           {
-            action: `Fix the ${violations.length} violation(s) above, then re-run: pnpm exec werkstatt run nachweis.validate --site ${systemId}`,
+            action: `Fix the ${violations.length} violation${violations.length === 1 ? "" : "s"} above, then re-run: pnpm exec werkstatt run nachweis.validate --site ${systemId}`,
             kind: "required",
           },
         ]

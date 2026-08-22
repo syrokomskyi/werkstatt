@@ -161,12 +161,12 @@ export async function runDnsRecordUpsert(
       results,
       summary: { created, updated, skipped, total, errors },
     },
-    summary: `[dns.record.upsert] ${systemId}: ${created} created, ${updated} updated, ${skipped} skipped, ${errors} error(s) (${total} total)${dryRun ? " [dry-run]" : ""}`,
+    summary: `[dns.record.upsert] ${systemId}: ${created} created, ${updated} updated, ${skipped} skipped, ${errors} error${errors === 1 ? "" : "s"} (${total} total)${dryRun ? " [dry-run]" : ""}`,
     nextSteps:
       errors > 0
         ? [
             {
-              action: `Fix the ${errors} error(s) above, then re-run: pnpm exec werkstatt run dns.record.upsert --site ${systemId}`,
+              action: `Fix the ${errors} error${errors === 1 ? "" : "s"} above, then re-run: pnpm exec werkstatt run dns.record.upsert --site ${systemId}`,
               kind: "required",
             },
           ]

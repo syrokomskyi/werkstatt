@@ -1021,8 +1021,8 @@ export async function runReleaseStateValidate(
 
   const firstTarget = targets[0];
   const summary = hasError
-    ? `[release.state.validate] ${allChecks.filter((c) => c.status === "fail").length} error(s) found`
-    : `[release.state.validate] all checks passed${allChecks.some((c) => c.status === "warn") ? ` (${allChecks.filter((c) => c.status === "warn").length} warning(s))` : ""}`;
+    ? `[release.state.validate] ${allChecks.filter((c) => c.status === "fail").length} error${allChecks.filter((c) => c.status === "fail").length === 1 ? "" : "s"} found`
+    : `[release.state.validate] all checks passed${allChecks.some((c) => c.status === "warn") ? ` (${allChecks.filter((c) => c.status === "warn").length} warning${allChecks.filter((c) => c.status === "warn").length === 1 ? "" : "s"})` : ""}`;
 
   if (hasError) {
     logger.warn(`[release.state.validate] ${summary}`);

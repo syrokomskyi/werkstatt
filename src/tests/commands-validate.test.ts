@@ -178,7 +178,7 @@ export async function execute(): Promise<KernelCommandResult> {
   return failResult("test.cmd", ["error 1"]);
 }
 function failResult(command: string, violations: string[]): KernelCommandResult {
-  return { exitCode: 1, summary: \`[\${command}] \${violations.length} violation(s)\`, nextSteps: [{ action: "fix", kind: "required" }] };
+  return { exitCode: 1, summary: \`[\${command}] \${violations.length} violation\${violations.length === 1 ? "" : "s"}\`, nextSteps: [{ action: "fix", kind: "required" }] };
 }
 `,
     );
@@ -320,7 +320,7 @@ export async function execute(): Promise<KernelCommandResult> {
 
     const result = await runCommandsValidate(workspaceRoot, "error");
     expect(result.summary).toBe(
-      "[werkstatt.commands.validate] 0 violation(s) across 1 files scanned",
+      "[werkstatt.commands.validate] 0 violations across 1 files scanned",
     );
   });
 

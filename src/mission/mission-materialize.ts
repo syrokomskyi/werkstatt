@@ -669,7 +669,7 @@ async function runPreflightGate(
   const warningFailures = warningResults.filter((r) => !r.ok);
   if (warningFailures.length > 0) {
     logger.info(
-      `  Preflight: ${warningFailures.length} warning(s) — see evidence/preflight-report.json`,
+      `  Preflight: ${warningFailures.length} warning${warningFailures.length === 1 ? "" : "s"} — see evidence/preflight-report.json`,
     );
   }
 

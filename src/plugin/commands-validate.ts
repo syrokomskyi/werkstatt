@@ -370,7 +370,7 @@ export async function runCommandsValidate(
   return {
     data: result,
     exitCode: hasErrors ? 1 : 0,
-    summary: `[${COMMAND_NAME}] ${allDiagnostics.length} violation(s) across ${totalScanned} files scanned`,
+    summary: `[${COMMAND_NAME}] ${allDiagnostics.length} violation${allDiagnostics.length === 1 ? "" : "s"} across ${totalScanned} files scanned`,
     nextSteps: hasErrors ? defaultFailNextSteps() : undefined,
   };
 }

@@ -182,6 +182,6 @@ export async function runMaterializeConfigValidate(
       summary,
     },
     exitCode: summary.error > 0 ? 1 : 0,
-    summary: `materialize.config.validate: ${summary.error} error(s), ${summary.warning} warning(s)`,
+    summary: `materialize.config.validate: ${summary.error} error${summary.error === 1 ? "" : "s"}, ${summary.warning} warning${summary.warning === 1 ? "" : "s"}`,
   };
 }

@@ -533,7 +533,7 @@ export async function runMissionClose(
         .map((v) => `  [${v.rule}] ${v.message}`)
         .join("\n");
       throw new Error(
-        `[mission.close] bordbuch for system '${manifest.systemId}' has ${bordbuchCheck.violations.length} violation(s) — run bordbuch.repair first\n${violationLines}`,
+        `[mission.close] bordbuch for system '${manifest.systemId}' has ${bordbuchCheck.violations.length} violation${bordbuchCheck.violations.length === 1 ? "" : "s"} — run bordbuch.repair first\n${violationLines}`,
       );
     }
 

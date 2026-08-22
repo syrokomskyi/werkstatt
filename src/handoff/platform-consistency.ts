@@ -301,7 +301,7 @@ export async function runPlatformConsistencyValidate(
     data,
     exitCode: hasErrors ? 1 : 0,
     summary: hasErrors
-      ? `Platform consistency check failed with ${violations.filter((v) => v.severity === "error").length} error(s)`
+      ? `Platform consistency check failed with ${violations.filter((v) => v.severity === "error").length} error${violations.filter((v) => v.severity === "error").length === 1 ? "" : "s"}`
       : "Platform consistency check passed",
   };
 }

@@ -73,7 +73,7 @@ export function runMigratorRegistryValidate(
     return {
       data: { migratorCount: migratorRegistry.length, violations },
       exitCode: 1,
-      summary: `[migrator.registry.validate] ${violations.length} violation(s)`,
+      summary: `[migrator.registry.validate] ${violations.length} violation${violations.length === 1 ? "" : "s"}`,
     };
   }
 

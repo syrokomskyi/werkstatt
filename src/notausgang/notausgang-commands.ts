@@ -761,7 +761,9 @@ export async function runNotausgangValidate(
   if (!hasViolations) {
     logger.success(`[notausgang.validate] export package valid, no violations detected`);
   } else {
-    logger.error(`[notausgang.validate] ${violations.length} violation(s) detected:`);
+    logger.error(
+      `[notausgang.validate] ${violations.length} violation${violations.length === 1 ? "" : "s"} detected:`,
+    );
     for (const v of violations) {
       logger.error(`  [${v.rule}] ${v.message}${v.file ? ` (${v.file})` : ""}`);
     }
@@ -787,11 +789,11 @@ export async function runNotausgangValidate(
       violations,
     },
     exitCode: hasViolations ? 1 : 0,
-    summary: `[notausgang.validate] ${hasViolations ? "invalid" : "valid"} — ${violations.length} violation(s), ${liveKeyScan}`,
+    summary: `[notausgang.validate] ${hasViolations ? "invalid" : "valid"} — ${violations.length} violation${violations.length === 1 ? "" : "s"}, ${liveKeyScan}`,
     nextSteps: hasViolations
       ? [
           {
-            action: `Fix the ${violations.length} violation(s) above, then re-run: pnpm exec werkstatt run notausgang.validate --site <system-id>`,
+            action: `Fix the ${violations.length} violation${violations.length === 1 ? "" : "s"} above, then re-run: pnpm exec werkstatt run notausgang.validate --site <system-id>`,
             kind: "required",
           },
         ]
